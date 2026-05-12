@@ -65,12 +65,20 @@ function getPublicBaseUrl(req) {
   return proto + "://" + host;
 }
 
+function getProxyExtension(sourceUrl) {
+  const cleanUrl = String(sourceUrl || "").split("?")[0].toLowerCase();
+  const match = cleanUrl.match(/\.([a-z0-9]{2,5})$/);
+  if (match) return match[1];
+  return "m3u8";
+}
+
 function getProxyUrl(req, stream) {
   const payload = {
     url: stream.url,
     headers: stream.headers || {}
   };
-  return getPublicBaseUrl(req) + "/proxy/" + base64UrlEncode(JSON.stringify(payload));
+  const extension = getProxyExtension(stream.url);
+  return getPublicBaseUrl(req) + "/proxy/" + base64UrlEncode(JSON.stringify(payload)) + "/stream." + extension;
 }
 
 function escapeHtml(value) {
@@ -150,7 +158,7 @@ function parseStreamPath(pathname) {
 }
 
 function parseProxyPath(pathname) {
-  const match = pathname.match(/^\/proxy\/([^/]+)$/);
+  const match = pathname.match(/^\/proxy\/([^/]+)(?:\/[^/]+)?$/);
   if (!match) return null;
 
   try {
@@ -201,6 +209,19 @@ function loadProvider(provider) {
 
 function isPlaylistUrl(url) {
   return /\.m3u8(?:[?#]|$)/i.test(url);
+}
+
+function isMp4Url(url) {
+  return /\.mp4(?:[?#]|$)/i.test(url);
+}
+
+function getStreamRank(stream) {
+  if (!stream || !stream.originalUrl && !stream.url) return 50;
+  const url = stream.url || "";
+  if (isMp4Url(url)) return 0;
+  if (isPlaylistUrl(url)) return 10;
+  if (stream.isDirect) return 20;
+  return 40;
 }
 
 function shouldProxyStream(stream) {
@@ -382,6 +403,7 @@ async function getStreams(request, req) {
         const stremioStream = toStremioStream(stream, provider, req);
         if (!stremioStream || seen.has(stremioStream.url)) continue;
         seen.add(stremioStream.url);
+        stremioStream._rank = getStreamRank(stream);
         streams.push(stremioStream);
       }
     } catch (error) {
@@ -389,7 +411,12 @@ async function getStreams(request, req) {
     }
   }
 
-  return streams;
+  return streams
+    .sort((a, b) => (a._rank || 0) - (b._rank || 0))
+    .map((stream) => {
+      delete stream._rank;
+      return stream;
+    });
 }
 
 const server = http.createServer(async (req, res) => {
