@@ -95,9 +95,10 @@
         "mp4",
         "mkv"
       ],
-      "limited": false,
+      "limited": true,
       "disabledPlatforms": [],
-      "supportsExternalPlayer": false
+      "supportsExternalPlayer": false,
+      "notes": "Inconsistent during tests: can work, but may timeout."
     },
     {
       "id": "french-anime",
@@ -215,9 +216,10 @@
         "mp4",
         "mkv"
       ],
-      "limited": false,
+      "limited": true,
       "disabledPlatforms": [],
-      "supportsExternalPlayer": false
+      "supportsExternalPlayer": false,
+      "notes": "Returned 0 streams for One Piece S1E1 during latest tests."
     },
     {
       "id": "movix",
@@ -291,7 +293,8 @@
       ],
       "limited": true,
       "disabledPlatforms": [],
-      "supportsExternalPlayer": false
+      "supportsExternalPlayer": false,
+      "notes": "Timed out during latest tests."
     },
     {
       "id": "frenchstream",
@@ -411,7 +414,8 @@
         "hi",
         "es",
         "pt"
-      ]
+      ],
+      "notes": "Works but can be slow; use a higher test timeout."
     },
     {
       "id": "cinemacity",
@@ -439,7 +443,9 @@
         "id",
         "pl",
         "ar"
-      ]
+      ],
+      "limited": true,
+      "notes": "Returned 0 streams without private cookie/access during latest tests."
     }
   ]
 }

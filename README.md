@@ -17,24 +17,26 @@ https://raw.githubusercontent.com/Madrador60/Plugins-nuvio/refs/heads/main/
 
 ## Providers inclus
 
-- Anime-Sama (`anime-sama`)
-- VoirAnime (`voiranime`)
-- Vostfree (`vostfree`)
-- AnimoFlix (`animoflix`)
-- French-Anime (`french-anime`)
-- AnimeVOSTFR (`animevostfr`)
-- AnimesUltra (`animesultra`)
-- JetAnimes (`jetanimes`)
-- Sekai (`sekai`)
-- Movix (`movix`)
-- Mugiwara-no-Streaming (`mugiwarastream`)
-- AnimeSite (`animesite`)
-- Frenchstream (`frenchstream`)
-- Nakios (`nakios`)
-- Purstream (`purstream`)
-- ToFlix (`toflix`)
-- VIDEASY (`videasy`)
-- CinemaCity (`cinemacity`)
+| Provider | ID | Type | Langue | Notes |
+|---|---|---|---|---|
+| Anime-Sama | `anime-sama` | Anime | FR | Gros catalogue anime |
+| VoirAnime | `voiranime` | Anime | FR | Anime VF/VOSTFR |
+| Vostfree | `vostfree` | Anime | FR | Anime VF/VOSTFR |
+| AnimoFlix | `animoflix` | Anime | FR | Anime VF/VOSTFR |
+| French-Anime | `french-anime` | Anime | FR | Anime VF/VOSTFR |
+| AnimeVOSTFR | `animevostfr` | Anime | FR | Anime VF/VOSTFR |
+| AnimesUltra | `animesultra` | Anime | FR | Anime VF/VOSTFR |
+| JetAnimes | `jetanimes` | Anime | FR | Anime |
+| Sekai | `sekai` | Anime | FR | Streams directs rapides |
+| Movix | `movix` | Films/series | FR | VF/VOSTFR |
+| Mugiwara-no-Streaming | `mugiwarastream` | Anime | FR | API Next.js |
+| AnimeSite | `animesite` | Anime | FR | Provider limite |
+| Frenchstream | `frenchstream` | Films/series | FR | Domaines fallback inclus |
+| Nakios | `nakios` | Films/series | FR/EN | Qualite 4K possible |
+| Purstream | `purstream` | Films/series | FR/EN | VF/VOSTFR/MULTI |
+| ToFlix | `toflix` | Films/series | FR/EN | VF/VOSTFR |
+| VIDEASY | `videasy` | Multi | FR/multi | Provider limite |
+| CinemaCity | `cinemacity` | Multi | FR/multi | Peut necessiter un acces/cookie selon les contenus |
 
 ## Structure
 
@@ -100,6 +102,32 @@ cd C:\Users\madra\Desktop\teste
 node -e "const p=require('./providers/frenchstream.js'); p.getStreams('872585','movie').then(x=>console.log(x.length, x)).catch(console.error)"
 ```
 
+Tu peux aussi utiliser le script de test inclus :
+
+```powershell
+node scripts\test-providers.js
+```
+
+Pour un test plus realiste, surtout avec les providers lents :
+
+```powershell
+node scripts\test-providers.js --timeout=45000
+```
+
+Tester seulement certains providers :
+
+```powershell
+node scripts\test-providers.js --only=frenchstream,movix,cinemacity
+```
+
+Limiter le nombre de providers testes :
+
+```powershell
+node scripts\test-providers.js --limit=3
+```
+
+Le dernier rapport de test est dans `TESTING.md`.
+
 Exemples TMDB utiles :
 
 ```text
@@ -135,10 +163,10 @@ git push
 
 ## A ameliorer
 
-- Mettre a jour automatiquement les domaines qui changent souvent, surtout Frenchstream et ses miroirs.
-- Tester regulierement les providers pour savoir lesquels retournent vraiment des streams.
-- Ajouter un petit script de test qui lance tous les providers et affiche `OK`, `0 stream`, ou `erreur`.
-- Ajouter une colonne dans le README avec le type principal : anime, films, series, multi.
+- Utiliser `scripts/test-providers.js` regulierement et desactiver les providers qui restent morts trop longtemps.
+- Ajouter un fichier `domains.json` pour centraliser les domaines qui changent souvent.
+- Ajouter le meme systeme de fallback de domaines a Movix, Purstream, ToFlix et Nakios.
+- Corriger ou remplacer `sekai`, `animesite` et `cinemacity` si les prochains tests restent a `0` ou en timeout.
 - Nettoyer les providers bundles quand c'est possible pour faciliter les corrections.
 - Ajouter plus de logos stables, de preference heberges sur GitHub ou un CDN fiable.
 - Verifier les providers marques `limited` et indiquer leurs limites dans le README.
