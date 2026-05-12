@@ -1,4 +1,4 @@
-# Michat88's Nuvio Providers
+# Madrador60's Nuvio Providers
 
 A collection of local scrapers for the Nuvio streaming application. These scrapers allow you to fetch streams from various sources directly within the app.
 
@@ -8,7 +8,7 @@ A collection of local scrapers for the Nuvio streaming application. These scrape
 2. Go to Settings → Local Scrapers
 3. Add this repository URL (**Copy exactly as shown below**):
    ```
-   https://raw.githubusercontent.com/michat88/nuvio-providers/refs/heads/main/
+   https://raw.githubusercontent.com/Madrador60/Plugins-nuvio/refs/heads/main/
    ```
    > **Note:** The `refs/heads/main/` part is required by the Nuvio app. Do not remove it.
 
@@ -154,4 +154,4 @@ If you believe content is violating copyright laws, please contact the **actual 
 
 ---
 
-**Thank You for using Michat88's Nuvio Providers!**
+**Thank You for using Madrador60's Nuvio Providers!**
