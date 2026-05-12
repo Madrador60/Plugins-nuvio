@@ -15,6 +15,31 @@ https://raw.githubusercontent.com/Madrador60/Plugins-nuvio/refs/heads/main/
 4. Rafraichis la liste
 5. Active les providers que tu veux utiliser
 
+## Version Stremio
+
+Le dossier `stremio/` contient aussi un addon Stremio local qui reutilise les providers de ce repo.
+
+Lancer l'addon :
+
+```powershell
+node stremio\server.js
+```
+
+Ajouter dans Stremio :
+
+```text
+http://127.0.0.1:7000/manifest.json
+```
+
+Sur TV/telephone, remplace `127.0.0.1` par l'adresse IP du PC qui lance le serveur.
+
+Pour limiter les providers utilises par Stremio :
+
+```powershell
+$env:STREMIO_PROVIDERS='frenchstream,movix,nakios'
+node stremio\server.js
+```
+
 ## Providers inclus
 
 | Provider | ID | Type | Langue | Notes |

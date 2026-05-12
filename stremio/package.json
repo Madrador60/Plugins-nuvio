@@ -1,0 +1,13 @@
+{
+  "name": "madrador60-stremio-addon",
+  "version": "1.0.0",
+  "description": "Stremio addon wrapper for Madrador60 Nuvio providers.",
+  "main": "server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
