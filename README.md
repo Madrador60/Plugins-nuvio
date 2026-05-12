@@ -13,7 +13,18 @@ https://raw.githubusercontent.com/Madrador60/Plugins-nuvio/refs/heads/main/
 ## Providers inclus
 
 - Anime-Sama
+- VoirAnime
+- VostFree
+- AnimoFlix
+- French Anime
+- AnimeVostFR
+- AnimesUltra
+- JetAnimes
+- Sekai
 - Movix VF
+- MugiwaraStream
+- AnimeSite
+- FrenchStream
 - Nakios
 - Purstream
 - ToFlix
