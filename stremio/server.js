@@ -29,6 +29,19 @@ const animeProviders = new Set([
   "animesite"
 ]);
 
+function base64UrlEncode(value) {
+  return Buffer.from(value, "utf8")
+    .toString("base64")
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_")
+    .replace(/=+$/g, "");
+}
+
+function base64UrlDecode(value) {
+  const padded = value.replace(/-/g, "+").replace(/_/g, "/").padEnd(Math.ceil(value.length / 4) * 4, "=");
+  return Buffer.from(padded, "base64").toString("utf8");
+}
+
 function sendJson(res, status, payload) {
   res.writeHead(status, {
     "content-type": "application/json; charset=utf-8",
@@ -50,6 +63,14 @@ function getPublicBaseUrl(req) {
   const proto = req.headers["x-forwarded-proto"] || "http";
   const host = req.headers["x-forwarded-host"] || req.headers.host || "localhost:" + PORT;
   return proto + "://" + host;
+}
+
+function getProxyUrl(req, stream) {
+  const payload = {
+    url: stream.url,
+    headers: stream.headers || {}
+  };
+  return getPublicBaseUrl(req) + "/proxy/" + base64UrlEncode(JSON.stringify(payload));
 }
 
 function escapeHtml(value) {
@@ -128,6 +149,22 @@ function parseStreamPath(pathname) {
   };
 }
 
+function parseProxyPath(pathname) {
+  const match = pathname.match(/^\/proxy\/([^/]+)$/);
+  if (!match) return null;
+
+  try {
+    const payload = JSON.parse(base64UrlDecode(match[1]));
+    if (!payload || typeof payload.url !== "string") return null;
+    return {
+      url: payload.url,
+      headers: payload.headers && typeof payload.headers === "object" ? payload.headers : {}
+    };
+  } catch (_) {
+    return null;
+  }
+}
+
 function withTimeout(promise, ms, label) {
   return new Promise((resolve) => {
     const timer = setTimeout(() => {
@@ -162,6 +199,104 @@ function loadProvider(provider) {
   return require(providerPath);
 }
 
+function isPlaylistUrl(url) {
+  return /\.m3u8(?:[?#]|$)/i.test(url);
+}
+
+function shouldProxyStream(stream) {
+  if (!stream || !stream.url) return false;
+  if (stream.headers && Object.keys(stream.headers).length > 0) return true;
+  return isPlaylistUrl(stream.url);
+}
+
+function rewritePlaylist(content, sourceUrl, req, headers) {
+  return content.split(/\r?\n/).map((line) => {
+    const trimmed = line.trim();
+    if (!trimmed) return line;
+
+    if (trimmed.startsWith("#")) {
+      return line.replace(/URI="([^"]+)"/g, (match, value) => {
+        try {
+          const absoluteUrl = new URL(value, sourceUrl).toString();
+          return "URI=\"" + getProxyUrl(req, { url: absoluteUrl, headers }) + "\"";
+        } catch (_) {
+          return match;
+        }
+      });
+    }
+
+    try {
+      const absoluteUrl = new URL(trimmed, sourceUrl).toString();
+      return getProxyUrl(req, { url: absoluteUrl, headers });
+    } catch (_) {
+      return line;
+    }
+  }).join("\n");
+}
+
+function copyProxyHeaders(upstream, res, contentLengthOverride) {
+  const headers = {
+    "access-control-allow-origin": "*",
+    "accept-ranges": upstream.headers.get("accept-ranges") || "bytes"
+  };
+
+  const contentType = upstream.headers.get("content-type");
+  const contentLength = typeof contentLengthOverride === "number" ? String(contentLengthOverride) : upstream.headers.get("content-length");
+  const contentRange = upstream.headers.get("content-range");
+
+  if (contentType) headers["content-type"] = contentType;
+  if (contentLength) headers["content-length"] = contentLength;
+  if (contentRange) headers["content-range"] = contentRange;
+
+  return headers;
+}
+
+async function proxyMedia(req, res, proxyRequest) {
+  const requestHeaders = Object.assign({}, proxyRequest.headers);
+  if (req.headers.range) requestHeaders.Range = req.headers.range;
+
+  const upstream = await fetch(proxyRequest.url, {
+    headers: requestHeaders,
+    redirect: "follow"
+  });
+
+  if (!upstream.ok && upstream.status !== 206) {
+    sendJson(res, upstream.status, { error: "Upstream HTTP " + upstream.status });
+    return;
+  }
+
+  const contentType = upstream.headers.get("content-type") || "";
+  if (isPlaylistUrl(proxyRequest.url) || contentType.includes("mpegurl") || contentType.includes("m3u8")) {
+    const text = await upstream.text();
+    const rewritten = rewritePlaylist(text, proxyRequest.url, req, proxyRequest.headers);
+    res.writeHead(upstream.status, {
+      "content-type": "application/vnd.apple.mpegurl; charset=utf-8",
+      "access-control-allow-origin": "*",
+      "cache-control": "no-store"
+    });
+    res.end(rewritten);
+    return;
+  }
+
+  res.writeHead(upstream.status, copyProxyHeaders(upstream, res));
+  if (!upstream.body) {
+    res.end();
+    return;
+  }
+
+  const reader = upstream.body.getReader();
+  try {
+    while (true) {
+      const chunk = await reader.read();
+      if (chunk.done) break;
+      res.write(Buffer.from(chunk.value));
+    }
+    res.end();
+  } catch (error) {
+    res.destroy(error);
+  }
+}
+
 async function resolveTmdb(imdbId, mediaType) {
   if (!imdbId || !imdbId.startsWith("tt")) {
     return { tmdbId: imdbId, mediaType };
@@ -193,7 +328,7 @@ async function resolveTmdb(imdbId, mediaType) {
   throw new Error("No TMDB match for " + imdbId);
 }
 
-function toStremioStream(stream, provider) {
+function toStremioStream(stream, provider, req) {
   if (!stream || !stream.url || typeof stream.url !== "string") return null;
 
   const quality = stream.quality || "HD";
@@ -206,7 +341,7 @@ function toStremioStream(stream, provider) {
   const result = {
     name: provider.name || stream.name || provider.id,
     title: titleParts.join("\n"),
-    url: stream.url,
+    url: shouldProxyStream(stream) ? getProxyUrl(req, stream) : stream.url,
     behaviorHints: {
       notWebReady: false
     }
@@ -222,7 +357,7 @@ function toStremioStream(stream, provider) {
   return result;
 }
 
-async function getStreams(request) {
+async function getStreams(request, req) {
   const resolved = await resolveTmdb(request.imdbId, request.mediaType);
   const providers = getEnabledProviders(resolved.mediaType);
   const streams = [];
@@ -244,7 +379,7 @@ async function getStreams(request) {
       }
 
       for (const stream of result.streams) {
-        const stremioStream = toStremioStream(stream, provider);
+        const stremioStream = toStremioStream(stream, provider, req);
         if (!stremioStream || seen.has(stremioStream.url)) continue;
         seen.add(stremioStream.url);
         streams.push(stremioStream);
@@ -298,9 +433,15 @@ const server = http.createServer(async (req, res) => {
       return;
     }
 
+    const proxyRequest = parseProxyPath(url.pathname);
+    if (proxyRequest) {
+      await proxyMedia(req, res, proxyRequest);
+      return;
+    }
+
     const streamRequest = parseStreamPath(url.pathname);
     if (streamRequest) {
-      const streams = await getStreams(streamRequest);
+      const streams = await getStreams(streamRequest, req);
       sendJson(res, 200, { streams });
       return;
     }
