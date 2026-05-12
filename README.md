@@ -29,6 +29,7 @@ https://raw.githubusercontent.com/Madrador60/Plugins-nuvio/refs/heads/main/
 - Purstream
 - ToFlix
 - VIDEASY
+- CinemaCity
 
 ## Notes
 
