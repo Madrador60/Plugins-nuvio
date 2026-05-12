@@ -133,12 +133,24 @@ function renderHomePage(req) {
     "</head>" +
     "<body><main>" +
     "<div class=\"hero\"><h1>Madrador60 FR Providers</h1><p class=\"lead\">Addon Stremio heberge pour films, series et animes francais. Ajoute l'URL du manifest dans Stremio et lance ton contenu.</p>" +
-    "<div class=\"actions\"><a class=\"btn primary\" href=\"" + escapeHtml(stremioInstallUrl) + "\">Installer dans Stremio</a><a class=\"btn\" href=\"/manifest.json\">Voir le manifest</a><a class=\"btn\" href=\"https://github.com/Madrador60/Plugins-nuvio\">GitHub</a></div></div>" +
+    "<div class=\"actions\"><a class=\"btn primary\" href=\"" + escapeHtml(stremioInstallUrl) + "\">Installer dans Stremio</a><a class=\"btn\" href=\"/manifest.json\">Voir le manifest</a><a class=\"btn\" href=\"/test-player\">Tester la lecture</a><a class=\"btn\" href=\"https://github.com/Madrador60/Plugins-nuvio\">GitHub</a></div></div>" +
     "<div class=\"grid\"><div class=\"box\"><strong>" + movieProviders.length + "</strong><span>providers films/series</span></div><div class=\"box\"><strong>" + seriesProviders.length + "</strong><span>providers series/animes</span></div><div class=\"box\"><strong>FR</strong><span>sources francaises en priorite</span></div></div>" +
     "<section><h2>URL a mettre dans Stremio</h2><code>" + escapeHtml(manifestUrl) + "</code><p class=\"note\">Sur Render gratuit, le premier chargement peut etre lent si le service etait en veille.</p></section>" +
     "<section><h2>Providers actifs</h2><table><thead><tr><th>Provider</th><th>Langues</th><th>Etat</th></tr></thead><tbody>" + providerRows + "</tbody></table></section>" +
     "<section><h2>Pour Nuvio</h2><code>https://raw.githubusercontent.com/Madrador60/Plugins-nuvio/refs/heads/main/</code></section>" +
     "</main></body></html>";
+}
+
+function renderTestPlayerPage() {
+  return "<!doctype html>" +
+    "<html lang=\"fr\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">" +
+    "<title>Test lecture</title><style>body{margin:0;background:#111315;color:#f5f7fa;font-family:Segoe UI,Arial,sans-serif}main{width:min(960px,calc(100% - 32px));margin:0 auto;padding:34px 0}video{width:100%;max-height:70vh;background:#000;border-radius:8px}button{min-height:42px;padding:0 14px;border-radius:8px;border:1px solid #30353b;background:#8b5cf6;color:white;font-weight:700}pre{white-space:pre-wrap;background:#080a0c;border:1px solid #30353b;border-radius:8px;padding:12px;color:#cbd5e1;overflow:auto}</style></head>" +
+    "<body><main><h1>Test lecture Stremio</h1><p>Ce test lance le premier stream trouve pour Interstellar.</p><video id=\"video\" controls playsinline></video><p><button id=\"load\">Charger un stream</button></p><pre id=\"log\">Pret.</pre></main>" +
+    "<script src=\"https://cdn.jsdelivr.net/npm/hls.js@1\"></script><script>" +
+    "const log=document.getElementById('log');const video=document.getElementById('video');const btn=document.getElementById('load');" +
+    "function write(x){log.textContent += '\\n' + x}" +
+    "btn.onclick=async()=>{try{log.textContent='Chargement...';const data=await fetch('/stream/movie/tt0816692.json').then(r=>r.json());write('Streams: '+data.streams.length);const s=data.streams[0];write(JSON.stringify(s,null,2));if(!s) return; if(s.url.includes('.m3u8')){if(window.Hls&&Hls.isSupported()){const hls=new Hls();hls.loadSource(s.url);hls.attachMedia(video);hls.on(Hls.Events.ERROR,(e,d)=>write('HLS error: '+JSON.stringify(d)));}else if(video.canPlayType('application/vnd.apple.mpegurl')){video.src=s.url}else{write('HLS non supporte dans ce navigateur')}}else{video.src=s.url} await video.play().catch(e=>write('play blocked: '+e.message));}catch(e){write('Erreur: '+(e.stack||e.message||e))}};" +
+    "</script></body></html>";
 }
 
 function parseStreamPath(pathname) {
@@ -352,6 +364,7 @@ async function resolveTmdb(imdbId, mediaType) {
 function toStremioStream(stream, provider, req) {
   if (!stream || !stream.url || typeof stream.url !== "string") return null;
 
+  const proxied = shouldProxyStream(stream);
   const quality = stream.quality || "HD";
   const titleParts = [
     stream.title || provider.name,
@@ -362,13 +375,13 @@ function toStremioStream(stream, provider, req) {
   const result = {
     name: provider.name || stream.name || provider.id,
     title: titleParts.join("\n"),
-    url: shouldProxyStream(stream) ? getProxyUrl(req, stream) : stream.url,
+    url: proxied ? getProxyUrl(req, stream) : stream.url,
     behaviorHints: {
       notWebReady: false
     }
   };
 
-  if (stream.headers && Object.keys(stream.headers).length > 0) {
+  if (!proxied && stream.headers && Object.keys(stream.headers).length > 0) {
     result.headers = stream.headers;
     result.behaviorHints.proxyHeaders = {
       request: stream.headers
@@ -434,6 +447,11 @@ const server = http.createServer(async (req, res) => {
 
     if (url.pathname === "/") {
       sendHtml(res, 200, renderHomePage(req));
+      return;
+    }
+
+    if (url.pathname === "/test-player") {
+      sendHtml(res, 200, renderTestPlayerPage());
       return;
     }
 
