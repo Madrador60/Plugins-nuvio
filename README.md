@@ -1,39 +1,69 @@
-# Madrador60 Nuvio Providers FR
+# Plugins Nuvio FR
 
-Collection de providers francais pour Nuvio. Le repo contient des fichiers JavaScript prets a charger dans l'app via les Local Scrapers.
+Providers francais pour **Nuvio**, avec un petit addon local pour **Stremio**.
 
-## Installation rapide
+Le but du repo est simple : tu copies une URL, tu l'ajoutes dans l'application, et tu actives les sources qui t'interessent.
 
-1. Ouvre **Nuvio**
-2. Va dans **Settings** puis **Plugins** ou **Local Scrapers**
-3. Ajoute cette URL :
+## Installer sur Nuvio
+
+### 1. Copier l'URL du repo
 
 ```text
 https://raw.githubusercontent.com/Madrador60/Plugins-nuvio/refs/heads/main/
 ```
 
+### 2. Ajouter l'URL dans Nuvio
+
+Dans Nuvio :
+
+1. Ouvre **Settings**
+2. Va dans **Plugins** ou **Local Scrapers**
+3. Colle l'URL du repo
 4. Rafraichis la liste
 5. Active les providers que tu veux utiliser
 
-## Version Stremio
+### 3. Tester
 
-Le dossier `stremio/` contient aussi un addon Stremio local qui reutilise les providers de ce repo.
+Lance un film, une serie ou un anime. Si un provider ne donne rien, essaie un autre provider : certains sites changent souvent de domaine ou ne proposent pas tous les contenus.
 
-Lancer l'addon :
+## Installer sur Stremio
+
+L'addon Stremio est local : il faut laisser le serveur ouvert sur ton PC pendant que tu utilises Stremio.
+
+### 1. Lancer l'addon
+
+Dans le dossier du repo :
 
 ```powershell
 node stremio\server.js
 ```
 
-Ajouter dans Stremio :
+### 2. Ajouter l'addon dans Stremio
+
+Dans Stremio, ajoute :
 
 ```text
 http://127.0.0.1:7000/manifest.json
 ```
 
-Sur TV/telephone, remplace `127.0.0.1` par l'adresse IP du PC qui lance le serveur.
+Si tu utilises Stremio sur une TV ou un telephone, remplace `127.0.0.1` par l'adresse IP du PC qui lance le serveur.
 
-Pour limiter les providers utilises par Stremio :
+Exemple :
+
+```text
+http://192.168.1.20:7000/manifest.json
+```
+
+### Options utiles
+
+Changer le port :
+
+```powershell
+$env:PORT='7100'
+node stremio\server.js
+```
+
+Limiter les providers utilises par Stremio :
 
 ```powershell
 $env:STREMIO_PROVIDERS='frenchstream,movix,nakios'
@@ -42,56 +72,67 @@ node stremio\server.js
 
 ## Providers inclus
 
-| Provider | ID | Type | Langue | Notes |
-|---|---|---|---|---|
-| Anime-Sama | `anime-sama` | Anime | FR | Gros catalogue anime |
-| VoirAnime | `voiranime` | Anime | FR | Anime VF/VOSTFR |
-| Vostfree | `vostfree` | Anime | FR | Anime VF/VOSTFR |
-| AnimoFlix | `animoflix` | Anime | FR | Anime VF/VOSTFR |
-| French-Anime | `french-anime` | Anime | FR | Anime VF/VOSTFR |
-| AnimeVOSTFR | `animevostfr` | Anime | FR | Anime VF/VOSTFR |
-| AnimesUltra | `animesultra` | Anime | FR | Anime VF/VOSTFR |
-| JetAnimes | `jetanimes` | Anime | FR | Anime |
-| Sekai | `sekai` | Anime | FR | Streams directs rapides |
-| Movix | `movix` | Films/series | FR | VF/VOSTFR |
-| Mugiwara-no-Streaming | `mugiwarastream` | Anime | FR | API Next.js |
-| AnimeSite | `animesite` | Anime | FR | Provider limite |
-| Frenchstream | `frenchstream` | Films/series | FR | Domaines fallback inclus |
-| Nakios | `nakios` | Films/series | FR/EN | Qualite 4K possible |
-| Purstream | `purstream` | Films/series | FR/EN | VF/VOSTFR/MULTI |
-| ToFlix | `toflix` | Films/series | FR/EN | VF/VOSTFR |
-| VIDEASY | `videasy` | Multi | FR/multi | Provider limite |
-| CinemaCity | `cinemacity` | Multi | FR/multi | Peut necessiter un acces/cookie selon les contenus |
+### Films et series
 
-## Structure
+| Provider | Langue | Etat |
+|---|---|---|
+| Frenchstream | FR | Fonctionne, domaines fallback inclus |
+| Movix | FR | Fonctionne |
+| Nakios | FR/EN | Fonctionne |
+| Purstream | FR/EN | Fonctionne |
+| ToFlix | FR/EN | Fonctionne |
+| VIDEASY | Multi dont FR | Fonctionne mais peut etre lent |
+| CinemaCity | Multi dont FR | Limite, peut demander un acces/cookie |
 
-```text
-Plugins-nuvio/
-├── providers/          # Providers JavaScript charges par Nuvio
-├── manifest.json       # Liste des providers disponibles
-├── README.md           # Documentation du repo
-└── LICENSE
+### Animes
+
+| Provider | Langue | Etat |
+|---|---|---|
+| Anime-Sama | FR | Fonctionne |
+| VoirAnime | FR | Fonctionne |
+| Vostfree | FR | Fonctionne |
+| French-Anime | FR | Fonctionne |
+| AnimeVOSTFR | FR | Fonctionne |
+| AnimesUltra | FR | Fonctionne |
+| JetAnimes | FR | Fonctionne mais parfois lent |
+| Mugiwara-no-Streaming | FR | Fonctionne |
+| AnimoFlix | FR | Instable selon les tests |
+| Sekai | FR | Limite selon les contenus |
+| AnimeSite | FR | Instable selon les tests |
+
+## Pourquoi un provider peut ne rien afficher ?
+
+- Le site a change de domaine.
+- Le film ou l'episode n'existe pas sur ce site.
+- Le site bloque temporairement les requetes.
+- Le provider est lent et depasse le timeout.
+- Certains liens demandent des headers speciaux selon le lecteur.
+
+## Tester les providers
+
+Depuis le dossier du repo :
+
+```powershell
+node scripts\test-providers.js
 ```
 
-## Comment ca marche
+Tester seulement certains providers :
 
-Nuvio lit d'abord `manifest.json`. Chaque entree du manifest pointe vers un fichier dans `providers/`.
-
-Exemple :
-
-```json
-{
-  "id": "frenchstream",
-  "name": "Frenchstream",
-  "filename": "providers/frenchstream.js",
-  "supportedTypes": ["movie", "tv"],
-  "enabled": true,
-  "contentLanguage": ["fr"],
-  "formats": ["mp4", "mkv", "m3u8"]
-}
+```powershell
+node scripts\test-providers.js --only=frenchstream,movix,nakios
 ```
 
-Chaque fichier provider doit exporter une fonction :
+Donner plus de temps aux providers lents :
+
+```powershell
+node scripts\test-providers.js --timeout=45000
+```
+
+Le dernier rapport est disponible ici : [TESTING.md](TESTING.md)
+
+## Pour contribuer
+
+Un provider Nuvio doit etre dans `providers/` et exporter une fonction `getStreams`.
 
 ```javascript
 function getStreams(tmdbId, mediaType, seasonNum, episodeNum) {
@@ -101,107 +142,23 @@ function getStreams(tmdbId, mediaType, seasonNum, episodeNum) {
 module.exports = { getStreams };
 ```
 
-## Format des streams
+Ensuite, il faut l'ajouter dans [manifest.json](manifest.json).
 
-Un provider doit retourner un tableau d'objets comme celui-ci :
-
-```javascript
-{
-  name: "Provider",
-  title: "VF - 1080p",
-  url: "https://...",
-  quality: "1080p",
-  size: "Unknown",
-  headers: {
-    "Referer": "https://source.example/"
-  }
-}
-```
-
-## Tester un provider
-
-Tu peux tester un provider avec Node.js :
-
-```powershell
-cd C:\Users\madra\Desktop\teste
-node -e "const p=require('./providers/frenchstream.js'); p.getStreams('872585','movie').then(x=>console.log(x.length, x)).catch(console.error)"
-```
-
-Tu peux aussi utiliser le script de test inclus :
-
-```powershell
-node scripts\test-providers.js
-```
-
-Pour un test plus realiste, surtout avec les providers lents :
-
-```powershell
-node scripts\test-providers.js --timeout=45000
-```
-
-Tester seulement certains providers :
-
-```powershell
-node scripts\test-providers.js --only=frenchstream,movix,cinemacity
-```
-
-Limiter le nombre de providers testes :
-
-```powershell
-node scripts\test-providers.js --limit=3
-```
-
-Le dernier rapport de test est dans `TESTING.md`.
-
-Exemples TMDB utiles :
+## Structure du repo
 
 ```text
-872585  Oppenheimer
-157336  Interstellar
-1399    Game of Thrones
+Plugins-nuvio/
+  providers/          Providers Nuvio
+  stremio/            Addon Stremio local
+  scripts/            Outils de test
+  manifest.json       Liste des providers Nuvio
+  domains.json        Domaines connus / fallbacks
+  TESTING.md          Derniers tests
 ```
 
-Pour une serie :
+## Notes
 
-```powershell
-node -e "const p=require('./providers/frenchstream.js'); p.getStreams('1399','tv',1,1).then(x=>console.log(x.length, x)).catch(console.error)"
-```
-
-## Ajouter un provider
-
-1. Ajoute le fichier dans `providers/monprovider.js`
-2. Verifie qu'il exporte `getStreams`
-3. Ajoute une entree dans `manifest.json`
-4. Teste la syntaxe :
-
-```powershell
-node --check providers\monprovider.js
-```
-
-5. Commit et push :
-
-```powershell
-git add .
-git commit -m "Add MonProvider"
-git push
-```
-
-## A ameliorer
-
-- Utiliser `scripts/test-providers.js` regulierement et desactiver les providers qui restent morts trop longtemps.
-- Ajouter un fichier `domains.json` pour centraliser les domaines qui changent souvent.
-- Ajouter le meme systeme de fallback de domaines a Movix, Purstream, ToFlix et Nakios.
-- Corriger ou remplacer `sekai`, `animesite` et `cinemacity` si les prochains tests restent a `0` ou en timeout.
-- Nettoyer les providers bundles quand c'est possible pour faciliter les corrections.
-- Ajouter plus de logos stables, de preference heberges sur GitHub ou un CDN fiable.
-- Verifier les providers marques `limited` et indiquer leurs limites dans le README.
-
-## Notes importantes
-
-- Certains providers peuvent apparaitre dans Nuvio mais retourner `0` stream selon le film, la serie, la langue ou le domaine actuel.
-- Les domaines changent souvent. Quand un site change de domaine, il faut mettre a jour le provider ou ajouter le nouveau domaine dans ses fallbacks.
-- Ce repo ne stocke aucune video.
-
-## Disclaimer
-
-Ce repository ne contient aucun contenu video et n'heberge aucun stream. Les providers fonctionnent comme des scrapers locaux pour Nuvio. Les utilisateurs sont responsables de leur utilisation et du respect des lois applicables.
+- Le repo ne contient aucune video.
+- Les providers ne font que chercher des liens depuis des sites externes.
+- Les domaines changent souvent, donc certains providers peuvent casser puis etre corriges.
+- Utilise ce repo en respectant les lois applicables dans ton pays.
