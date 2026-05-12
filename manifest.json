@@ -5,7 +5,7 @@
     {
       "id": "kisskh",
       "name": "Kisskh",
-      "description": "Asian Drama & Anime streaming",
+      "description": "Streams Korean dramas and movies from onlykdrama.top",
       "version": "1.0.0",
       "author": "Michat88",
       "supportedTypes": [
@@ -18,18 +18,20 @@
         "mp4",
         "m3u8"
       ],
-      "logo": "https://kisskh.ovh/favicon.ico",
+      "logo": "https://i.postimg.cc/2yLnTzPP/kisskh.jpg",
       "contentLanguage": [
-        "en",
-        "id"
+        "ko",
+        "ch",
+        "ja",
+        "th"
       ]
     },
     {
       "id": "4khdhub",
-      "name": "4khdhub",
-      "description": "Auto-generated description for 4khdhub",
-      "version": "1.0.0",
-      "author": "Michat88",
+      "name": "4KHDHub",
+      "description": "4KHDHub direct links",
+      "version": "1.0.2",
+      "author": "Nuvio Team",
       "supportedTypes": [
         "movie",
         "tv"
@@ -37,20 +39,19 @@
       "filename": "providers/4khdhub.js",
       "enabled": true,
       "formats": [
-        "mp4",
-        "m3u8"
+        "mkv"
       ],
-      "logo": "https://via.placeholder.com/150",
+      "logo": "https://www.google.com/s2/favicons?domain=4khdhub.click&sz=128",
       "contentLanguage": [
         "en"
       ]
     },
     {
       "id": "animekai",
-      "name": "Animekai",
-      "description": "Auto-generated description for Animekai",
-      "version": "1.0.0",
-      "author": "Michat88",
+      "name": "AnimeKai",
+      "description": "AnimeKai TV episodes via AnimeKai servers",
+      "version": "1.1.0",
+      "author": "Nuvio Team",
       "supportedTypes": [
         "movie",
         "tv"
@@ -61,17 +62,18 @@
         "mp4",
         "m3u8"
       ],
-      "logo": "https://via.placeholder.com/150",
+      "logo": "https://animekai.to/assets/uploads/37585a39fe8c8d8fafaa2c7bfbf5374ecac859ea6a0288a6da2c61f5.png",
       "contentLanguage": [
         "en"
-      ]
+      ],
+      "limited": true
     },
     {
       "id": "castle",
       "name": "Castle",
-      "description": "Auto-generated description for Castle",
+      "description": "Multi Lang provider",
       "version": "1.0.0",
-      "author": "Michat88",
+      "author": "Nuvio Team",
       "supportedTypes": [
         "movie",
         "tv"
@@ -82,20 +84,24 @@
         "mp4",
         "m3u8"
       ],
-      "logo": "https://via.placeholder.com/150",
+      "logo": "https://static.hbayy.com/simple-blog-13/prod/_nuxt/big-logo.DESZ4mBj.png",
       "contentLanguage": [
-        "en"
+        "en",
+        "hi",
+        "ta",
+        "te",
+        "ml",
+        "kn"
       ]
     },
     {
       "id": "cinevibe",
       "name": "Cinevibe",
-      "description": "Auto-generated description for Cinevibe",
+      "description": "Cinevibe (Movies)",
       "version": "1.0.0",
-      "author": "Michat88",
+      "author": "Nuvio Team",
       "supportedTypes": [
-        "movie",
-        "tv"
+        "movie"
       ],
       "filename": "providers/cinevibe.js",
       "enabled": true,
@@ -103,17 +109,17 @@
         "mp4",
         "m3u8"
       ],
-      "logo": "https://via.placeholder.com/150",
+      "logo": "https://www.google.com/s2/favicons?domain=cinevibe.online&sz=128",
       "contentLanguage": [
         "en"
       ]
     },
     {
       "id": "dahmermovies",
-      "name": "Dahmermovies",
-      "description": "Auto-generated description for Dahmermovies",
-      "version": "1.0.0",
-      "author": "Michat88",
+      "name": "DahmerMovies",
+      "description": "Dahmer Movies streaming service. Can be slow at times to fetch and stream. Only use if needed.",
+      "version": "1.0.1",
+      "author": "Nuvio Team",
       "supportedTypes": [
         "movie",
         "tv"
@@ -121,20 +127,19 @@
       "filename": "providers/dahmermovies.js",
       "enabled": true,
       "formats": [
-        "mp4",
-        "m3u8"
+        "mkv"
       ],
-      "logo": "https://via.placeholder.com/150",
+      "logo": "https://image.similarpng.com/file/similarpng/very-thumbnail/2021/05/Letter-D-logo-design-template-with-geometric-shape-style-on-transparent-background-PNG.png",
       "contentLanguage": [
         "en"
       ]
     },
     {
       "id": "dvdplay",
-      "name": "Dvdplay",
-      "description": "Auto-generated description for Dvdplay",
-      "version": "1.0.0",
-      "author": "Michat88",
+      "name": "DVDPlay",
+      "description": "DVDPlay direct download links with HubCloud extraction",
+      "version": "1.0.2",
+      "author": "Nuvio Team",
       "supportedTypes": [
         "movie",
         "tv"
@@ -142,20 +147,21 @@
       "filename": "providers/dvdplay.js",
       "enabled": true,
       "formats": [
-        "mp4",
-        "m3u8"
+        "mkv"
       ],
-      "logo": "https://via.placeholder.com/150",
+      "logo": "https://www.google.com/s2/favicons?domain=dvdplay.com&sz=128",
       "contentLanguage": [
-        "en"
+        "mal",
+        "tam",
+        "hin"
       ]
     },
     {
       "id": "hdhub4u",
-      "name": "Hdhub4u",
-      "description": "Auto-generated description for Hdhub4u",
-      "version": "1.0.0",
-      "author": "Michat88",
+      "name": "HDHub4u",
+      "description": "Direct links from HDHub4u with high-speed download support",
+      "version": "1.1.0",
+      "author": "Nuvio Team",
       "supportedTypes": [
         "movie",
         "tv"
@@ -163,12 +169,13 @@
       "filename": "providers/hdhub4u.js",
       "enabled": true,
       "formats": [
-        "mp4",
-        "m3u8"
+        "mkv",
+        "mp4"
       ],
-      "logo": "https://via.placeholder.com/150",
+      "logo": "https://www.google.com/s2/favicons?domain=new6.hdhub4u.fo&sz=128",
       "contentLanguage": [
-        "en"
+        "en",
+        "hin"
       ]
     },
     {
@@ -215,23 +222,26 @@
     },
     {
       "id": "mallumv",
-      "name": "Mallumv",
-      "description": "Auto-generated description for Mallumv",
-      "version": "1.0.0",
-      "author": "Michat88",
+      "name": "MalluMV",
+      "description": "MalluMV direct links with support for Tamil, Telugu, Hindi, Malayalam, and Kannada movies",
+      "version": "1.0.1",
+      "author": "Nuvio Team",
       "supportedTypes": [
-        "movie",
-        "tv"
+        "movie"
       ],
       "filename": "providers/mallumv.js",
       "enabled": true,
       "formats": [
-        "mp4",
-        "m3u8"
+        "mkv",
+        "mp4"
       ],
-      "logo": "https://via.placeholder.com/150",
+      "logo": "https://mallumv.life/favicon.ico",
       "contentLanguage": [
-        "en"
+        "ta",
+        "te",
+        "hi",
+        "ml",
+        "kn"
       ]
     },
     {
@@ -256,32 +266,11 @@
       ]
     },
     {
-      "id": "moviebox",
-      "name": "Moviebox",
-      "description": "Auto-generated description for Moviebox",
-      "version": "1.0.0",
-      "author": "Michat88",
-      "supportedTypes": [
-        "movie",
-        "tv"
-      ],
-      "filename": "providers/moviebox.js",
-      "enabled": true,
-      "formats": [
-        "mp4",
-        "m3u8"
-      ],
-      "logo": "https://via.placeholder.com/150",
-      "contentLanguage": [
-        "en"
-      ]
-    },
-    {
       "id": "moviesmod",
-      "name": "Moviesmod",
-      "description": "Auto-generated description for Moviesmod",
-      "version": "1.0.0",
-      "author": "Michat88",
+      "name": "MoviesMod",
+      "description": "Movie and TV show streams from MoviesMod with multiple quality options",
+      "version": "1.0.1",
+      "author": "Nuvio Team",
       "supportedTypes": [
         "movie",
         "tv"
@@ -289,10 +278,9 @@
       "filename": "providers/moviesmod.js",
       "enabled": true,
       "formats": [
-        "mp4",
-        "m3u8"
+        "mkv"
       ],
-      "logo": "https://via.placeholder.com/150",
+      "logo": "https://www.google.com/s2/favicons?domain=moviesmod.farm&sz=128",
       "contentLanguage": [
         "en"
       ]
@@ -320,10 +308,10 @@
     },
     {
       "id": "netmirror",
-      "name": "Netmirror",
-      "description": "Auto-generated description for Netmirror",
-      "version": "1.0.0",
-      "author": "Michat88",
+      "name": "NetMirror",
+      "description": "Streaming links from netmirror. Automatically disabled on iOS due to compatibility issues.",
+      "version": "1.0.2",
+      "author": "Nuvio Team",
       "supportedTypes": [
         "movie",
         "tv"
@@ -334,17 +322,21 @@
         "mp4",
         "m3u8"
       ],
-      "logo": "https://via.placeholder.com/150",
+      "logo": "https://net22.cc/favicon.ico",
       "contentLanguage": [
         "en"
-      ]
+      ],
+      "disabledPlatforms": [
+        "ios"
+      ],
+      "supportsExternalPlayer": false
     },
     {
       "id": "showbox",
-      "name": "Showbox",
-      "description": "Auto-generated description for Showbox",
+      "name": "ShowBox",
+      "description": "ShowBox streaming with multiple quality options and versions",
       "version": "1.0.0",
-      "author": "Michat88",
+      "author": "Nuvio Team",
       "supportedTypes": [
         "movie",
         "tv"
@@ -353,19 +345,19 @@
       "enabled": true,
       "formats": [
         "mp4",
-        "m3u8"
+        "mkv"
       ],
-      "logo": "https://via.placeholder.com/150",
+      "logo": "https://raw.githubusercontent.com/tapframe/nuvio-providers/main/Assets/Logo-2.png",
       "contentLanguage": [
         "en"
       ]
     },
     {
       "id": "streamflix",
-      "name": "Streamflix",
-      "description": "Auto-generated description for Streamflix",
+      "name": "StreamFlix",
+      "description": "Direct links via StreamFlix API",
       "version": "1.0.0",
-      "author": "Michat88",
+      "author": "Nuvio Team",
       "supportedTypes": [
         "movie",
         "tv"
@@ -373,20 +365,20 @@
       "filename": "providers/streamflix.js",
       "enabled": true,
       "formats": [
-        "mp4",
-        "m3u8"
+        "mkv"
       ],
-      "logo": "https://via.placeholder.com/150",
+      "logo": "https://streamflix.app/assets/images/logo-text-148x72.png",
       "contentLanguage": [
-        "en"
+        "en",
+        "hin"
       ]
     },
     {
       "id": "uhdmovies",
-      "name": "Uhdmovies",
-      "description": "Auto-generated description for Uhdmovies",
-      "version": "1.0.0",
-      "author": "Michat88",
+      "name": "UHDMovies",
+      "description": "UHD Movies streaming with multiple resolution",
+      "version": "1.2.0",
+      "author": "Nuvio Team",
       "supportedTypes": [
         "movie",
         "tv"
@@ -394,20 +386,19 @@
       "filename": "providers/uhdmovies.js",
       "enabled": true,
       "formats": [
-        "mp4",
-        "m3u8"
+        "mkv"
       ],
-      "logo": "https://via.placeholder.com/150",
+      "logo": "https://www.google.com/s2/favicons?domain=uhdmovies.pink&sz=128",
       "contentLanguage": [
         "en"
       ]
     },
     {
       "id": "videasy",
-      "name": "Videasy",
-      "description": "Auto-generated description for Videasy",
+      "name": "VIDEASY",
+      "description": "VideoEasy streaming with multiple server support and languages",
       "version": "1.0.0",
-      "author": "Michat88",
+      "author": "Nuvio Team",
       "supportedTypes": [
         "movie",
         "tv"
@@ -415,20 +406,28 @@
       "filename": "providers/videasy.js",
       "enabled": true,
       "formats": [
+        "m3u8",
         "mp4",
-        "m3u8"
+        "mkv"
       ],
-      "logo": "https://via.placeholder.com/150",
+      "logo": "https://www.videasy.net/logo.png",
       "contentLanguage": [
-        "en"
-      ]
+        "en",
+        "de",
+        "it",
+        "fr",
+        "hi",
+        "es",
+        "pt"
+      ],
+      "limited": true
     },
     {
       "id": "vidlink",
       "name": "Vidlink",
-      "description": "Auto-generated description for Vidlink",
+      "description": "Vidlink streaming with encrypted TMDB ID support for movies and TV shows",
       "version": "1.0.0",
-      "author": "Michat88",
+      "author": "Nuvio Team",
       "supportedTypes": [
         "movie",
         "tv"
@@ -436,20 +435,20 @@
       "filename": "providers/vidlink.js",
       "enabled": true,
       "formats": [
-        "mp4",
-        "m3u8"
+        "m3u8",
+        "mp4"
       ],
-      "logo": "https://via.placeholder.com/150",
+      "logo": "https://vidlink.pro/favicon.ico",
       "contentLanguage": [
         "en"
       ]
     },
     {
       "id": "vidnest-anime",
-      "name": "Vidnest-anime",
-      "description": "Auto-generated description for Vidnest-anime",
+      "name": "VidnestAnime",
+      "description": "Vidnest anime streaming with TMDB→AniList mapping and 5 servers (hindi, satoru, miko, pahe, anya)",
       "version": "1.0.0",
-      "author": "Michat88",
+      "author": "Nuvio Team",
       "supportedTypes": [
         "movie",
         "tv"
@@ -457,20 +456,23 @@
       "filename": "providers/vidnest-anime.js",
       "enabled": true,
       "formats": [
-        "mp4",
         "m3u8"
       ],
-      "logo": "https://via.placeholder.com/150",
+      "logo": "https://vidnest.fun/favicon.ico",
       "contentLanguage": [
-        "en"
-      ]
+        "en",
+        "hi",
+        "ja"
+      ],
+      "limited": true,
+      "notes": "Automatically maps TMDB IDs to AniList. Supports sub/dub."
     },
     {
       "id": "vidnest",
       "name": "Vidnest",
-      "description": "Auto-generated description for Vidnest",
+      "description": "Vidnest streaming with encrypted AES-GCM sources",
       "version": "1.0.0",
-      "author": "Michat88",
+      "author": "Nuvio Team",
       "supportedTypes": [
         "movie",
         "tv"
@@ -481,7 +483,7 @@
         "mp4",
         "m3u8"
       ],
-      "logo": "https://via.placeholder.com/150",
+      "logo": "https://vidnest.fun/favicon.ico",
       "contentLanguage": [
         "en"
       ]
@@ -509,10 +511,10 @@
     },
     {
       "id": "vidsrc",
-      "name": "Vidsrc",
-      "description": "Auto-generated description for Vidsrc",
+      "name": "VidSrc",
+      "description": "Vidsrc - The best place to watch movies and TV shows online for free. Stream in 1080p HD",
       "version": "1.0.0",
-      "author": "Michat88",
+      "author": "Nuvio Team",
       "supportedTypes": [
         "movie",
         "tv"
@@ -523,7 +525,7 @@
         "mp4",
         "m3u8"
       ],
-      "logo": "https://via.placeholder.com/150",
+      "logo": "https://i.postimg.cc/ncMLBsLJ/vidsrc.png",
       "contentLanguage": [
         "en"
       ]
@@ -531,9 +533,9 @@
     {
       "id": "vixsrc",
       "name": "Vixsrc",
-      "description": "Auto-generated description for Vixsrc",
+      "description": "Vixsrc M3U8 streaming with auto quality selection",
       "version": "1.0.0",
-      "author": "Michat88",
+      "author": "Nuvio Team",
       "supportedTypes": [
         "movie",
         "tv"
@@ -544,7 +546,7 @@
         "mp4",
         "m3u8"
       ],
-      "logo": "https://via.placeholder.com/150",
+      "logo": "https://vixsrc.to/favicon.ico",
       "contentLanguage": [
         "en"
       ]
@@ -593,10 +595,10 @@
     },
     {
       "id": "yflix",
-      "name": "Yflix",
-      "description": "Auto-generated description for Yflix",
-      "version": "1.0.0",
-      "author": "Michat88",
+      "name": "YFlix",
+      "description": "YFlix streaming",
+      "version": "1.1.2",
+      "author": "Nuvio Team",
       "supportedTypes": [
         "movie",
         "tv"
@@ -604,13 +606,14 @@
       "filename": "providers/yflix.js",
       "enabled": true,
       "formats": [
-        "mp4",
-        "m3u8"
+        "m3u8",
+        "mp4"
       ],
-      "logo": "https://via.placeholder.com/150",
+      "logo": "https://yflix.to/assets/uploads/2f505f3de3c99889c1a72557f3e3714fc0c457b0.png",
       "contentLanguage": [
         "en"
-      ]
+      ],
+      "limited": true
     },
     {
       "id": "adimoviebox",
@@ -636,7 +639,7 @@
     {
       "id": "cinemacity",
       "name": "CinemaCity",
-      "description": "CinemaCity direct HTTP streams",
+      "description": "CinemaCity (Multi-Language)",
       "version": "1.0.0",
       "author": "Madrador60",
       "supportedTypes": [
@@ -649,9 +652,15 @@
         "mp4",
         "m3u8"
       ],
-      "logo": "https://cinemacity.cc/templates/dark/images/logo.png",
+      "logo": "https://i.postimg.cc/XYjKhS3b/cinemacity.png",
       "contentLanguage": [
-        "en"
+        "en",
+        "hi",
+        "ta",
+        "te",
+        "id",
+        "pl",
+        "ar"
       ]
     }
   ]
