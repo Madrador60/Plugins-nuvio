@@ -38,6 +38,80 @@ function sendJson(res, status, payload) {
   res.end(JSON.stringify(payload));
 }
 
+function sendHtml(res, status, html) {
+  res.writeHead(status, {
+    "content-type": "text/html; charset=utf-8",
+    "access-control-allow-origin": "*"
+  });
+  res.end(html);
+}
+
+function getPublicBaseUrl(req) {
+  const proto = req.headers["x-forwarded-proto"] || "http";
+  const host = req.headers["x-forwarded-host"] || req.headers.host || "localhost:" + PORT;
+  return proto + "://" + host;
+}
+
+function escapeHtml(value) {
+  return String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+function getProviderSummary(mediaType) {
+  return getEnabledProviders(mediaType).map((provider) => ({
+    id: provider.id,
+    name: provider.name,
+    languages: provider.contentLanguage || [],
+    limited: Boolean(provider.limited)
+  }));
+}
+
+function renderHomePage(req) {
+  const baseUrl = getPublicBaseUrl(req);
+  const manifestUrl = baseUrl + "/manifest.json";
+  const stremioInstallUrl = "stremio://" + manifestUrl.replace(/^https?:\/\//, "");
+  const movieProviders = getProviderSummary("movie");
+  const seriesProviders = getProviderSummary("tv");
+  const providerRows = seriesProviders
+    .map((provider) => {
+      const state = provider.limited ? "Limite" : "Actif";
+      const languages = provider.languages.length > 0 ? provider.languages.join(", ").toUpperCase() : "FR";
+      return "<tr><td>" + escapeHtml(provider.name) + "</td><td>" + escapeHtml(languages) + "</td><td>" + escapeHtml(state) + "</td></tr>";
+    })
+    .join("");
+
+  return "<!doctype html>" +
+    "<html lang=\"fr\">" +
+    "<head>" +
+    "<meta charset=\"utf-8\">" +
+    "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">" +
+    "<title>Madrador60 Stremio Addon</title>" +
+    "<style>" +
+    ":root{color-scheme:dark;--bg:#111315;--panel:#1a1d20;--text:#f5f7fa;--muted:#aab2bd;--line:#30353b;--accent:#8b5cf6;--ok:#2dd4bf}" +
+    "*{box-sizing:border-box}body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--text);line-height:1.5}" +
+    "main{width:min(980px,calc(100% - 32px));margin:0 auto;padding:42px 0 56px}" +
+    ".hero{display:grid;gap:18px;padding:34px 0 26px;border-bottom:1px solid var(--line)}" +
+    "h1{font-size:clamp(34px,6vw,58px);line-height:1;margin:0;letter-spacing:0}.lead{max-width:700px;color:var(--muted);font-size:18px;margin:0}" +
+    ".actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:6px}.btn{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 16px;border-radius:8px;border:1px solid var(--line);color:var(--text);text-decoration:none;background:var(--panel);font-weight:700}.btn.primary{background:var(--accent);border-color:var(--accent)}" +
+    ".grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:24px 0}.box{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:16px}.box strong{display:block;font-size:24px}.box span{color:var(--muted)}" +
+    "section{padding:22px 0}h2{font-size:24px;margin:0 0 12px}code{display:block;overflow:auto;background:#080a0c;border:1px solid var(--line);border-radius:8px;padding:14px;color:#e6edf3}" +
+    "table{width:100%;border-collapse:collapse;background:var(--panel);border:1px solid var(--line);border-radius:8px;overflow:hidden}th,td{text-align:left;padding:12px;border-bottom:1px solid var(--line)}th{color:var(--muted);font-weight:700}tr:last-child td{border-bottom:0}.note{color:var(--muted);font-size:14px}" +
+    "@media(max-width:720px){main{width:min(100% - 24px,980px);padding-top:24px}.grid{grid-template-columns:1fr}.actions{display:grid}.btn{width:100%}}" +
+    "</style>" +
+    "</head>" +
+    "<body><main>" +
+    "<div class=\"hero\"><h1>Madrador60 FR Providers</h1><p class=\"lead\">Addon Stremio heberge pour films, series et animes francais. Ajoute l'URL du manifest dans Stremio et lance ton contenu.</p>" +
+    "<div class=\"actions\"><a class=\"btn primary\" href=\"" + escapeHtml(stremioInstallUrl) + "\">Installer dans Stremio</a><a class=\"btn\" href=\"/manifest.json\">Voir le manifest</a><a class=\"btn\" href=\"https://github.com/Madrador60/Plugins-nuvio\">GitHub</a></div></div>" +
+    "<div class=\"grid\"><div class=\"box\"><strong>" + movieProviders.length + "</strong><span>providers films/series</span></div><div class=\"box\"><strong>" + seriesProviders.length + "</strong><span>providers series/animes</span></div><div class=\"box\"><strong>FR</strong><span>sources francaises en priorite</span></div></div>" +
+    "<section><h2>URL a mettre dans Stremio</h2><code>" + escapeHtml(manifestUrl) + "</code><p class=\"note\">Sur Render gratuit, le premier chargement peut etre lent si le service etait en veille.</p></section>" +
+    "<section><h2>Providers actifs</h2><table><thead><tr><th>Provider</th><th>Langues</th><th>Etat</th></tr></thead><tbody>" + providerRows + "</tbody></table></section>" +
+    "<section><h2>Pour Nuvio</h2><code>https://raw.githubusercontent.com/Madrador60/Plugins-nuvio/refs/heads/main/</code></section>" +
+    "</main></body></html>";
+}
+
 function parseStreamPath(pathname) {
   const match = pathname.match(/^\/stream\/([^/]+)\/(.+)\.json$/);
   if (!match) return null;
@@ -196,8 +270,31 @@ const server = http.createServer(async (req, res) => {
       return;
     }
 
-    if (url.pathname === "/" || url.pathname === "/manifest.json") {
+    if (url.pathname === "/") {
+      sendHtml(res, 200, renderHomePage(req));
+      return;
+    }
+
+    if (url.pathname === "/manifest.json") {
       sendJson(res, 200, stremioManifest);
+      return;
+    }
+
+    if (url.pathname === "/health.json") {
+      sendJson(res, 200, {
+        ok: true,
+        name: stremioManifest.name,
+        version: stremioManifest.version,
+        providers: getEnabledProviders("tv").length
+      });
+      return;
+    }
+
+    if (url.pathname === "/providers.json") {
+      sendJson(res, 200, {
+        movie: getProviderSummary("movie"),
+        series: getProviderSummary("tv")
+      });
       return;
     }
 

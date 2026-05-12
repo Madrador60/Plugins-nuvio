@@ -1,211 +1,105 @@
 # Plugins Nuvio FR
 
-Providers francais pour **Nuvio**, avec un petit addon local pour **Stremio**.
+Providers francais pour **Nuvio** + addon **Stremio** hebergeable.
 
-Le but du repo est simple : tu copies une URL, tu l'ajoutes dans l'application, et tu actives les sources qui t'interessent.
+## Installation rapide
 
-## Installer sur Nuvio
+### Nuvio
 
-### 1. Copier l'URL du repo
+Ajoute cette URL dans **Settings > Plugins** ou **Local Scrapers** :
 
 ```text
 https://raw.githubusercontent.com/Madrador60/Plugins-nuvio/refs/heads/main/
 ```
 
-### 2. Ajouter l'URL dans Nuvio
+### Stremio
 
-Dans Nuvio :
-
-1. Ouvre **Settings**
-2. Va dans **Plugins** ou **Local Scrapers**
-3. Colle l'URL du repo
-4. Rafraichis la liste
-5. Active les providers que tu veux utiliser
-
-### 3. Tester
-
-Lance un film, une serie ou un anime. Si un provider ne donne rien, essaie un autre provider : certains sites changent souvent de domaine ou ne proposent pas tous les contenus.
-
-## Installer sur Stremio
-
-Tu as deux choix :
-
-- **Local** : simple, mais ton PC doit rester allume.
-- **Heberge** : mieux pour TV/telephone, et ca continue de marcher quand ton PC est eteint.
-
-## Stremio avec PC eteint
-
-Pour que l'addon fonctionne sans ton PC, il faut l'heberger en ligne.
-
-### Methode simple avec Render
-
-1. Va sur [render.com](https://render.com)
-2. Connecte ton GitHub
-3. Clique sur **New** puis **Blueprint**
-4. Choisis ce repo : `Madrador60/Plugins-nuvio`
-5. Render va lire le fichier `render.yaml`
-6. Lance le deploiement
-
-Quand Render donne une URL du style :
-
-```text
-https://madrador60-stremio-addon.onrender.com
-```
-
-Dans Stremio, ajoute :
+Ajoute cette URL dans Stremio :
 
 ```text
 https://madrador60-stremio-addon.onrender.com/manifest.json
 ```
 
-Sur un plan gratuit, le serveur peut dormir quand personne ne l'utilise. Le premier chargement peut donc etre lent.
-
-### Hebergement avec Docker
-
-Si tu utilises un VPS ou un serveur compatible Docker :
-
-```powershell
-docker build -t madrador60-stremio-addon .
-docker run -p 7000:7000 madrador60-stremio-addon
-```
-
-L'URL a mettre dans Stremio sera ensuite :
+Page publique de l'addon :
 
 ```text
-http://IP_DU_SERVEUR:7000/manifest.json
+https://madrador60-stremio-addon.onrender.com/
 ```
 
-## Stremio en local
+Sur Render gratuit, le premier chargement peut prendre un peu de temps si le serveur etait en veille.
 
-### 1. Lancer l'addon
+## Ce qu'il y a dedans
 
-Dans le dossier du repo :
+| Partie | Description |
+|---|---|
+| `manifest.json` | Liste des providers pour Nuvio |
+| `providers/` | Scrapers Nuvio |
+| `stremio/` | Serveur addon Stremio |
+| `docs/` | Guides courts |
+| `scripts/` | Tests des providers |
+| `domains.json` | Domaines connus / fallbacks |
+
+## Providers
+
+Films et series : Frenchstream, Movix, Nakios, Purstream, ToFlix, VIDEASY, CinemaCity.
+
+Animes : Anime-Sama, VoirAnime, Vostfree, French-Anime, AnimeVOSTFR, AnimesUltra, JetAnimes, Mugiwara-no-Streaming, AnimoFlix, Sekai, AnimeSite.
+
+Liste detaillee : [docs/PROVIDERS.md](docs/PROVIDERS.md)
+
+## Tester
+
+Verifier la syntaxe :
 
 ```powershell
-node stremio\server.js
+node --check stremio\server.js
+node --check scripts\test-providers.js
 ```
 
-### 2. Ajouter l'addon dans Stremio
-
-Dans Stremio, ajoute :
-
-```text
-http://127.0.0.1:7000/manifest.json
-```
-
-Si tu utilises Stremio sur une TV ou un telephone, remplace `127.0.0.1` par l'adresse IP du PC qui lance le serveur.
-
-Exemple :
-
-```text
-http://192.168.1.20:7000/manifest.json
-```
-
-### Options utiles
-
-Changer le port :
+Tester quelques providers :
 
 ```powershell
-$env:PORT='7100'
-node stremio\server.js
+node scripts\test-providers.js --only=frenchstream,movix,nakios --timeout=45000
 ```
 
-Limiter les providers utilises par Stremio :
-
-```powershell
-$env:STREMIO_PROVIDERS='frenchstream,movix,nakios'
-node stremio\server.js
-```
-
-## Providers inclus
-
-### Films et series
-
-| Provider | Langue | Etat |
-|---|---|---|
-| Frenchstream | FR | Fonctionne, domaines fallback inclus |
-| Movix | FR | Fonctionne |
-| Nakios | FR/EN | Fonctionne |
-| Purstream | FR/EN | Fonctionne |
-| ToFlix | FR/EN | Fonctionne |
-| VIDEASY | Multi dont FR | Fonctionne mais peut etre lent |
-| CinemaCity | Multi dont FR | Limite, peut demander un acces/cookie |
-
-### Animes
-
-| Provider | Langue | Etat |
-|---|---|---|
-| Anime-Sama | FR | Fonctionne |
-| VoirAnime | FR | Fonctionne |
-| Vostfree | FR | Fonctionne |
-| French-Anime | FR | Fonctionne |
-| AnimeVOSTFR | FR | Fonctionne |
-| AnimesUltra | FR | Fonctionne |
-| JetAnimes | FR | Fonctionne mais parfois lent |
-| Mugiwara-no-Streaming | FR | Fonctionne |
-| AnimoFlix | FR | Instable selon les tests |
-| Sekai | FR | Limite selon les contenus |
-| AnimeSite | FR | Instable selon les tests |
-
-## Pourquoi un provider peut ne rien afficher ?
-
-- Le site a change de domaine.
-- Le film ou l'episode n'existe pas sur ce site.
-- Le site bloque temporairement les requetes.
-- Le provider est lent et depasse le timeout.
-- Certains liens demandent des headers speciaux selon le lecteur.
-
-## Tester les providers
-
-Depuis le dossier du repo :
+Tester tous les providers :
 
 ```powershell
 node scripts\test-providers.js
 ```
 
-Tester seulement certains providers :
+## Heberger l'addon Stremio
+
+Le repo est pret pour Render avec [render.yaml](render.yaml).
+
+1. Va sur [Render](https://render.com)
+2. Choisis **New > Blueprint**
+3. Selectionne `Madrador60/Plugins-nuvio`
+4. Lance le deploiement
+5. Mets l'URL `/manifest.json` dans Stremio
+
+Guide complet : [docs/STREMIO.md](docs/STREMIO.md)
+
+## Lancer en local
 
 ```powershell
-node scripts\test-providers.js --only=frenchstream,movix,nakios
+node stremio\server.js
 ```
 
-Donner plus de temps aux providers lents :
-
-```powershell
-node scripts\test-providers.js --timeout=45000
-```
-
-Le dernier rapport est disponible ici : [TESTING.md](TESTING.md)
-
-## Pour contribuer
-
-Un provider Nuvio doit etre dans `providers/` et exporter une fonction `getStreams`.
-
-```javascript
-function getStreams(tmdbId, mediaType, seasonNum, episodeNum) {
-  return Promise.resolve([]);
-}
-
-module.exports = { getStreams };
-```
-
-Ensuite, il faut l'ajouter dans [manifest.json](manifest.json).
-
-## Structure du repo
+Puis ouvre :
 
 ```text
-Plugins-nuvio/
-  providers/          Providers Nuvio
-  stremio/            Addon Stremio local
-  scripts/            Outils de test
-  manifest.json       Liste des providers Nuvio
-  domains.json        Domaines connus / fallbacks
-  TESTING.md          Derniers tests
+http://127.0.0.1:7000/
 ```
+
+## Pourquoi un provider peut ne pas marcher ?
+
+- Le site a change de domaine.
+- Le contenu n'existe pas sur cette source.
+- Le site bloque temporairement les requetes.
+- Le provider est lent et depasse le timeout.
+- Certains liens demandent des headers speciaux selon le lecteur.
 
 ## Notes
 
-- Le repo ne contient aucune video.
-- Les providers ne font que chercher des liens depuis des sites externes.
-- Les domaines changent souvent, donc certains providers peuvent casser puis etre corriges.
-- Utilise ce repo en respectant les lois applicables dans ton pays.
+Ce repo ne contient aucune video et n'heberge aucun contenu. Les providers cherchent des liens depuis des sites externes. Utilise ce projet en respectant les lois applicables dans ton pays.

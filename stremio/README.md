@@ -2,6 +2,18 @@
 
 Addon Stremio local qui reutilise les providers du repo Nuvio.
 
+## URL publique
+
+```text
+https://madrador60-stremio-addon.onrender.com/manifest.json
+```
+
+Page d'accueil :
+
+```text
+https://madrador60-stremio-addon.onrender.com/
+```
+
 ## Lancer en local
 
 Depuis la racine du repo :
@@ -51,3 +63,6 @@ node stremio\server.js
 - Les films utilisent surtout les providers films/series.
 - Les series peuvent utiliser les providers anime et films/series.
 - Certains streams qui demandent des headers speciaux peuvent ne pas marcher dans tous les lecteurs Stremio.
+- `/` affiche une page lisible pour les visiteurs.
+- `/health.json` permet de verifier que le serveur repond.
+- `/providers.json` liste les providers actifs.

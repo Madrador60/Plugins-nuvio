@@ -1,0 +1,17 @@
+{
+  "name": "plugins-nuvio",
+  "version": "1.1.0",
+  "description": "Providers francais pour Nuvio et addon Stremio hebergeable.",
+  "private": true,
+  "type": "commonjs",
+  "scripts": {
+    "start": "node stremio/server.js",
+    "start:stremio": "node stremio/server.js",
+    "check": "node --check stremio/server.js && node --check scripts/test-providers.js",
+    "test:providers": "node scripts/test-providers.js",
+    "test:quick": "node scripts/test-providers.js --only=frenchstream,movix,nakios --timeout=45000"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
