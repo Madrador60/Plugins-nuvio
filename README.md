@@ -28,7 +28,54 @@ Lance un film, une serie ou un anime. Si un provider ne donne rien, essaie un au
 
 ## Installer sur Stremio
 
-L'addon Stremio est local : il faut laisser le serveur ouvert sur ton PC pendant que tu utilises Stremio.
+Tu as deux choix :
+
+- **Local** : simple, mais ton PC doit rester allume.
+- **Heberge** : mieux pour TV/telephone, et ca continue de marcher quand ton PC est eteint.
+
+## Stremio avec PC eteint
+
+Pour que l'addon fonctionne sans ton PC, il faut l'heberger en ligne.
+
+### Methode simple avec Render
+
+1. Va sur [render.com](https://render.com)
+2. Connecte ton GitHub
+3. Clique sur **New** puis **Blueprint**
+4. Choisis ce repo : `Madrador60/Plugins-nuvio`
+5. Render va lire le fichier `render.yaml`
+6. Lance le deploiement
+
+Quand Render donne une URL du style :
+
+```text
+https://madrador60-stremio-addon.onrender.com
+```
+
+Dans Stremio, ajoute :
+
+```text
+https://madrador60-stremio-addon.onrender.com/manifest.json
+```
+
+Sur un plan gratuit, le serveur peut dormir quand personne ne l'utilise. Le premier chargement peut donc etre lent.
+
+### Hebergement avec Docker
+
+Si tu utilises un VPS ou un serveur compatible Docker :
+
+```powershell
+docker build -t madrador60-stremio-addon .
+docker run -p 7000:7000 madrador60-stremio-addon
+```
+
+L'URL a mettre dans Stremio sera ensuite :
+
+```text
+http://IP_DU_SERVEUR:7000/manifest.json
+```
+
+## Stremio en local
 
 ### 1. Lancer l'addon
 
