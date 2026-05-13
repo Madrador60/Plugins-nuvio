@@ -17,11 +17,13 @@ Stremio
 
 | Chemin | Role |
 |---|---|
+| `assets/` | Images et logos publics |
 | `manifest.json` | Manifest Nuvio |
 | `providers/` | Providers compatibles Nuvio |
 | `stremio/server.js` | Serveur addon Stremio |
 | `stremio/manifest.json` | Manifest Stremio |
 | `scripts/test-providers.js` | Test manuel des providers |
+| `scripts/update-manifest.js` | Ajout automatique des nouveaux providers au manifest |
 | `domains.json` | Domaines connus et fallbacks |
 | `render.yaml` | Deploiement Render |
 

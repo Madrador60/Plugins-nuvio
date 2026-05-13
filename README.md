@@ -87,19 +87,22 @@ Details : [docs/PROVIDERS.md](docs/PROVIDERS.md)
 | [docs/SECURITY.md](docs/SECURITY.md) | Securite, secrets et limites |
 | [TESTING.md](TESTING.md) | Derniers tests manuels |
 
-## Structure
+## Organisation
 
 ```text
 Plugins-nuvio/
-  Assets/              Images et logos
-  docs/                Documentation projet
-  providers/           Providers Nuvio
-  scripts/             Outils de test
-  stremio/             Serveur addon Stremio
-  domains.json         Domaines connus et fallbacks
-  manifest.json        Manifest Nuvio
-  render.yaml          Deploiement Render
+  assets/                  Images et logos
+  docs/                    Documentation detaillee
+  providers/               Providers Nuvio
+  scripts/                 Outils de maintenance et de test
+  stremio/                 Serveur addon Stremio
+  domains.json             Domaines connus et fallbacks
+  manifest.json            Manifest Nuvio public
+  package.json             Commandes du projet
+  render.yaml              Deploiement Render
 ```
+
+Les fichiers a la racine restent volontairement visibles parce que GitHub, Nuvio et Render les utilisent directement.
 
 ## Tests
 
@@ -108,6 +111,7 @@ Verifier la syntaxe :
 ```powershell
 node --check stremio\server.js
 node --check scripts\test-providers.js
+node --check scripts\update-manifest.js
 ```
 
 Tester les providers principaux :

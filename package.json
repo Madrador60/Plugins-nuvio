@@ -7,6 +7,7 @@
   "scripts": {
     "start": "node stremio/server.js",
     "start:stremio": "node stremio/server.js",
+    "manifest:update": "node scripts/update-manifest.js",
     "check": "node --check stremio/server.js && node --check scripts/test-providers.js",
     "test:providers": "node scripts/test-providers.js",
     "test:quick": "node scripts/test-providers.js --only=frenchstream,movix,nakios --timeout=45000"
