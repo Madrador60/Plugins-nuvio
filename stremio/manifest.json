@@ -1,20 +1,11 @@
 {
-  "id": "community.madrador60.film.v2",
-  "version": "1.3.0",
+  "id": "community.madrador60.film.v3",
+  "version": "1.4.0",
   "name": "Madrador Film FR",
   "description": "French movie, series and anime providers from Madrador60 Plugins-nuvio.",
   "logo": "https://raw.githubusercontent.com/Madrador60/Plugins-nuvio/refs/heads/main/assets/Logo-2.png",
   "resources": [
-    {
-      "name": "stream",
-      "types": [
-        "movie",
-        "series"
-      ],
-      "idPrefixes": [
-        "tt"
-      ]
-    },
+    "stream",
     "catalog"
   ],
   "types": [

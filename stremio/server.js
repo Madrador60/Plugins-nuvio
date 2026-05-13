@@ -95,6 +95,11 @@ function getPublicBaseUrl(req) {
   return proto + "://" + host;
 }
 
+function getAddonBaseUrl(req) {
+  const base = getPublicBaseUrl(req);
+  return req.addonPrefix ? base + req.addonPrefix : base;
+}
+
 function getProxyExtension(sourceUrl) {
   const cleanUrl = String(sourceUrl || "").split("?")[0].toLowerCase();
   const match = cleanUrl.match(/\.([a-z0-9]{2,5})$/);
@@ -124,7 +129,7 @@ function getProxyUrl(req, stream) {
     headers: getOriginHeaders(stream.url, stream.headers || {})
   };
   const extension = getProxyExtension(stream.url);
-  return getPublicBaseUrl(req) + "/proxy/" + base64UrlEncode(JSON.stringify(payload)) + "/stream." + extension;
+  return getAddonBaseUrl(req) + "/proxy/" + base64UrlEncode(JSON.stringify(payload)) + "/stream." + extension;
 }
 
 function escapeHtml(value) {
@@ -1018,6 +1023,13 @@ async function getStreams(request, req) {
 const server = http.createServer(async (req, res) => {
   try {
     const url = new URL(req.url, "http://" + (req.headers.host || "localhost"));
+    const prefixMatch = url.pathname.match(/^\/v[0-9]+(?=\/|$)/);
+    if (prefixMatch) {
+      req.addonPrefix = prefixMatch[0];
+      url.pathname = url.pathname.slice(prefixMatch[0].length) || "/";
+    } else {
+      req.addonPrefix = "";
+    }
 
     if (req.method === "OPTIONS") {
       res.writeHead(204, corsHeaders());

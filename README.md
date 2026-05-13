@@ -12,7 +12,7 @@ Ce depot sert deux usages :
 | Usage | URL |
 |---|---|
 | Nuvio | `https://raw.githubusercontent.com/Madrador60/Plugins-nuvio/refs/heads/main/` |
-| Stremio | `https://madrador60-stremio-addon.onrender.com/manifest.json` |
+| Stremio | `https://madrador60-stremio-addon.onrender.com/v3/manifest.json` |
 | Catalogue / page publique | `https://madrador60-stremio-addon.onrender.com/` |
 | Catalogue direct | `https://madrador60-stremio-addon.onrender.com/catalog` |
 | Lecteur de test | `https://madrador60-stremio-addon.onrender.com/test-player` |
@@ -37,7 +37,7 @@ Ensuite, rafraichis la liste et active les providers souhaites.
 Dans Stremio, ajoute :
 
 ```text
-https://madrador60-stremio-addon.onrender.com/manifest.json
+https://madrador60-stremio-addon.onrender.com/v3/manifest.json
 ```
 
 Si Stremio Web ne lit pas une source, teste la meme recherche sur :
