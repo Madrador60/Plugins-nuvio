@@ -1,8 +1,8 @@
 {
   "id": "community.madrador60.fr-providers",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "name": "Madrador60 FR Providers",
-  "description": "French streaming providers from Madrador60 Plugins-nuvio.",
+  "description": "French movie, series and anime providers from Madrador60 Plugins-nuvio.",
   "logo": "https://raw.githubusercontent.com/Madrador60/Plugins-nuvio/refs/heads/main/Assets/Logo-2.png",
   "resources": [
     "stream"

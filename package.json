@@ -1,6 +1,6 @@
 {
   "name": "plugins-nuvio",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Providers francais pour Nuvio et addon Stremio hebergeable.",
   "private": true,
   "type": "commonjs",
