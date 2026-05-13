@@ -2,11 +2,45 @@
 
 Last manual test: 2026-05-13
 
+## Stremio / Render checks
+
+Checked on 2026-05-13:
+
+| Check | Result | Notes |
+|---|---|---|
+| `/manifest.json` | OK | HTTP 200, CORS enabled |
+| `/test-player` | OK | Page loads and can search |
+| `/search.json?type=movie&q=Interstellar` | OK | Returns TMDB results |
+| `/stream/movie/tt0816692.json` | OK | Returns proxied MP4/M3U8 streams |
+| MP4 proxy range | OK | HTTP 206, `Content-Range`, `Accept-Ranges`, exposed CORS headers |
+
+Last important commits:
+
+```text
+68bec26 Harden Stremio web playback headers
+e162620 Add searchable test player
+```
+
 Command used:
 
 ```powershell
 node scripts\test-providers.js --timeout=45000
 ```
+
+Quick movie-provider test:
+
+```powershell
+node scripts\test-providers.js --only=frenchstream,movix,nakios,toflix --timeout=60000
+```
+
+Result:
+
+| Status | Provider | Streams | Time |
+|---|---|---:|---:|
+| OK | `movix` | 2 | 674ms |
+| OK | `frenchstream` | 2 | 2134ms |
+| OK | `nakios` | 3 | 370ms |
+| OK | `toflix` | 1 | 460ms |
 
 ## Current Status
 
