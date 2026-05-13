@@ -1,12 +1,12 @@
 {
   "name": "plugins-nuvio",
   "version": "1.1.1",
-  "description": "Providers francais pour Nuvio et addon Stremio hebergeable.",
+  "description": "Providers francais pour Nuvio et site Madrador Film hebergeable.",
   "private": true,
   "type": "commonjs",
   "scripts": {
     "start": "node stremio/server.js",
-    "start:stremio": "node stremio/server.js",
+    "start:web": "node stremio/server.js",
     "manifest:update": "node scripts/update-manifest.js",
     "check": "node --check stremio/server.js && node --check scripts/test-providers.js",
     "test:providers": "node scripts/test-providers.js",

@@ -14,12 +14,12 @@ Puis :
 2. Active les providers souhaites.
 3. Lance un film, une serie ou un anime.
 
-## Stremio public
+## Site public
 
-URL a ajouter dans Stremio :
+Ouvre le site :
 
 ```text
-https://madrador60-stremio-addon.onrender.com/manifest.json
+https://madrador60-stremio-addon.onrender.com/
 ```
 
 Page de test :
@@ -36,7 +36,7 @@ https://madrador60-stremio-addon.onrender.com/status
 
 Sur Render gratuit, le service peut dormir. Le premier chargement peut donc prendre 30 a 60 secondes.
 
-## Stremio local
+## Site local
 
 Depuis la racine du depot :
 
@@ -48,12 +48,6 @@ Puis ouvre :
 
 ```text
 http://127.0.0.1:7000/
-```
-
-URL addon locale :
-
-```text
-http://127.0.0.1:7000/manifest.json
 ```
 
 ## Variables utiles

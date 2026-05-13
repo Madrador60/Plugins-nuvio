@@ -7,10 +7,10 @@ Nuvio
   lit manifest.json
   charge providers/*.js
 
-Stremio
-  lit stremio/manifest.json via /manifest.json
-  appelle /stream/movie/:imdb.json ou /stream/series/:imdb:s:e.json
-  recoit des streams proxifies
+Madrador Film
+  sert le catalogue web
+  appelle les providers
+  proxifie les liens MP4/HLS pour le lecteur
 ```
 
 ## Dossiers
@@ -20,8 +20,7 @@ Stremio
 | `assets/` | Images et logos publics |
 | `manifest.json` | Manifest Nuvio |
 | `providers/` | Providers compatibles Nuvio |
-| `stremio/server.js` | Serveur addon Stremio |
-| `stremio/manifest.json` | Manifest Stremio |
+| `stremio/server.js` | Serveur web Madrador Film |
 | `scripts/test-providers.js` | Test manuel des providers |
 | `scripts/update-manifest.js` | Ajout automatique des nouveaux providers au manifest |
 | `domains.json` | Domaines connus et fallbacks |
@@ -31,20 +30,18 @@ Stremio
 
 | Page | Role |
 |---|---|
-| `/` | Accueil de l'addon |
-| `/catalog` | Catalogue films/series en rangees d'affiches |
+| `/` | Catalogue films/series |
+| `/catalog` | Alias du catalogue |
 | `/test-player` | Lecteur de test avec recherche et filtres MP4/HLS |
 | `/status` | Diagnostic providers |
 | `/providers` | Etat public des providers, langues, formats et domaines |
 
-## Flux Stremio
+## Lecture
 
-1. Stremio demande `/manifest.json`.
-2. Stremio demande `/stream/...`.
-3. Le serveur convertit l'ID IMDb en TMDB avec l'API TMDB.
-4. Le serveur appelle les providers.
-5. Les liens video sont transformes en URLs `/proxy/.../stream.mp4` ou `/proxy/.../stream.m3u8`.
-6. Stremio lit l'URL proxifiee.
+1. Le site cherche un titre avec TMDB.
+2. Le serveur appelle les providers actifs.
+3. Les liens video sont transformes en URLs `/proxy/.../stream.mp4` ou `/proxy/.../stream.m3u8`.
+4. Le lecteur web lit l'URL proxifiee.
 
 ## Proxy media
 
@@ -56,8 +53,6 @@ Le proxy sert a :
 - donner une extension visible (`stream.mp4`, `stream.m3u8`) aux lecteurs.
 
 ## Cache
-
-Le serveur utilise un cache memoire simple pour reduire les appels repetes a TMDB, aux diagnostics et aux providers.
 
 | Cache | Duree par defaut |
 |---|---|

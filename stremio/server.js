@@ -5,9 +5,10 @@ const { URL } = require("node:url");
 
 const ROOT = path.resolve(__dirname, "..");
 const nuvioManifest = require(path.join(ROOT, "manifest.json"));
-const stremioManifest = require("./manifest.json");
 const domains = require(path.join(ROOT, "domains.json"));
 
+const SITE_NAME = "Madrador Film";
+const SITE_VERSION = "1.5.0";
 const HOST = process.env.HOST || "0.0.0.0";
 const PORT = Number(process.env.PORT || 7000);
 const TMDB_API_KEY = process.env.TMDB_API_KEY || "8265bd1679663a7ea12ac168da84d2e8";
@@ -97,7 +98,7 @@ function getPublicBaseUrl(req) {
 
 function getAddonBaseUrl(req) {
   const base = getPublicBaseUrl(req);
-  return req.addonPrefix ? base + req.addonPrefix : base;
+  return req.routePrefix ? base + req.routePrefix : base;
 }
 
 function getProxyExtension(sourceUrl) {
@@ -193,50 +194,6 @@ async function cachedJson(key, fetcher, ttlMs) {
   return setCached(key, await fetcher(), ttlMs);
 }
 
-function renderHomePage(req) {
-  const baseUrl = getPublicBaseUrl(req);
-  const manifestUrl = baseUrl + "/manifest.json";
-  const stremioInstallUrl = "stremio://" + manifestUrl.replace(/^https?:\/\//, "");
-  const movieProviders = getProviderSummary("movie");
-  const seriesProviders = getProviderSummary("tv");
-  const providerRows = seriesProviders
-    .map((provider) => {
-      const state = provider.unstable ? "Instable" : provider.limited ? "Limite" : "Actif";
-      const languages = provider.languages.length > 0 ? provider.languages.join(", ").toUpperCase() : "FR";
-      return "<tr><td>" + escapeHtml(provider.name) + "</td><td>" + escapeHtml(languages) + "</td><td>" + escapeHtml(state) + "</td></tr>";
-    })
-    .join("");
-
-  return "<!doctype html>" +
-    "<html lang=\"fr\">" +
-    "<head>" +
-    "<meta charset=\"utf-8\">" +
-    "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">" +
-    "<title>Madrador60 Stremio Addon</title>" +
-    "<link rel=\"icon\" href=\"/logo.png\">" +
-    "<style>" +
-    ":root{color-scheme:dark;--bg:#111315;--panel:#1a1d20;--text:#f5f7fa;--muted:#aab2bd;--line:#30353b;--accent:#8b5cf6;--ok:#2dd4bf}" +
-    "*{box-sizing:border-box}body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--text);line-height:1.5}" +
-    "main{width:min(980px,calc(100% - 32px));margin:0 auto;padding:42px 0 56px}" +
-    ".hero{display:grid;gap:18px;padding:34px 0 26px;border-bottom:1px solid var(--line)}" +
-    "h1{font-size:clamp(34px,6vw,58px);line-height:1;margin:0;letter-spacing:0}.lead{max-width:700px;color:var(--muted);font-size:18px;margin:0}" +
-    ".actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:6px}.btn{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 16px;border-radius:8px;border:1px solid var(--line);color:var(--text);text-decoration:none;background:var(--panel);font-weight:700}.btn.primary{background:var(--accent);border-color:var(--accent)}" +
-    ".grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:24px 0}.box{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:16px}.box strong{display:block;font-size:24px}.box span{color:var(--muted)}" +
-    "section{padding:22px 0}h2{font-size:24px;margin:0 0 12px}code{display:block;overflow:auto;background:#080a0c;border:1px solid var(--line);border-radius:8px;padding:14px;color:#e6edf3}" +
-    "table{width:100%;border-collapse:collapse;background:var(--panel);border:1px solid var(--line);border-radius:8px;overflow:hidden}th,td{text-align:left;padding:12px;border-bottom:1px solid var(--line)}th{color:var(--muted);font-weight:700}tr:last-child td{border-bottom:0}.note{color:var(--muted);font-size:14px}" +
-    "@media(max-width:720px){main{width:min(100% - 24px,980px);padding-top:24px}.grid{grid-template-columns:1fr}.actions{display:grid}.btn{width:100%}}" +
-    "</style>" +
-    "</head>" +
-    "<body><main>" +
-    "<div class=\"hero\"><h1>Madrador60 FR Providers</h1><p class=\"lead\">Addon Stremio heberge pour films, series et animes francais. Ajoute l'URL du manifest dans Stremio et lance ton contenu.</p>" +
-    "<div class=\"actions\"><a class=\"btn primary\" href=\"" + escapeHtml(stremioInstallUrl) + "\">Installer dans Stremio</a><a class=\"btn\" href=\"/catalog\">Catalogue</a><a class=\"btn\" href=\"/providers\">Providers</a><a class=\"btn\" href=\"/test-player\">Tester la lecture</a><a class=\"btn\" href=\"https://github.com/Madrador60/Plugins-nuvio\">GitHub</a></div></div>" +
-    "<div class=\"grid\"><div class=\"box\"><strong>" + movieProviders.length + "</strong><span>providers films/series</span></div><div class=\"box\"><strong>" + seriesProviders.length + "</strong><span>providers series/animes</span></div><div class=\"box\"><strong>FR</strong><span>sources francaises en priorite</span></div></div>" +
-    "<section><h2>URL a mettre dans Stremio</h2><code>" + escapeHtml(manifestUrl) + "</code><p class=\"note\">Sur Render gratuit, le premier chargement peut etre lent si le service etait en veille.</p></section>" +
-    "<section><h2>Providers actifs</h2><table><thead><tr><th>Provider</th><th>Langues</th><th>Etat</th></tr></thead><tbody>" + providerRows + "</tbody></table></section>" +
-    "<section><h2>Pour Nuvio</h2><code>https://raw.githubusercontent.com/Madrador60/Plugins-nuvio/refs/heads/main/</code></section>" +
-    "</main></body></html>";
-}
-
 function renderTestPlayerPage() {
   return `<!doctype html>
 <html lang="fr">
@@ -253,7 +210,7 @@ main{position:relative;z-index:1;width:min(1280px,calc(100% - 32px));margin:0 au
 .nav{height:54px;display:flex;align-items:center;justify-content:space-between;gap:16px}.brand{font-weight:900;font-size:24px;color:#a78bfa;letter-spacing:0;text-shadow:0 0 24px rgba(124,58,237,.6)}.navlinks{display:flex;gap:10px;flex-wrap:wrap}.navlinks a{color:#eef2ff;text-decoration:none;font-weight:700;font-size:14px;padding:8px 10px;border-radius:6px}.navlinks a:hover{background:#1b2144}
 .hero{display:grid;grid-template-columns:minmax(0,1.22fr) minmax(340px,.78fr);gap:22px;align-items:stretch;margin-top:14px}.player{position:relative;background:#000;border-radius:8px;overflow:hidden;box-shadow:0 24px 90px rgba(37,99,235,.18),0 18px 70px rgba(0,0,0,.58)}video{display:block;width:100%;height:100%;min-height:430px;max-height:68vh;background:#000;object-fit:contain}.shade{position:absolute;inset:auto 0 0 0;padding:22px 22px 52px;background:linear-gradient(0deg,rgba(8,10,25,.94),transparent);pointer-events:none}.shade h1{font-size:clamp(30px,5vw,58px);line-height:1;margin:0 0 8px}.shade p{margin:0;color:var(--muted);max-width:720px}
 .side{display:flex;flex-direction:column;gap:14px}.searchBox,.now,.streamsPanel,.logPanel{background:rgba(17,20,38,.92);border:1px solid var(--line);border-radius:8px;padding:14px}.searchGrid{display:grid;grid-template-columns:1fr 110px;gap:10px}input,select,button{font:inherit;min-height:42px;border-radius:6px;border:1px solid #303866}input,select{background:#080b1d;color:#fff;padding:0 12px}button{border:0;background:linear-gradient(135deg,#7c3aed,#2563eb);color:white;font-weight:800;padding:0 14px;cursor:pointer}button:hover{background:linear-gradient(135deg,#8b5cf6,#3b82f6)}button.secondary{background:#232a50}button.ghost{background:#080b1d;border:1px solid #303866}.searchBtn{width:100%;margin-top:10px}
-.label{color:var(--muted);font-size:12px;text-transform:uppercase;font-weight:800;letter-spacing:.08em;margin-bottom:8px}.nowTitle{font-weight:900;font-size:18px}.nowUrl{color:var(--muted);font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.tools{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}.filters{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px}.stremioBtn{width:100%;margin-top:8px;background:linear-gradient(135deg,#2563eb,#7c3aed)}
+.label{color:var(--muted);font-size:12px;text-transform:uppercase;font-weight:800;letter-spacing:.08em;margin-bottom:8px}.nowTitle{font-weight:900;font-size:18px}.nowUrl{color:var(--muted);font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.tools{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}.filters{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px}
 .rows{margin-top:26px}.rowHead{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}h2{margin:0;font-size:22px}.rail{display:grid;grid-auto-flow:column;grid-auto-columns:156px;gap:12px;overflow-x:auto;overscroll-behavior-x:contain;padding:2px 0 14px;scrollbar-color:#555 transparent}.poster{height:232px;width:156px;text-align:left;background:#151515;border:1px solid #242424;border-radius:7px;color:#fff;padding:0;overflow:hidden;transition:transform .16s,border-color .16s}.poster:hover{transform:scale(1.04);border-color:#777}.poster img{width:100%;height:178px;object-fit:cover;background:#222}.poster strong{display:block;padding:8px 8px 0;font-size:13px;line-height:1.2}.poster small{display:block;color:var(--muted);padding:3px 8px 8px;font-size:12px}
 .streamGrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.stream{min-height:86px;text-align:left;background:#10142b;border:1px solid #29305c;border-radius:8px;color:#fff;padding:12px}.stream.active{border-color:var(--green);box-shadow:0 0 0 1px var(--green),0 0 24px rgba(56,189,248,.25)}.stream strong{display:block;font-size:15px}.stream small{display:block;color:var(--muted);font-weight:400;font-size:12px;margin-top:5px}.pill{display:inline-flex;align-items:center;min-height:22px;padding:0 8px;border-radius:999px;background:#29305c;color:#fff;font-size:11px;font-weight:900;margin-top:7px}.pill.mp4{background:#2563eb}.pill.hls{background:#6d28d9}
 pre{white-space:pre-wrap;background:#050505;border:1px solid #222;border-radius:8px;padding:12px;color:#cbd5e1;overflow:auto;max-height:170px;margin:0}.empty{color:var(--muted);background:#101010;border:1px dashed #333;border-radius:8px;padding:18px}
@@ -285,7 +242,6 @@ pre{white-space:pre-wrap;background:#050505;border:1px solid #222;border-radius:
         <div id="nowTitle" class="nowTitle">Aucun stream lance</div>
         <div id="nowUrl" class="nowUrl">Choisis une source pour commencer.</div>
         <div class="tools"><button id="copy" class="secondary">Copier l'URL</button><button id="open" class="ghost">Ouvrir</button></div>
-        <button id="stremio" class="stremioBtn">Tester ce film dans Stremio</button>
       </div>
       <div class="logPanel"><div class="label">Journal</div><pre id="log">Pret.</pre></div>
     </aside>
@@ -301,7 +257,7 @@ pre{white-space:pre-wrap;background:#050505;border:1px solid #222;border-radius:
 </main>
 <script src="https://cdn.jsdelivr.net/npm/hls.js@1"></script>
 <script>
-const log=document.getElementById('log'),video=document.getElementById('video'),q=document.getElementById('query'),type=document.getElementById('type'),searchBtn=document.getElementById('search'),results=document.getElementById('results'),streamsBox=document.getElementById('streams'),nowTitle=document.getElementById('nowTitle'),nowUrl=document.getElementById('nowUrl'),copyBtn=document.getElementById('copy'),openBtn=document.getElementById('open'),stremioBtn=document.getElementById('stremio'),heroTitle=document.getElementById('heroTitle'),heroMeta=document.getElementById('heroMeta'),resultCount=document.getElementById('resultCount'),streamCount=document.getElementById('streamCount'),filterAll=document.getElementById('filterAll'),filterMp4=document.getElementById('filterMp4'),filterHls=document.getElementById('filterHls'),filterVf=document.getElementById('filterVf'),filterVostfr=document.getElementById('filterVostfr'),filterMulti=document.getElementById('filterMulti');let hls=null,currentUrl='',currentMeta=null,allStreams=[],streamFilter='all',languageFilter='all';const params=new URLSearchParams(location.search);if(params.get('q'))q.value=params.get('q');if(params.get('type'))type.value=params.get('type');const noPoster='data:image/svg+xml;charset=utf-8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="312" height="464"><rect width="100%" height="100%" fill="#151515"/><text x="50%" y="47%" fill="#777" font-family="Arial" font-size="28" text-anchor="middle">MADRADOR</text><text x="50%" y="55%" fill="#555" font-family="Arial" font-size="22" text-anchor="middle">FILM</text></svg>');
+const log=document.getElementById('log'),video=document.getElementById('video'),q=document.getElementById('query'),type=document.getElementById('type'),searchBtn=document.getElementById('search'),results=document.getElementById('results'),streamsBox=document.getElementById('streams'),nowTitle=document.getElementById('nowTitle'),nowUrl=document.getElementById('nowUrl'),copyBtn=document.getElementById('copy'),openBtn=document.getElementById('open'),heroTitle=document.getElementById('heroTitle'),heroMeta=document.getElementById('heroMeta'),resultCount=document.getElementById('resultCount'),streamCount=document.getElementById('streamCount'),filterAll=document.getElementById('filterAll'),filterMp4=document.getElementById('filterMp4'),filterHls=document.getElementById('filterHls'),filterVf=document.getElementById('filterVf'),filterVostfr=document.getElementById('filterVostfr'),filterMulti=document.getElementById('filterMulti');let hls=null,currentUrl='',currentMeta=null,allStreams=[],streamFilter='all',languageFilter='all';const params=new URLSearchParams(location.search);if(params.get('q'))q.value=params.get('q');if(params.get('type'))type.value=params.get('type');const noPoster='data:image/svg+xml;charset=utf-8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="312" height="464"><rect width="100%" height="100%" fill="#151515"/><text x="50%" y="47%" fill="#777" font-family="Arial" font-size="28" text-anchor="middle">MADRADOR</text><text x="50%" y="55%" fill="#555" font-family="Arial" font-size="22" text-anchor="middle">FILM</text></svg>');
 function write(x){log.textContent+='\\n'+x;log.scrollTop=log.scrollHeight}function setLog(x){log.textContent=x}function esc(x){return String(x||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}function formatUrl(u){const s=String(u||'').replace(location.origin,'');const m=s.match(/^\\/proxy\\/[^/]+\\/(stream\\.[a-z0-9]+)$/i);return m?'/proxy/.../'+m[1]:s}
 async function search(autoLoadFirst){const query=q.value.trim();if(!query)return;setLog('Recherche: '+query);results.className='empty';results.textContent='Recherche...';streamsBox.className='empty';streamsBox.textContent='Choisis un resultat.';streamCount.textContent='';const data=await fetch('/search.json?type='+encodeURIComponent(type.value)+'&q='+encodeURIComponent(query)).then(r=>r.json());resultCount.textContent=data.results.length+' resultat(s)';results.className='rail';results.innerHTML=data.results.map(r=>'<button class="poster" data-id="'+r.id+'" data-type="'+r.type+'" data-title="'+esc(r.title)+'" data-year="'+esc(r.year||'')+'"><img src="'+esc(r.poster||noPoster)+'" alt=""><strong>'+esc(r.title)+'</strong><small>'+esc(r.year||'Annee inconnue')+' · TMDB '+r.id+'</small></button>').join('')||'<div class="empty">Aucun resultat</div>';results.querySelectorAll('button').forEach(b=>b.onclick=()=>loadStreams(b.dataset.type,b.dataset.id,b.dataset.title,b.dataset.year));write('Resultats: '+data.results.length);if(autoLoadFirst&&data.results[0]){const r=data.results[0];await loadStreams(r.type,r.id,r.title,r.year)}}
 function streamText(s){return [s.name,s.title,s.description,s.url].join(' ').toLowerCase()}
@@ -311,7 +267,7 @@ async function loadStreams(mediaType,id,title,year){currentMeta={mediaType,id,ti
 async function play(s,button){if(!s)return;streamsBox.querySelectorAll('.active').forEach(x=>x.classList.remove('active'));if(button)button.classList.add('active');const kind=s.url.includes('.mp4')?'MP4':s.url.includes('.m3u8')?'HLS':'Lien';currentUrl=s.url;nowTitle.textContent=s.name+' · '+kind;nowUrl.textContent=formatUrl(s.url);heroMeta.textContent=s.title||s.description||kind;write('Lecture: '+s.name+' - '+(s.title||s.description||''));write(s.url);if(hls){hls.destroy();hls=null}video.removeAttribute('src');video.load();if(s.url.includes('.m3u8')){if(window.Hls&&Hls.isSupported()){hls=new Hls({enableWorker:true,lowLatencyMode:false});hls.loadSource(s.url);hls.attachMedia(video);hls.on(Hls.Events.ERROR,(e,d)=>write('HLS error: '+JSON.stringify({type:d.type,details:d.details,fatal:d.fatal})));}else if(video.canPlayType('application/vnd.apple.mpegurl')){video.src=s.url}else{write('HLS non supporte dans ce navigateur');return}}else{video.src=s.url}await video.play().catch(e=>write('Lecture bloquee: '+e.message))}
 function setFilter(value){streamFilter=value;filterAll.className=value==='all'?'secondary':'ghost';filterMp4.className=value==='mp4'?'secondary':'ghost';filterHls.className=value==='hls'?'secondary':'ghost';renderStreams()}
 function setLanguageFilter(value){languageFilter=value;filterVf.className=value==='vf'?'secondary':'ghost';filterVostfr.className=value==='vostfr'?'secondary':'ghost';filterMulti.className=value==='multi'?'secondary':'ghost';renderStreams()}
-copyBtn.onclick=async()=>{if(!currentUrl)return;await navigator.clipboard.writeText(currentUrl).catch(()=>{});write('URL copiee')};openBtn.onclick=()=>{if(currentUrl)window.open(currentUrl,'_blank')};stremioBtn.onclick=async()=>{if(!currentMeta){write('Choisis d abord un resultat.');return}const data=await fetch('/stremio-open.json?type='+encodeURIComponent(currentMeta.mediaType)+'&id='+encodeURIComponent(currentMeta.id)).then(r=>r.json());if(data.desktopUrl){write('Ouverture Stremio: '+data.webUrl);location.href=data.desktopUrl;setTimeout(()=>window.open(data.webUrl,'_blank'),700)}else{write('Impossible de generer le lien Stremio: '+(data.error||''))}};filterAll.onclick=()=>setFilter('all');filterMp4.onclick=()=>setFilter('mp4');filterHls.onclick=()=>setFilter('hls');filterVf.onclick=()=>setLanguageFilter(languageFilter==='vf'?'all':'vf');filterVostfr.onclick=()=>setLanguageFilter(languageFilter==='vostfr'?'all':'vostfr');filterMulti.onclick=()=>setLanguageFilter(languageFilter==='multi'?'all':'multi');video.addEventListener('error',()=>write('Video error code: '+(video.error&&video.error.code)));searchBtn.onclick=()=>search(false).catch(e=>setLog('Erreur: '+(e.stack||e.message||e)));q.addEventListener('keydown',e=>{if(e.key==='Enter')searchBtn.click()});if(params.get('id')){setTimeout(()=>loadStreams(type.value,params.get('id'),q.value||'Titre choisi',params.get('year')||''),250)}else if(params.get('q'))setTimeout(()=>search(params.get('autoload')==='1'),250);
+copyBtn.onclick=async()=>{if(!currentUrl)return;await navigator.clipboard.writeText(currentUrl).catch(()=>{});write('URL copiee')};openBtn.onclick=()=>{if(currentUrl)window.open(currentUrl,'_blank')};filterAll.onclick=()=>setFilter('all');filterMp4.onclick=()=>setFilter('mp4');filterHls.onclick=()=>setFilter('hls');filterVf.onclick=()=>setLanguageFilter(languageFilter==='vf'?'all':'vf');filterVostfr.onclick=()=>setLanguageFilter(languageFilter==='vostfr'?'all':'vostfr');filterMulti.onclick=()=>setLanguageFilter(languageFilter==='multi'?'all':'multi');video.addEventListener('error',()=>write('Video error code: '+(video.error&&video.error.code)));searchBtn.onclick=()=>search(false).catch(e=>setLog('Erreur: '+(e.stack||e.message||e)));q.addEventListener('keydown',e=>{if(e.key==='Enter')searchBtn.click()});if(params.get('id')){setTimeout(()=>loadStreams(type.value,params.get('id'),q.value||'Titre choisi',params.get('year')||''),250)}else if(params.get('q'))setTimeout(()=>search(params.get('autoload')==='1'),250);
 </script>
 </body>
 </html>`;
@@ -363,7 +319,7 @@ function renderCatalogPage() {
 <body>
 <main>
   <header class="nav"><div class="brand">MADRADOR FILM</div><nav><a href="/test-player">Lecteur</a><a href="/providers">Providers</a></nav></header>
-  <section class="hero"><div><span class="chip">Catalogue beta</span><h1>Films et series</h1><p class="lead">Cherche un titre, ouvre sa fiche, puis lance directement la lecture ou Stremio.</p><div class="searchShell"><div class="search"><input id="query" placeholder="Rechercher un titre..." value="" autocomplete="off"><select id="type"><option value="movie">Film</option><option value="series">Serie</option></select><button id="go">Rechercher</button></div><div id="suggestions" class="suggestions"></div></div></div></section>
+  <section class="hero"><div><span class="chip">Catalogue beta</span><h1>Films et series</h1><p class="lead">Cherche un titre, ouvre sa fiche, puis lance directement la lecture sur Madrador Film.</p><div class="searchShell"><div class="search"><input id="query" placeholder="Rechercher un titre..." value="" autocomplete="off"><select id="type"><option value="movie">Film</option><option value="series">Serie</option></select><button id="go">Rechercher</button></div><div id="suggestions" class="suggestions"></div></div></div></section>
   <section id="favoritesRow" class="row hidden"></section>
   <section id="historyRow" class="row hidden"></section>
   <div id="searchResults"></div>
@@ -386,7 +342,7 @@ function card(item){return '<button class="poster" data-title="'+esc(item.title)
 function bindPosters(root){root.querySelectorAll('.poster').forEach(b=>b.onclick=()=>openDetails({id:b.dataset.id,type:b.dataset.type,title:b.dataset.title,year:b.dataset.year}))}
 function renderLocalRows(){const favs=readStore('madradorFavorites'),hist=readStore('madradorHistory');favoritesRow.className='row '+(favs.length?'':'hidden');favoritesRow.innerHTML=favs.length?'<div class="rowHead"><h2>Favoris</h2><button class="miniBtn" id="clearFavs">Vider</button></div><div class="rail">'+favs.map(card).join('')+'</div>':'';historyRow.className='row '+(hist.length?'':'hidden');historyRow.innerHTML=hist.length?'<div class="rowHead"><h2>Recemment ouverts</h2><button class="miniBtn" id="clearHistory">Vider</button></div><div class="rail">'+hist.map(card).join('')+'</div>':'';bindPosters(favoritesRow);bindPosters(historyRow);const cf=document.getElementById('clearFavs'),ch=document.getElementById('clearHistory');if(cf)cf.onclick=()=>{writeStore('madradorFavorites',[]);renderLocalRows()};if(ch)ch.onclick=()=>{writeStore('madradorHistory',[]);renderLocalRows()}}
 function renderSources(streams){if(!streams.length)return '<div class="empty">Aucune source trouvee pour le moment.</div>';return '<div class="sourceList">'+streams.slice(0,9).map((s,i)=>{const text=[s.name,s.title||s.description].filter(Boolean).join(' · ');const isHls=/m3u8/i.test(s.url||''),isMp4=/\\.mp4/i.test(s.url||'');return '<button class="sourceCard" data-index="'+i+'"><strong>'+esc(s.name||('Source '+(i+1)))+'</strong><small>'+esc(text.slice(0,120))+'</small><span class="chip">'+(isMp4?'MP4':isHls?'HLS':'Direct')+'</span></button>'}).join('')+'</div>'}
-async function openDetails(item){modal.className='modal open';sheet.innerHTML='<div class="empty">Chargement de la fiche...</div>';try{const d=await fetch('/details.json?type='+encodeURIComponent(item.type)+'&id='+encodeURIComponent(item.id)).then(r=>r.json());saveRecent({id:d.id,type:d.type,title:d.title,year:d.year,poster:d.poster});const play=playerUrl(d);const favLabel=isFav(d)?'Retirer des favoris':'Ajouter aux favoris';const stremio=await fetch('/stremio-open.json?type='+encodeURIComponent(d.type)+'&id='+encodeURIComponent(d.id)).then(r=>r.json()).catch(()=>({}));sheet.innerHTML='<div class="detailHero" style="background-image:linear-gradient(90deg,rgba(8,10,25,.98),rgba(8,10,25,.68)),url('+esc(d.backdrop||'')+')"><img class="detailPoster" src="'+esc(d.poster||noPoster)+'" alt=""><div class="detailText"><span class="chip">'+esc(d.type==='series'?'Serie':'Film')+'</span><h2>'+esc(d.title)+'</h2><div class="meta">'+esc([d.year,d.rating?('TMDB '+Number(d.rating).toFixed(1)):'',d.genres&&d.genres.join(', ')].filter(Boolean).join(' · '))+'</div><p class="overview">'+esc(d.overview||'Aucun resume disponible.')+'</p><div class="detailActions"><button id="playNow">Lire maintenant</button>'+(stremio.desktopUrl?'<button id="openStremio">Ouvrir dans Stremio</button>':'')+'<button id="favBtn" class="miniBtn">'+favLabel+'</button><button id="copyBtn" class="miniBtn">Copier le lien</button></div></div></div><div class="sourcePanel"><div class="sourceHead"><div><strong>Sources disponibles</strong><div class="meta" id="sourceMeta">Recherche automatique en cours...</div></div><button class="miniBtn" id="refreshSources">Relancer</button></div><div id="sourceList" class="empty">Chargement des sources...</div></div>';document.getElementById('playNow').onclick=()=>location.href=play;if(document.getElementById('openStremio'))document.getElementById('openStremio').onclick=()=>{location.href=stremio.desktopUrl;setTimeout(()=>window.open(stremio.webUrl,'_blank'),700)};document.getElementById('copyBtn').onclick=()=>navigator.clipboard.writeText(location.origin+play);document.getElementById('favBtn').onclick=()=>{document.getElementById('favBtn').textContent=toggleFav({id:d.id,type:d.type,title:d.title,year:d.year,poster:d.poster})?'Retirer des favoris':'Ajouter aux favoris'};async function loadSources(){const list=document.getElementById('sourceList'),meta=document.getElementById('sourceMeta');list.className='empty';list.textContent='Chargement des sources...';try{const data=await fetch('/stream/'+encodeURIComponent(d.type)+'/'+encodeURIComponent(d.id)+'.json').then(r=>r.json());const streams=data.streams||[];meta.textContent=streams.length+' source'+(streams.length>1?'s':'')+' trouvee'+(streams.length>1?'s':'');list.className='';list.innerHTML=renderSources(streams);list.querySelectorAll('.sourceCard').forEach(btn=>btn.onclick=()=>{const s=streams[Number(btn.dataset.index)];if(s&&s.url)location.href=s.url})}catch(e){meta.textContent='Erreur pendant la recherche';list.className='empty';list.textContent='Impossible de charger les sources: '+(e.message||e)}}document.getElementById('refreshSources').onclick=loadSources;renderLocalRows();loadSources()}catch(e){sheet.innerHTML='<div class="empty">Impossible de charger la fiche: '+esc(e.message||e)+'</div>'}}
+async function openDetails(item){modal.className='modal open';sheet.innerHTML='<div class="empty">Chargement de la fiche...</div>';try{const d=await fetch('/details.json?type='+encodeURIComponent(item.type)+'&id='+encodeURIComponent(item.id)).then(r=>r.json());saveRecent({id:d.id,type:d.type,title:d.title,year:d.year,poster:d.poster});const play=playerUrl(d);const favLabel=isFav(d)?'Retirer des favoris':'Ajouter aux favoris';sheet.innerHTML='<div class="detailHero" style="background-image:linear-gradient(90deg,rgba(8,10,25,.98),rgba(8,10,25,.68)),url('+esc(d.backdrop||'')+')"><img class="detailPoster" src="'+esc(d.poster||noPoster)+'" alt=""><div class="detailText"><span class="chip">'+esc(d.type==='series'?'Serie':'Film')+'</span><h2>'+esc(d.title)+'</h2><div class="meta">'+esc([d.year,d.rating?('TMDB '+Number(d.rating).toFixed(1)):'',d.genres&&d.genres.join(', ')].filter(Boolean).join(' · '))+'</div><p class="overview">'+esc(d.overview||'Aucun resume disponible.')+'</p><div class="detailActions"><button id="playNow">Lire maintenant</button><button id="favBtn" class="miniBtn">'+favLabel+'</button><button id="copyBtn" class="miniBtn">Copier le lien</button></div></div></div><div class="sourcePanel"><div class="sourceHead"><div><strong>Sources disponibles</strong><div class="meta" id="sourceMeta">Recherche automatique en cours...</div></div><button class="miniBtn" id="refreshSources">Relancer</button></div><div id="sourceList" class="empty">Chargement des sources...</div></div>';document.getElementById('playNow').onclick=()=>location.href=play;document.getElementById('copyBtn').onclick=()=>navigator.clipboard.writeText(location.origin+play);document.getElementById('favBtn').onclick=()=>{document.getElementById('favBtn').textContent=toggleFav({id:d.id,type:d.type,title:d.title,year:d.year,poster:d.poster})?'Retirer des favoris':'Ajouter aux favoris'};async function loadSources(){const list=document.getElementById('sourceList'),meta=document.getElementById('sourceMeta');list.className='empty';list.textContent='Chargement des sources...';try{const data=await fetch('/stream/'+encodeURIComponent(d.type)+'/'+encodeURIComponent(d.id)+'.json').then(r=>r.json());const streams=data.streams||[];meta.textContent=streams.length+' source'+(streams.length>1?'s':'')+' trouvee'+(streams.length>1?'s':'');list.className='';list.innerHTML=renderSources(streams);list.querySelectorAll('.sourceCard').forEach(btn=>btn.onclick=()=>{const s=streams[Number(btn.dataset.index)];if(s&&s.url)location.href=s.url})}catch(e){meta.textContent='Erreur pendant la recherche';list.className='empty';list.textContent='Impossible de charger les sources: '+(e.message||e)}}document.getElementById('refreshSources').onclick=loadSources;renderLocalRows();loadSources()}catch(e){sheet.innerHTML='<div class="empty">Impossible de charger la fiche: '+esc(e.message||e)+'</div>'}}
 async function searchCatalog(){const q=query.value.trim();if(!q)return;searchResults.innerHTML='<section class="row"><div class="rowHead"><h2>Recherche</h2><span class="chip">Chargement</span></div><div class="empty">Recherche en cours...</div></section>';const data=await fetch('/search.json?type='+encodeURIComponent(type.value)+'&q='+encodeURIComponent(q)).then(r=>r.json());searchResults.innerHTML='<section class="row"><div class="rowHead"><h2>Recherche</h2><span class="chip">'+data.results.length+' titres</span></div><div class="rail">'+data.results.map(card).join('')+'</div></section>';bindPosters(searchResults)}
 let suggestTimer=0;async function loadSuggestions(){const q=query.value.trim();clearTimeout(suggestTimer);if(q.length<2){suggestions.className='suggestions';suggestions.innerHTML='';return}suggestTimer=setTimeout(async()=>{try{const data=await fetch('/search.json?type='+encodeURIComponent(type.value)+'&q='+encodeURIComponent(q)).then(r=>r.json());const items=(data.results||[]).slice(0,5);suggestions.className='suggestions '+(items.length?'open':'');suggestions.innerHTML=items.map(item=>'<button class="suggestion" data-title="'+esc(item.title)+'" data-type="'+item.type+'" data-id="'+esc(item.id)+'" data-year="'+esc(item.year||'')+'"><img src="'+esc(item.poster||noPoster)+'" alt=""><span><strong>'+esc(item.title)+'</strong><small>'+esc(item.year||'')+' · '+esc(item.type==='series'?'Serie':'Film')+'</small></span><span class="chip">Ouvrir</span></button>').join('');suggestions.querySelectorAll('.suggestion').forEach(b=>b.onclick=()=>{suggestions.className='suggestions';openDetails({id:b.dataset.id,type:b.dataset.type,title:b.dataset.title,year:b.dataset.year})})}catch(e){suggestions.className='suggestions'}},260)}
 async function load(){try{const data=await fetch('/catalog.json').then(r=>r.json());rows.innerHTML=data.rows.map(row=>'<section class="row"><div class="rowHead"><h2>'+esc(row.title)+'</h2><span class="chip">'+row.items.length+' titres</span></div><div class="rail">'+row.items.map(card).join('')+'</div></section>').join('');bindPosters(rows)}catch(e){rows.innerHTML='<div class="empty">Erreur catalogue: '+esc(e.message||e)+'</div>'}}
@@ -432,42 +388,6 @@ function renderProvidersPage() {
 </html>`;
 }
 
-function renderInstallPage(req) {
-  const baseUrl = getPublicBaseUrl(req);
-  const manifestUrl = baseUrl + "/v3/manifest.json";
-  const stremioUrl = "stremio://" + manifestUrl.replace(/^https?:\/\//, "");
-  const webAddonsUrl = "https://web.stremio.com/#/addons";
-
-  return `<!doctype html>
-<html lang="fr">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Installer Madrador Film FR</title>
-<link rel="icon" href="/logo.png">
-<style>
-:root{color-scheme:dark;--bg:#060714;--panel:#111426;--line:#303866;--text:#fff;--muted:#b8c0e0;--violet:#7c3aed;--blue:#2563eb;--ok:#38bdf8}
-*{box-sizing:border-box}body{margin:0;background:#060714;color:#fff;font-family:Inter,Segoe UI,Arial,sans-serif;line-height:1.5}body:before{content:"";position:fixed;inset:0;background:radial-gradient(circle at 16% 0%,rgba(124,58,237,.34),transparent 34%),radial-gradient(circle at 82% 8%,rgba(37,99,235,.26),transparent 30%),linear-gradient(180deg,rgba(0,0,0,.12),#060714 62%);pointer-events:none}main{position:relative;z-index:1;width:min(920px,calc(100% - 28px));margin:0 auto;padding:34px 0 56px}.brand{font-weight:900;color:#a78bfa;font-size:24px;margin-bottom:24px}h1{font-size:clamp(38px,7vw,74px);line-height:.98;margin:0 0 12px}.lead{color:#dbeafe;font-size:18px;max-width:760px}.card{background:rgba(17,20,38,.92);border:1px solid var(--line);border-radius:8px;padding:18px;margin:16px 0}.actions{display:flex;flex-wrap:wrap;gap:10px;margin:18px 0}a,button{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 16px;border-radius:7px;border:1px solid var(--line);color:#fff;text-decoration:none;font-weight:900;background:#10142b}a.primary,button.primary{border:0;background:linear-gradient(135deg,var(--violet),var(--blue))}code{display:block;background:#050817;border:1px solid var(--line);border-radius:7px;padding:13px;overflow:auto;color:#dbeafe}.steps{counter-reset:item;display:grid;gap:10px;margin-top:12px}.step{display:grid;grid-template-columns:36px 1fr;gap:10px;align-items:start}.step:before{counter-increment:item;content:counter(item);display:grid;place-items:center;width:30px;height:30px;border-radius:999px;background:linear-gradient(135deg,var(--violet),var(--blue));font-weight:900}.muted{color:var(--muted)}.ok{color:var(--ok);font-weight:900}@media(max-width:620px){main{width:100%;padding:22px 12px 42px}.actions{display:grid}a,button{width:100%}.card{padding:14px}h1{font-size:38px}}
-</style>
-</head>
-<body>
-<main>
-  <div class="brand">MADRADOR FILM</div>
-  <h1>Installation Stremio propre</h1>
-  <p class="lead">Cette page utilise l'URL versionnee qui evite le vieux cache de Stremio Web.</p>
-  <div class="actions"><a class="primary" href="${escapeHtml(stremioUrl)}">Installer dans Stremio Desktop</a><a href="${escapeHtml(webAddonsUrl)}" target="_blank">Ouvrir Stremio Web Addons</a><a href="/v3/manifest.json" target="_blank">Voir le manifest</a></div>
-  <div class="card"><strong>URL a copier dans Add addon</strong><code id="manifest">${escapeHtml(manifestUrl)}</code><div class="actions"><button class="primary" id="copy">Copier l'URL</button><button id="test">Tester Mario</button></div><p id="out" class="muted">Pret.</p></div>
-  <div class="card"><strong>Etapes exactes</strong><div class="steps"><div class="step">Dans Stremio, supprime tous les anciens addons Madrador.</div><div class="step">Va dans Addons puis clique Add addon.</div><div class="step">Colle exactement l'URL ci-dessus et installe Madrador Film FR.</div><div class="step">Retourne sur ton film et fais Ctrl+F5 si tu es sur Stremio Web.</div></div></div>
-</main>
-<script>
-const manifest=document.getElementById('manifest').textContent,out=document.getElementById('out');
-document.getElementById('copy').onclick=async()=>{await navigator.clipboard.writeText(manifest).catch(()=>{});out.innerHTML='<span class="ok">URL copiee.</span>'};
-document.getElementById('test').onclick=async()=>{out.textContent='Test en cours...';try{const data=await fetch('/v3/stream/movie/tt28650488.json').then(r=>r.json());out.innerHTML='<span class="ok">'+(data.streams||[]).length+' streams trouves pour Mario.</span>'}catch(e){out.textContent='Erreur test: '+(e.message||e)}};
-</script>
-</body>
-</html>`;
-}
-
 async function searchTmdb(query, mediaType) {
   const type = mediaType === "series" || mediaType === "tv" ? "tv" : "movie";
   const normalizedQuery = query.trim().toLowerCase();
@@ -486,23 +406,6 @@ async function searchTmdb(query, mediaType) {
       poster: item.poster_path ? "https://image.tmdb.org/t/p/w185" + item.poster_path : null
     }));
   }, SEARCH_CACHE_TTL_MS);
-}
-
-async function getTmdbExternalId(tmdbId, mediaType) {
-  const type = mediaType === "series" || mediaType === "tv" ? "tv" : "movie";
-  return cachedJson("external:" + type + ":" + tmdbId, async () => {
-    const endpoint = "https://api.themoviedb.org/3/" + type + "/" + encodeURIComponent(tmdbId) +
-      "?api_key=" + encodeURIComponent(TMDB_API_KEY) +
-      "&append_to_response=external_ids";
-    const response = await fetch(endpoint);
-    if (!response.ok) throw new Error("TMDB details failed: HTTP " + response.status);
-    const data = await response.json();
-    return {
-      imdbId: data.imdb_id || data.external_ids && data.external_ids.imdb_id || "",
-      title: data.title || data.name || "",
-      type: type === "tv" ? "series" : "movie"
-    };
-  }, 24 * 60 * 60 * 1000);
 }
 
 async function getTmdbDetails(tmdbId, mediaType) {
@@ -578,47 +481,6 @@ async function getCatalogRows() {
   }, 30 * 60 * 1000);
 }
 
-async function toStremioMetaPreview(item) {
-  try {
-    const external = await getTmdbExternalId(item.id, item.type);
-    if (!external.imdbId) return null;
-    return {
-      id: external.imdbId,
-      type: item.type === "series" ? "series" : "movie",
-      name: item.title,
-      poster: item.poster || undefined,
-      background: item.backdrop || undefined,
-      description: item.overview || undefined,
-      releaseInfo: item.year || undefined,
-      imdbRating: item.rating ? String(Number(item.rating).toFixed(1)) : undefined
-    };
-  } catch (_) {
-    return null;
-  }
-}
-
-async function getStremioCatalog(type, catalogId, extra) {
-  const stremioType = type === "series" ? "series" : "movie";
-  const expectedId = stremioType === "series" ? "madrador-series" : "madrador-movies";
-  if (catalogId !== expectedId) return { metas: [] };
-
-  const search = String(extra.search || "").trim();
-  const skip = Math.max(0, Number(extra.skip || 0) || 0);
-  const page = String(Math.floor(skip / 18) + 1);
-  const cacheKey = ["stremio-catalog", stremioType, catalogId, search.toLowerCase(), page].join(":");
-
-  return cachedJson(cacheKey, async () => {
-    const items = search
-      ? await searchTmdb(search, stremioType)
-      : stremioType === "series"
-        ? await tmdbList("/tv/popular", { page }, "tv")
-        : await tmdbList("/movie/popular", { page }, "movie");
-
-    const metas = (await Promise.all(items.slice(0, 18).map(toStremioMetaPreview))).filter(Boolean);
-    return { metas };
-  }, SEARCH_CACHE_TTL_MS);
-}
-
 async function runDiagnostics(req) {
   const ids = (req.url && new URL(req.url, "http://localhost").searchParams.get("providers") || "movix,frenchstream,nakios,toflix")
     .split(",")
@@ -682,8 +544,8 @@ async function runDiagnostics(req) {
 
 function getConfig(req) {
   return {
-    name: stremioManifest.name,
-    version: stremioManifest.version,
+    name: SITE_NAME,
+    version: SITE_VERSION,
     providers: getEnabledProviders("tv").map((provider) => provider.id),
     movieProviders: getEnabledProviders("movie").map((provider) => provider.id),
     providerTimeoutMs: PROVIDER_TIMEOUT_MS,
@@ -698,52 +560,19 @@ function getConfig(req) {
   };
 }
 
-async function getStremioOpenInfo(tmdbId, mediaType) {
-  const external = await getTmdbExternalId(tmdbId, mediaType);
-  if (!external.imdbId) throw new Error("Aucun ID IMDb trouve pour ce titre.");
-  const type = external.type === "series" ? "series" : "movie";
-  return {
-    title: external.title,
-    type,
-    tmdbId: String(tmdbId),
-    imdbId: external.imdbId,
-    desktopUrl: "stremio:///detail/" + type + "/" + external.imdbId + "/" + external.imdbId,
-    webUrl: "https://web.stremio.com/#/detail/" + type + "/" + external.imdbId + "/" + external.imdbId
-  };
-}
-
 function parseStreamPath(pathname) {
   const match = pathname.match(/^\/stream\/([^/]+)\/(.+)\.json$/);
   if (!match) return null;
 
-  const stremioType = decodeURIComponent(match[1]);
+  const routeType = decodeURIComponent(match[1]);
   const rawId = decodeURIComponent(match[2]);
   const parts = rawId.split(":");
 
   return {
     imdbId: parts[0],
-    mediaType: stremioType === "series" ? "tv" : "movie",
+    mediaType: routeType === "series" ? "tv" : "movie",
     season: parts[1] ? Number(parts[1]) : undefined,
     episode: parts[2] ? Number(parts[2]) : undefined
-  };
-}
-
-function parseCatalogPath(pathname) {
-  const match = pathname.match(/^\/catalog\/([^/]+)\/([^/]+)(?:\/(.+))?\.json$/);
-  if (!match) return null;
-
-  const extra = {};
-  if (match[3]) {
-    const params = new URLSearchParams(decodeURIComponent(match[3]));
-    for (const [key, value] of params.entries()) {
-      extra[key] = value;
-    }
-  }
-
-  return {
-    type: decodeURIComponent(match[1]),
-    id: decodeURIComponent(match[2]),
-    extra
   };
 }
 
@@ -959,7 +788,7 @@ async function resolveTmdb(imdbId, mediaType) {
   }, 24 * 60 * 60 * 1000);
 }
 
-function toStremioStream(stream, provider, req) {
+function toSiteStream(stream, provider, req) {
   if (!stream || !stream.url || typeof stream.url !== "string") return null;
 
   const proxied = shouldProxyStream(stream);
@@ -1019,14 +848,14 @@ async function getStreams(request, req) {
         );
 
         if (result.error) {
-          console.warn("[Stremio] " + provider.id + ": " + result.error.message);
+          console.warn("[Madrador Film] " + provider.id + ": " + result.error.message);
         }
 
         for (const stream of result.streams) {
           rows.push({ providerId: provider.id, stream });
         }
       } catch (error) {
-        console.warn("[Stremio] " + provider.id + ": " + (error && error.message ? error.message : error));
+        console.warn("[Madrador Film] " + provider.id + ": " + (error && error.message ? error.message : error));
       }
       return rows;
     });
@@ -1041,11 +870,11 @@ async function getStreams(request, req) {
   for (const row of rawStreams) {
     const provider = providerById.get(row.providerId);
     if (!provider) continue;
-    const stremioStream = toStremioStream(row.stream, provider, req);
-    if (!stremioStream || seen.has(stremioStream.url)) continue;
-    seen.add(stremioStream.url);
-    stremioStream._rank = getStreamRank(row.stream);
-    streams.push(stremioStream);
+    const siteStream = toSiteStream(row.stream, provider, req);
+    if (!siteStream || seen.has(siteStream.url)) continue;
+    seen.add(siteStream.url);
+    siteStream._rank = getStreamRank(row.stream);
+    streams.push(siteStream);
   }
 
   return streams
@@ -1061,10 +890,10 @@ const server = http.createServer(async (req, res) => {
     const url = new URL(req.url, "http://" + (req.headers.host || "localhost"));
     const prefixMatch = url.pathname.match(/^\/v[0-9]+(?=\/|$)/);
     if (prefixMatch) {
-      req.addonPrefix = prefixMatch[0];
+      req.routePrefix = prefixMatch[0];
       url.pathname = url.pathname.slice(prefixMatch[0].length) || "/";
     } else {
-      req.addonPrefix = "";
+      req.routePrefix = "";
     }
 
     if (req.method === "OPTIONS") {
@@ -1098,26 +927,21 @@ const server = http.createServer(async (req, res) => {
       return;
     }
 
-    if (url.pathname === "/install") {
-      sendHtml(res, 200, renderInstallPage(req));
-      return;
-    }
-
     if (url.pathname === "/status") {
       sendHtml(res, 200, renderStatusPage());
       return;
     }
 
     if (url.pathname === "/manifest.json") {
-      sendJson(res, 200, stremioManifest);
+      sendJson(res, 404, { error: "Addon removed. Use the Madrador Film website instead." });
       return;
     }
 
     if (url.pathname === "/health.json") {
       sendJson(res, 200, {
         ok: true,
-        name: stremioManifest.name,
-        version: stremioManifest.version,
+        name: SITE_NAME,
+        version: SITE_VERSION,
         providers: getEnabledProviders("tv").length
       });
       return;
@@ -1165,17 +989,6 @@ const server = http.createServer(async (req, res) => {
       return;
     }
 
-    if (url.pathname === "/stremio-open.json") {
-      const tmdbId = url.searchParams.get("id") || "";
-      const mediaType = url.searchParams.get("type") || "movie";
-      if (!tmdbId.trim()) {
-        sendJson(res, 400, { error: "Missing id" });
-        return;
-      }
-      sendJson(res, 200, await getStremioOpenInfo(tmdbId, mediaType));
-      return;
-    }
-
     if (url.pathname === "/search.json") {
       const query = url.searchParams.get("q") || "";
       const mediaType = url.searchParams.get("type") || "movie";
@@ -1184,12 +997,6 @@ const server = http.createServer(async (req, res) => {
         return;
       }
       sendJson(res, 200, { results: await searchTmdb(query, mediaType) });
-      return;
-    }
-
-    const catalogRequest = parseCatalogPath(url.pathname);
-    if (catalogRequest) {
-      sendJson(res, 200, await getStremioCatalog(catalogRequest.type, catalogRequest.id, catalogRequest.extra));
       return;
     }
 
@@ -1208,12 +1015,12 @@ const server = http.createServer(async (req, res) => {
 
     sendJson(res, 404, { error: "Not found" });
   } catch (error) {
-    console.error("[Stremio] " + (error && error.stack ? error.stack : error));
+    console.error("[Madrador Film] " + (error && error.stack ? error.stack : error));
     sendJson(res, 500, { error: "Internal server error" });
   }
 });
 
 server.listen(PORT, HOST, () => {
-  console.log("Stremio addon listening on http://" + HOST + ":" + PORT + "/manifest.json");
+  console.log("Madrador Film website listening on http://" + HOST + ":" + PORT + "/");
   console.log("Providers: " + getEnabledProviders("tv").map((provider) => provider.id).join(", "));
 });

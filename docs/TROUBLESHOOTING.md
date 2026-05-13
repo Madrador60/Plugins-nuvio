@@ -1,54 +1,29 @@
 # Depannage
 
-## Stremio affiche `No streams were found`
+## Le site ne charge pas
 
-1. Verifie que l'addon installe est bien :
+1. Ouvre `https://madrador60-stremio-addon.onrender.com/health.json`.
+2. Si Render etait en veille, attends le premier reveil puis recharge la page.
+3. Teste aussi `https://madrador60-stremio-addon.onrender.com/catalog.json`.
 
-```text
-https://madrador60-stremio-addon.onrender.com/manifest.json
-```
+## Aucune source trouvee
 
-2. Supprime l'ancien addon dans Stremio.
-3. Recharge Stremio Web avec `Ctrl + F5`.
-4. Reinstalle l'addon.
-5. Teste le titre sur `/test-player`.
+Certains films recents ou rares ne sont pas disponibles chez les providers actifs.
 
-## Le site lit la video mais pas Stremio Web
+1. Essaie un autre titre connu.
+2. Clique sur `Relancer` dans la fiche.
+3. Verifie `/providers` pour voir les providers actifs ou instables.
 
-Le proxy fonctionne, mais le lecteur Stremio Web peut bloquer certains formats.
+## La video ne se lance pas
 
-Actions conseillees :
+1. Essaie une source `MP4` en priorite.
+2. Essaie une source `HLS` si MP4 ne marche pas.
+3. Ouvre le meme titre dans `/test-player` pour voir les erreurs du lecteur.
 
-1. Essaie une source `MP4`.
-2. Essaie Stremio Desktop.
-3. Supprime et reinstalle l'addon pour vider le cache.
-
-## Render met longtemps a repondre
-
-Le plan gratuit peut mettre le service en veille.
-
-Attends 30 a 60 secondes, puis recharge.
-
-## Un provider retourne 0 stream
-
-Ca peut venir de :
-
-- titre absent de la source ;
-- domaine change ;
-- site temporairement bloque ;
-- timeout trop court ;
-- contenu uniquement disponible dans une autre langue.
-
-## Verifier le serveur
-
-```text
-https://madrador60-stremio-addon.onrender.com/health.json
-https://madrador60-stremio-addon.onrender.com/diagnostics.json
-```
-
-## Tester localement
+## Tests rapides
 
 ```powershell
+node --check stremio\server.js
+node --check scripts\test-providers.js
 node stremio\server.js
-node scripts\test-providers.js --only=frenchstream,movix,nakios,toflix --timeout=60000
 ```

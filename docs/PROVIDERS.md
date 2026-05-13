@@ -8,7 +8,7 @@
 | Movix | FR | OK | Source rapide pour films/series |
 | Nakios | FR/EN | OK | MP4 et HLS, souvent prioritaire |
 | Purstream | FR/EN | OK | VF/VOSTFR/MULTI |
-| ToFlix | FR/EN | OK | MP4 utile pour Stremio Web |
+| ToFlix | FR/EN | OK | MP4 utile pour le lecteur web |
 | VIDEASY | Multi dont FR | Lent | Peut necessiter un timeout plus haut |
 | CinemaCity | Multi dont FR | Limite | Peut demander un acces/cookie |
 

@@ -1,19 +1,17 @@
 # Plugins Nuvio FR
 
-Providers francais pour **Nuvio** et addon local/hebergeable pour **Stremio**.
+Providers francais pour **Nuvio** et site hebergeable **Madrador Film**.
 
 Ce depot sert deux usages :
 
 - charger des providers dans Nuvio avec un `manifest.json` public ;
-- proposer une interface Stremio + une page de test web avec recherche et lecteur integre.
+- proposer un site de streaming web avec catalogue, fiches, favoris et lecteur integre.
 
 ## Liens rapides
 
 | Usage | URL |
 |---|---|
 | Nuvio | `https://raw.githubusercontent.com/Madrador60/Plugins-nuvio/refs/heads/main/` |
-| Stremio | `https://madrador60-stremio-addon.onrender.com/v3/manifest.json` |
-| Installation Stremio guidee | `https://madrador60-stremio-addon.onrender.com/install` |
 | Catalogue / page publique | `https://madrador60-stremio-addon.onrender.com/` |
 | Catalogue direct | `https://madrador60-stremio-addon.onrender.com/catalog` |
 | Lecteur de test | `https://madrador60-stremio-addon.onrender.com/test-player` |
@@ -33,18 +31,12 @@ https://raw.githubusercontent.com/Madrador60/Plugins-nuvio/refs/heads/main/
 
 Ensuite, rafraichis la liste et active les providers souhaites.
 
-### Stremio
+### Madrador Film
 
-Dans Stremio, ajoute :
-
-```text
-https://madrador60-stremio-addon.onrender.com/v3/manifest.json
-```
-
-Si Stremio Web ne lit pas une source, teste la meme recherche sur :
+Ouvre simplement le site :
 
 ```text
-https://madrador60-stremio-addon.onrender.com/test-player
+https://madrador60-stremio-addon.onrender.com/
 ```
 
 ## Fonctionnalites
@@ -52,10 +44,10 @@ https://madrador60-stremio-addon.onrender.com/test-player
 | Fonction | Description |
 |---|---|
 | Providers Nuvio | Fichiers `providers/*.js` compatibles avec le manifest Nuvio |
-| Addon Stremio | Serveur HTTP sans dependance externe obligatoire, avec streams et catalogues Stremio |
+| Site Madrador Film | Serveur HTTP sans dependance externe obligatoire |
 | Proxy media | Ajoute les headers requis et expose des URLs compatibles MP4/HLS |
-| Catalogue | Recherche integree, fiches detail, boutons Lire/Stremio, favoris et historique local |
-| Test player | Interface web bleu/violet avec recherche TMDB, filtres et bouton Stremio |
+| Catalogue | Recherche integree, fiches detail, boutons Lire, favoris et historique local |
+| Test player | Interface web bleu/violet avec recherche TMDB, filtres et lecteur |
 | Diagnostic | Pages `/status`, `/providers` et endpoint `/diagnostics.json` |
 | Deploiement | Pret pour Render avec `render.yaml` |
 
@@ -80,8 +72,7 @@ Details : [docs/PROVIDERS.md](docs/PROVIDERS.md)
 
 | Document | Role |
 |---|---|
-| [docs/INSTALL.md](docs/INSTALL.md) | Installation Nuvio, Stremio, local |
-| [docs/STREMIO.md](docs/STREMIO.md) | Endpoints, variables, diagnostic Stremio |
+| [docs/INSTALL.md](docs/INSTALL.md) | Installation Nuvio, site web, local |
 | [docs/PROVIDERS.md](docs/PROVIDERS.md) | Liste et etat des providers |
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Structure technique du projet |
 | [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) | Problemes courants et solutions |
@@ -97,7 +88,7 @@ Plugins-nuvio/
   docs/                    Documentation detaillee
   providers/               Providers Nuvio
   scripts/                 Outils de maintenance et de test
-  stremio/                 Serveur addon Stremio
+  stremio/                 Serveur web Madrador Film
   domains.json             Domaines connus et fallbacks
   manifest.json            Manifest Nuvio public
   package.json             Commandes du projet
@@ -151,6 +142,6 @@ http://127.0.0.1:7000/
 
 | Priorite | Etat | Sujet |
 |---|---|---|
-| 1 | Fait | Proxy MP4/HLS plus robuste, cache TMDB/streams, bouton Stremio, page status bleu/violet |
+| 1 | Fait | Proxy MP4/HLS plus robuste, cache TMDB/streams, page status bleu/violet |
 | 2 | Partiel | Etats providers publics, domaines visibles dans `/providers`, providers instables marques |
 | 3 | Partiel | Filtres MP4/HLS/VF/VOSTFR/MULTI, page providers publique, branding Madrador Film |

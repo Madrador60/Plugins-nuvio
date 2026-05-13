@@ -3,7 +3,7 @@
 ## Ce que le depot contient
 
 - du code JavaScript de providers ;
-- un serveur local/hebergeable pour Stremio ;
+- un serveur local/hebergeable pour le site Madrador Film ;
 - un proxy technique pour rendre certains liens lisibles par les lecteurs.
 
 ## Ce que le depot ne contient pas
