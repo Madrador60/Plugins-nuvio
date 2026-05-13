@@ -26,6 +26,7 @@ L'addon Stremio reutilise les providers Nuvio du dossier `providers/`.
 | `/providers` | Page publique des providers, etats, formats et domaines |
 | `/catalog` | Page catalogue films/series |
 | `/catalog.json` | Donnees catalogue TMDB avec cache |
+| `/details.json?type=movie&id=157336` | Fiche detail TMDB |
 | `/diagnostics.json` | Test rapide des providers principaux |
 | `/search.json?type=movie&q=Interstellar` | Recherche TMDB |
 | `/stremio-open.json?type=movie&id=157336` | Genere les liens Stremio Desktop/Web depuis un ID TMDB |

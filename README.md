@@ -53,7 +53,7 @@ https://madrador60-stremio-addon.onrender.com/test-player
 | Providers Nuvio | Fichiers `providers/*.js` compatibles avec le manifest Nuvio |
 | Addon Stremio | Serveur HTTP sans dependance externe obligatoire |
 | Proxy media | Ajoute les headers requis et expose des URLs compatibles MP4/HLS |
-| Catalogue | Rangees films/series inspirees des plateformes de streaming |
+| Catalogue | Recherche integree, fiches detail, boutons Lire/Stremio |
 | Test player | Interface web bleu/violet avec recherche TMDB, filtres et bouton Stremio |
 | Diagnostic | Pages `/status`, `/providers` et endpoint `/diagnostics.json` |
 | Deploiement | Pret pour Render avec `render.yaml` |

@@ -12,6 +12,7 @@ Checked on 2026-05-13:
 | `/test-player` | OK | Page loads and can search |
 | `/catalog` | OK | 6 rows, 108 posters, no browser console errors locally |
 | `/catalog.json` | OK | Returns cached TMDB rows for films and series |
+| `/details.json?type=movie&id=157336` | OK | Returns detail page data |
 | `/providers` | OK | Public provider state page |
 | `/stremio-open.json?type=movie&id=157336` | OK | Returns Desktop/Web Stremio links |
 | `/search.json?type=movie&q=Interstellar` | OK | Returns TMDB results |
