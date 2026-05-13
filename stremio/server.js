@@ -150,7 +150,7 @@ function renderHomePage(req) {
     "</head>" +
     "<body><main>" +
     "<div class=\"hero\"><h1>Madrador60 FR Providers</h1><p class=\"lead\">Addon Stremio heberge pour films, series et animes francais. Ajoute l'URL du manifest dans Stremio et lance ton contenu.</p>" +
-    "<div class=\"actions\"><a class=\"btn primary\" href=\"" + escapeHtml(stremioInstallUrl) + "\">Installer dans Stremio</a><a class=\"btn\" href=\"/manifest.json\">Voir le manifest</a><a class=\"btn\" href=\"/test-player\">Tester la lecture</a><a class=\"btn\" href=\"https://github.com/Madrador60/Plugins-nuvio\">GitHub</a></div></div>" +
+    "<div class=\"actions\"><a class=\"btn primary\" href=\"" + escapeHtml(stremioInstallUrl) + "\">Installer dans Stremio</a><a class=\"btn\" href=\"/manifest.json\">Voir le manifest</a><a class=\"btn\" href=\"/test-player\">Tester la lecture</a><a class=\"btn\" href=\"/status\">Statut</a><a class=\"btn\" href=\"https://github.com/Madrador60/Plugins-nuvio\">GitHub</a></div></div>" +
     "<div class=\"grid\"><div class=\"box\"><strong>" + movieProviders.length + "</strong><span>providers films/series</span></div><div class=\"box\"><strong>" + seriesProviders.length + "</strong><span>providers series/animes</span></div><div class=\"box\"><strong>FR</strong><span>sources francaises en priorite</span></div></div>" +
     "<section><h2>URL a mettre dans Stremio</h2><code>" + escapeHtml(manifestUrl) + "</code><p class=\"note\">Sur Render gratuit, le premier chargement peut etre lent si le service etait en veille.</p></section>" +
     "<section><h2>Providers actifs</h2><table><thead><tr><th>Provider</th><th>Langues</th><th>Etat</th></tr></thead><tbody>" + providerRows + "</tbody></table></section>" +
@@ -175,6 +175,14 @@ function renderTestPlayerPage() {
     "</script></body></html>";
 }
 
+function renderStatusPage() {
+  return "<!doctype html>" +
+    "<html lang=\"fr\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">" +
+    "<title>Statut providers</title><style>:root{color-scheme:dark;--bg:#111315;--panel:#1a1d20;--line:#30353b;--text:#f5f7fa;--muted:#aab2bd;--accent:#8b5cf6;--ok:#22c55e;--bad:#ef4444}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Segoe UI,Arial,sans-serif;line-height:1.5}main{width:min(1040px,calc(100% - 32px));margin:0 auto;padding:34px 0}button{min-height:42px;padding:0 14px;border-radius:8px;border:1px solid var(--line);background:var(--accent);color:white;font-weight:700;cursor:pointer}table{width:100%;border-collapse:collapse;background:var(--panel);border:1px solid var(--line);border-radius:8px;overflow:hidden;margin-top:16px}th,td{text-align:left;padding:12px;border-bottom:1px solid var(--line)}th{color:var(--muted)}tr:last-child td{border-bottom:0}.ok{color:var(--ok);font-weight:700}.bad{color:var(--bad);font-weight:700}.muted{color:var(--muted)}pre{white-space:pre-wrap;background:#080a0c;border:1px solid var(--line);border-radius:8px;padding:12px;color:#cbd5e1;overflow:auto}</style></head>" +
+    "<body><main><h1>Statut providers</h1><p class=\"muted\">Teste les providers films principaux avec Interstellar. Le test peut prendre jusqu'a une minute.</p><p><button id=\"run\">Lancer le diagnostic</button> <a style=\"color:#c4b5fd\" href=\"/test-player\">Test player</a></p><div id=\"out\" class=\"muted\">Pret.</div></main>" +
+    "<script>const out=document.getElementById('out');document.getElementById('run').onclick=async()=>{out.textContent='Diagnostic en cours...';try{const data=await fetch('/diagnostics.json').then(r=>r.json());out.innerHTML='<table><thead><tr><th>Provider</th><th>Statut</th><th>Streams</th><th>Temps</th><th>Note</th></tr></thead><tbody>'+data.results.map(r=>'<tr><td>'+r.provider+'</td><td class=\"'+(r.status==='OK'?'ok':'bad')+'\">'+r.status+'</td><td>'+r.streams+'</td><td>'+r.timeMs+'ms</td><td>'+((r.error||'').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])))+'</td></tr>').join('')+'</tbody></table><pre>'+JSON.stringify(data,null,2)+'</pre>'}catch(e){out.textContent='Erreur: '+(e.message||e)}};</script></body></html>";
+}
+
 async function searchTmdb(query, mediaType) {
   const type = mediaType === "series" || mediaType === "tv" ? "tv" : "movie";
   const endpoint = "https://api.themoviedb.org/3/search/" + type +
@@ -190,6 +198,71 @@ async function searchTmdb(query, mediaType) {
     year: String(item.release_date || item.first_air_date || "").slice(0, 4),
     poster: item.poster_path ? "https://image.tmdb.org/t/p/w185" + item.poster_path : null
   }));
+}
+
+async function runDiagnostics(req) {
+  const ids = (req.url && new URL(req.url, "http://localhost").searchParams.get("providers") || "movix,frenchstream,nakios,toflix")
+    .split(",")
+    .map((item) => item.trim())
+    .filter(Boolean);
+  const results = [];
+
+  for (const id of ids) {
+    const provider = nuvioManifest.scrapers.find((item) => item.id === id);
+    if (!provider) {
+      results.push({ provider: id, status: "ERROR", streams: 0, timeMs: 0, error: "Unknown provider" });
+      continue;
+    }
+
+    const started = Date.now();
+    try {
+      const module = loadProvider(provider);
+      if (!module || typeof module.getStreams !== "function") {
+        throw new Error("Missing getStreams");
+      }
+
+      const result = await withTimeout(
+        module.getStreams("157336", "movie"),
+        Math.min(PROVIDER_TIMEOUT_MS, 60000),
+        provider.id
+      );
+      const streams = Array.isArray(result.streams) ? result.streams : [];
+      results.push({
+        provider: id,
+        status: streams.length > 0 ? "OK" : result.error ? "ERROR" : "ZERO",
+        streams: streams.length,
+        timeMs: Date.now() - started,
+        error: result.error ? result.error.message : ""
+      });
+    } catch (error) {
+      results.push({
+        provider: id,
+        status: "ERROR",
+        streams: 0,
+        timeMs: Date.now() - started,
+        error: error && error.message ? error.message : String(error)
+      });
+    }
+  }
+
+  return {
+    ok: results.every((item) => item.status === "OK"),
+    test: "Interstellar",
+    tmdbId: "157336",
+    generatedAt: new Date().toISOString(),
+    results
+  };
+}
+
+function getConfig(req) {
+  return {
+    name: stremioManifest.name,
+    version: stremioManifest.version,
+    providers: getEnabledProviders("tv").map((provider) => provider.id),
+    movieProviders: getEnabledProviders("movie").map((provider) => provider.id),
+    providerTimeoutMs: PROVIDER_TIMEOUT_MS,
+    providerFilter: PROVIDER_FILTER
+  };
 }
 
 function parseStreamPath(pathname) {
@@ -279,6 +352,12 @@ function shouldProxyStream(stream) {
   if (!stream || !stream.url) return false;
   if (stream.headers && Object.keys(stream.headers).length > 0) return true;
   return isPlaylistUrl(stream.url);
+}
+
+function getBingeGroup(provider, stream) {
+  const quality = String(stream.quality || "hd").toLowerCase().replace(/[^a-z0-9]+/g, "-");
+  const format = isMp4Url(stream.url) ? "mp4" : isPlaylistUrl(stream.url) ? "hls" : "direct";
+  return [provider.id || provider.name || "provider", quality, format].join("-");
 }
 
 function rewritePlaylist(content, sourceUrl, req, headers) {
@@ -407,6 +486,7 @@ function toStremioStream(stream, provider, req) {
   if (!stream || !stream.url || typeof stream.url !== "string") return null;
 
   const proxied = shouldProxyStream(stream);
+  const extension = getProxyExtension(stream.url);
   const quality = stream.quality || "HD";
   const titleParts = [
     stream.title || provider.name,
@@ -418,9 +498,11 @@ function toStremioStream(stream, provider, req) {
     name: provider.name || stream.name || provider.id,
     title: titleParts.join("\n"),
     url: proxied ? getProxyUrl(req, stream) : stream.url,
+    description: titleParts.join("\n"),
     behaviorHints: {
-      notWebReady: false,
-      filename: safeFilename(stream.title || provider.name || provider.id, getProxyExtension(stream.url))
+      notWebReady: extension !== "mp4",
+      bingeGroup: getBingeGroup(provider, stream),
+      filename: safeFilename(stream.title || provider.name || provider.id, extension)
     }
   };
 
@@ -495,6 +577,11 @@ const server = http.createServer(async (req, res) => {
       return;
     }
 
+    if (url.pathname === "/status") {
+      sendHtml(res, 200, renderStatusPage());
+      return;
+    }
+
     if (url.pathname === "/manifest.json") {
       sendJson(res, 200, stremioManifest);
       return;
@@ -507,6 +594,16 @@ const server = http.createServer(async (req, res) => {
         version: stremioManifest.version,
         providers: getEnabledProviders("tv").length
       });
+      return;
+    }
+
+    if (url.pathname === "/config.json") {
+      sendJson(res, 200, getConfig(req));
+      return;
+    }
+
+    if (url.pathname === "/diagnostics.json") {
+      sendJson(res, 200, await runDiagnostics(req));
       return;
     }
 

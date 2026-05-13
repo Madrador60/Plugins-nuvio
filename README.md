@@ -32,6 +32,12 @@ Page de test avec recherche :
 https://madrador60-stremio-addon.onrender.com/test-player
 ```
 
+Statut des providers :
+
+```text
+https://madrador60-stremio-addon.onrender.com/status
+```
+
 Sur Render gratuit, le premier chargement peut prendre un peu de temps si le serveur etait en veille.
 
 ## Ce qu'il y a dedans

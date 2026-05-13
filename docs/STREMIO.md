@@ -27,9 +27,12 @@ https://madrador60-stremio-addon.onrender.com/test-player
 | `/` | Page d'accueil lisible |
 | `/manifest.json` | Manifest Stremio |
 | `/health.json` | Statut du serveur |
+| `/config.json` | Configuration active |
 | `/providers.json` | Providers actifs |
+| `/diagnostics.json` | Test rapide des providers principaux |
 | `/search.json?type=movie&q=Interstellar` | Recherche TMDB pour la page de test |
 | `/test-player` | Lecteur web de diagnostic |
+| `/status` | Page de statut des providers |
 | `/stream/movie/:id.json` | Streams films |
 | `/stream/series/:id:season:episode.json` | Streams series |
 
