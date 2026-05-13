@@ -17,9 +17,25 @@ Checked on 2026-05-13:
 Last important commits:
 
 ```text
+1c61647 Add provider diagnostics and Stremio hints
 68bec26 Harden Stremio web playback headers
 e162620 Add searchable test player
 ```
+
+Latest public Render diagnostic:
+
+```text
+https://madrador60-stremio-addon.onrender.com/diagnostics.json
+```
+
+Result on 2026-05-13:
+
+| Status | Provider | Streams | Time |
+|---|---|---:|---:|
+| OK | `movix` | 2 | 1399ms |
+| OK | `frenchstream` | 2 | 12603ms |
+| OK | `nakios` | 3 | 501ms |
+| OK | `toflix` | 1 | 598ms |
 
 Command used:
 
