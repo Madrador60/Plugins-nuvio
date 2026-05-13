@@ -8,6 +8,7 @@ Dernier test manuel : 2026-05-13
 |---|---|---|
 | `/` | OK | Catalogue en premiere page |
 | `/catalog` | OK | Alias du catalogue |
+| `/catalog.json?refresh=1` | OK | 24 categories, environ 864 titres, regeneration forcee |
 | `/test-player` | OK | Recherche, filtres et lecteur integre |
 | `/brand.svg` | OK | Logo public du site |
 | `/banner.svg` | OK | Banniere GitHub |

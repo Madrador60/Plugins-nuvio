@@ -14,3 +14,5 @@ services:
         value: 22000
       - key: PROVIDER_FILTER
         value: frenchstream,movix,nakios,purstream,toflix,videasy
+      - key: CATALOG_CACHE_TTL_MS
+        value: 1800000

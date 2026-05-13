@@ -8,7 +8,7 @@ const nuvioManifest = require(path.join(ROOT, "manifest.json"));
 const domains = require(path.join(ROOT, "domains.json"));
 
 const SITE_NAME = "Madrador Film";
-const SITE_VERSION = "1.6.0";
+const SITE_VERSION = "1.7.0";
 const HOST = process.env.HOST || "0.0.0.0";
 const PORT = Number(process.env.PORT || 7000);
 const TMDB_API_KEY = process.env.TMDB_API_KEY || "8265bd1679663a7ea12ac168da84d2e8";
@@ -229,6 +229,9 @@ pre{white-space:pre-wrap;background:#050505;border:1px solid #222;border-radius:
 @media(max-width:520px){body{overflow-x:hidden}main{width:100%;padding:12px 10px calc(92px + env(safe-area-inset-bottom))}.brand{padding-left:2px}.hero{min-height:210px;padding:16px;border-radius:0;margin:8px -10px 18px;background-position:center top}.hero .chip{font-size:11px;min-height:26px}h1{font-size:34px;max-width:330px}.lead{font-size:14px;max-width:330px}.search{margin-top:14px}.search input,.search select,.search button{min-height:48px;border-radius:8px;font-size:15px}.row{margin:20px 0}.rowHead{padding:0 2px}.rowHead .chip{white-space:nowrap}.rail{grid-auto-columns:42vw;gap:10px;margin:0 -10px;padding:2px 10px 16px;scroll-padding-left:10px}.poster{width:42vw;height:calc(42vw * 1.55);border-radius:7px}.poster:hover{transform:none}.poster img{height:calc(42vw * 1.16)}.poster strong{font-size:12px;padding:7px 7px 0}.poster small{font-size:11px;padding:2px 7px}.modal{align-items:stretch;padding-top:env(safe-area-inset-top)}.sheet{height:100dvh;max-height:100dvh;border:0;border-radius:0;overflow:auto}.detailHero{min-height:100%;display:block;padding:56px 16px 24px;background-position:center top}.detailPoster{width:118px;float:left;margin:0 14px 8px 0}.detailText h2{font-size:30px;line-height:1.02}.meta{font-size:13px}.overview{clear:both;max-height:none;font-size:14px;line-height:1.5}.detailActions{display:grid;grid-template-columns:1fr;gap:9px;margin-top:18px}.detailActions button{min-height:48px}.close{position:fixed;right:12px;top:calc(12px + env(safe-area-inset-top));z-index:30;border-radius:999px}.bottomNav{left:8px;right:8px;bottom:calc(8px + env(safe-area-inset-bottom));padding:7px;border-radius:12px}.bottomNav a{font-size:12px;min-height:42px;display:flex;align-items:center;justify-content:center}}@media(max-width:360px){.rail{grid-auto-columns:46vw}.poster{width:46vw;height:calc(46vw * 1.58)}.poster img{height:calc(46vw * 1.18)}h1{font-size:30px}.detailPoster{width:104px}}
 .brand{display:flex;align-items:center;gap:10px}.brand img{width:34px;height:34px;border-radius:8px}.categoryBar{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0 6px}.categoryBar button{min-height:36px;border:1px solid #303866;background:#10142b;border-radius:999px;padding:0 13px}.categoryBar button.active{background:linear-gradient(135deg,#7c3aed,#2563eb);border-color:transparent}.sourcePlayer{display:none;margin:0 0 14px;background:#020617;border:1px solid #303866;border-radius:8px;overflow:hidden}.sourcePlayer.open{display:block}.sourcePlayer video{display:block;width:100%;max-height:360px;background:#000}.sourcePlayerInfo{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:10px 12px;background:#0b1028;color:#dbeafe}.sourceStatus{color:#bfdbfe;font-size:13px}.sourceCard.best{border-color:#38bdf8;box-shadow:0 0 0 1px rgba(56,189,248,.55)}.sourceCard.best:before{content:"Meilleur choix";display:inline-flex;margin-bottom:8px;min-height:22px;align-items:center;border-radius:999px;padding:0 8px;background:#075985;color:#e0f2fe;font-size:11px;font-weight:900}.empty strong{color:#fff}.empty .hint{display:block;margin-top:6px;color:#b8c0e0}.skeleton{min-height:220px;background:linear-gradient(90deg,#111426,#1d2446,#111426);background-size:240% 100%;animation:pulse 1.2s linear infinite;border-radius:8px}@keyframes pulse{to{background-position:-240% 0}}@media(max-width:520px){.categoryBar{display:grid;grid-template-columns:1fr 1fr}.categoryBar button{min-height:42px}.sourcePlayer video{max-height:280px}.sourcePlayerInfo{display:grid}.brand img{width:30px;height:30px}}
 </style>
+<style>
+.updatePanel{display:flex;align-items:center;justify-content:space-between;gap:12px;background:rgba(17,20,38,.88);border:1px solid #303866;border-radius:8px;padding:12px 14px;margin:0 0 18px}.updatePanel strong{display:block}.updatePanel span{display:block;color:#b8c0e0;font-size:13px}.updatePanel button{min-height:36px;border-radius:999px}.rowCount{display:inline-flex;align-items:center;min-height:30px;border:1px solid #303866;border-radius:999px;padding:0 10px;color:#dbeafe;background:#10142b;font-weight:800;font-size:12px}@media(max-width:620px){.updatePanel{display:grid}.updatePanel button{width:100%}}
+</style>
 </head>
 <body>
 <main>
@@ -303,7 +306,8 @@ function renderCatalogPage() {
   <header class="nav"><div class="brand"><img src="/brand.svg" alt="">MADRADOR FILM</div><nav><a href="/test-player">Lecteur</a><a href="/providers">Providers</a></nav></header>
   <section class="hero"><div><span class="chip good">Madrador Film</span><h1>Films et series</h1><p class="lead">Un catalogue simple, rapide et pense pour lancer les sources FR sans passer par un addon externe.</p><div class="searchShell"><div class="search"><input id="query" placeholder="Rechercher un titre..." value="" autocomplete="off"><select id="type"><option value="movie">Film</option><option value="series">Serie</option></select><button id="go">Rechercher</button></div><div id="suggestions" class="suggestions"></div></div><div class="quick"><button data-q="Mario" data-type="movie">Mario</button><button data-q="Interstellar" data-type="movie">Interstellar</button><button data-q="One Piece" data-type="series">One Piece</button><button data-q="The Last of Us" data-type="series">The Last of Us</button></div></div></section>
   <section class="categoryBar" aria-label="Filtres catalogue"><button class="active" data-filter="all">Tout</button><button data-filter="movie">Films</button><button data-filter="series">Series</button><button data-filter="anime">Animes</button></section>
-  <section class="stats"><div class="stat"><strong id="statTitles">...</strong><span>Titres affiches</span></div><div class="stat"><strong>FR</strong><span>Sources prioritaires</span></div><div class="stat"><strong>MP4/HLS</strong><span>Tri automatique</span></div><div class="stat"><strong>Mobile</strong><span>Interface adaptee</span></div></section>
+  <section class="stats"><div class="stat"><strong id="statTitles">...</strong><span>Titres affiches</span></div><div class="stat"><strong id="statRows">...</strong><span>Categories auto</span></div><div class="stat"><strong>FR</strong><span>Sources prioritaires</span></div><div class="stat"><strong id="statUpdate">Auto</strong><span>Mise a jour TMDB</span></div></section>
+  <section class="updatePanel"><div><strong>Catalogue mis a jour automatiquement</strong><span id="updateInfo">Chargement des informations...</span></div><button id="refreshCatalog">Actualiser maintenant</button></section>
   <section id="favoritesRow" class="row hidden"></section>
   <section id="historyRow" class="row hidden"></section>
   <div id="searchResults"></div>
@@ -313,7 +317,7 @@ function renderCatalogPage() {
 <div id="modal" class="modal"><button id="close" class="close">X</button><div id="sheet" class="sheet"></div></div>
 <script src="https://cdn.jsdelivr.net/npm/hls.js@1"></script>
 <script>
-const rows=document.getElementById('rows'),searchResults=document.getElementById('searchResults'),query=document.getElementById('query'),type=document.getElementById('type'),go=document.getElementById('go'),modal=document.getElementById('modal'),sheet=document.getElementById('sheet'),closeBtn=document.getElementById('close'),suggestions=document.getElementById('suggestions'),favoritesRow=document.getElementById('favoritesRow'),historyRow=document.getElementById('historyRow'),statTitles=document.getElementById('statTitles'),categoryBtns=[...document.querySelectorAll('.categoryBar button')];let detailHls=null,activeCatalogFilter='all';
+const rows=document.getElementById('rows'),searchResults=document.getElementById('searchResults'),query=document.getElementById('query'),type=document.getElementById('type'),go=document.getElementById('go'),modal=document.getElementById('modal'),sheet=document.getElementById('sheet'),closeBtn=document.getElementById('close'),suggestions=document.getElementById('suggestions'),favoritesRow=document.getElementById('favoritesRow'),historyRow=document.getElementById('historyRow'),statTitles=document.getElementById('statTitles'),statRows=document.getElementById('statRows'),statUpdate=document.getElementById('statUpdate'),updateInfo=document.getElementById('updateInfo'),refreshCatalog=document.getElementById('refreshCatalog'),categoryBtns=[...document.querySelectorAll('.categoryBar button')];let detailHls=null,activeCatalogFilter='all';
 const noPoster='data:image/svg+xml;charset=utf-8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="312" height="464"><rect width="100%" height="100%" fill="#111426"/><text x="50%" y="48%" fill="#8b5cf6" font-family="Arial" font-size="26" text-anchor="middle">MADRADOR</text><text x="50%" y="56%" fill="#60a5fa" font-family="Arial" font-size="20" text-anchor="middle">FILM</text></svg>');
 function esc(x){return String(x||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
 function playerUrl(item){return '/test-player?q='+encodeURIComponent(item.title)+'&type='+encodeURIComponent(item.type)+'&id='+encodeURIComponent(item.id||'')+'&year='+encodeURIComponent(item.year||'')+'&autoload=1'}
@@ -393,9 +397,10 @@ async function openDetails(item){
 }
 async function searchCatalog(){const q=query.value.trim();if(!q)return;searchResults.innerHTML='<section class="row"><div class="rowHead"><h2>Recherche</h2><span class="chip">Chargement</span></div><div class="empty">Recherche en cours...</div></section>';const data=await fetch('/search.json?type='+encodeURIComponent(type.value)+'&q='+encodeURIComponent(q)).then(r=>r.json());searchResults.innerHTML='<section class="row"><div class="rowHead"><h2>Recherche</h2><span class="chip">'+data.results.length+' titres</span></div><div class="rail">'+data.results.map(card).join('')+'</div></section>';bindPosters(searchResults)}
 let suggestTimer=0;async function loadSuggestions(){const q=query.value.trim();clearTimeout(suggestTimer);if(q.length<2){suggestions.className='suggestions';suggestions.innerHTML='';return}suggestTimer=setTimeout(async()=>{try{const data=await fetch('/search.json?type='+encodeURIComponent(type.value)+'&q='+encodeURIComponent(q)).then(r=>r.json());const items=(data.results||[]).slice(0,5);suggestions.className='suggestions '+(items.length?'open':'');suggestions.innerHTML=items.map(item=>'<button class="suggestion" data-title="'+esc(item.title)+'" data-type="'+item.type+'" data-id="'+esc(item.id)+'" data-year="'+esc(item.year||'')+'"><img src="'+esc(item.poster||noPoster)+'" alt=""><span><strong>'+esc(item.title)+'</strong><small>'+esc(item.year||'')+' · '+esc(item.type==='series'?'Serie':'Film')+'</small></span><span class="chip">Ouvrir</span></button>').join('');suggestions.querySelectorAll('.suggestion').forEach(b=>b.onclick=()=>{suggestions.className='suggestions';openDetails({id:b.dataset.id,type:b.dataset.type,title:b.dataset.title,year:b.dataset.year})})}catch(e){suggestions.className='suggestions'}},260)}
-function applyCatalogFilter(){categoryBtns.forEach(btn=>btn.classList.toggle('active',btn.dataset.filter===activeCatalogFilter));rows.querySelectorAll('.row').forEach(row=>{const group=row.dataset.group||'movie';row.style.display=activeCatalogFilter==='all'||group===activeCatalogFilter?'':'none'})}
-async function load(){try{const data=await fetch('/catalog.json').then(r=>r.json());const total=(data.rows||[]).reduce((n,row)=>n+(row.items||[]).length,0);statTitles.textContent=total;rows.innerHTML=data.rows.map(row=>'<section class="row" data-group="'+esc(row.group||'movie')+'"><div class="rowHead"><h2>'+esc(row.title)+'</h2><span class="chip">'+row.items.length+' titres</span></div><div class="rail">'+row.items.map(card).join('')+'</div></section>').join('');bindPosters(rows);applyCatalogFilter()}catch(e){rows.innerHTML='<div class="empty">Erreur catalogue: '+esc(e.message||e)+'</div>';statTitles.textContent='0'}}
-go.onclick=()=>searchCatalog().catch(e=>{searchResults.innerHTML='<div class="empty">Erreur recherche: '+esc(e.message||e)+'</div>'});document.querySelectorAll('.quick button').forEach(b=>b.onclick=()=>{query.value=b.dataset.q;type.value=b.dataset.type;go.click()});categoryBtns.forEach(btn=>btn.onclick=()=>{activeCatalogFilter=btn.dataset.filter;applyCatalogFilter()});query.addEventListener('input',loadSuggestions);type.addEventListener('change',loadSuggestions);query.addEventListener('keydown',e=>{if(e.key==='Enter')go.click()});closeBtn.onclick=()=>{if(detailHls){detailHls.destroy();detailHls=null}modal.className='modal'};modal.onclick=e=>{if(e.target===modal){if(detailHls){detailHls.destroy();detailHls=null}modal.className='modal'}};renderLocalRows();load();
+function applyCatalogFilter(){categoryBtns.forEach(btn=>btn.classList.toggle('active',btn.dataset.filter===activeCatalogFilter));let visible=0;rows.querySelectorAll('.row').forEach(row=>{const group=row.dataset.group||'movie';const show=activeCatalogFilter==='all'||group===activeCatalogFilter;row.style.display=show?'':'none';if(show)visible+=1});statRows.textContent=visible}
+function formatDateTime(value){try{return new Date(value).toLocaleString('fr-FR',{dateStyle:'short',timeStyle:'short'})}catch(e){return '-'}}
+async function load(force){try{rows.innerHTML='<div class="skeleton"></div>';const data=await fetch('/catalog.json'+(force?'?refresh=1':'')).then(r=>r.json());const total=(data.rows||[]).reduce((n,row)=>n+(row.items||[]).length,0);statTitles.textContent=total;statUpdate.textContent=Math.round((data.cacheTtlMs||0)/60000)+' min';updateInfo.textContent='Derniere generation: '+formatDateTime(data.generatedAt)+' · Prochaine verification: '+formatDateTime(data.nextRefreshAt);rows.innerHTML=data.rows.map(row=>'<section class="row" data-group="'+esc(row.group||'movie')+'"><div class="rowHead"><h2>'+esc(row.title)+'</h2><span class="rowCount">'+row.items.length+' titres</span></div><div class="rail">'+row.items.map(card).join('')+'</div></section>').join('');bindPosters(rows);applyCatalogFilter()}catch(e){rows.innerHTML='<div class="empty">Erreur catalogue: '+esc(e.message||e)+'</div>';statTitles.textContent='0';statRows.textContent='0';updateInfo.textContent='Impossible de lire la mise a jour auto.'}}
+go.onclick=()=>searchCatalog().catch(e=>{searchResults.innerHTML='<div class="empty">Erreur recherche: '+esc(e.message||e)+'</div>'});refreshCatalog.onclick=()=>load(true);document.querySelectorAll('.quick button').forEach(b=>b.onclick=()=>{query.value=b.dataset.q;type.value=b.dataset.type;go.click()});categoryBtns.forEach(btn=>btn.onclick=()=>{activeCatalogFilter=btn.dataset.filter;applyCatalogFilter()});query.addEventListener('input',loadSuggestions);type.addEventListener('change',loadSuggestions);query.addEventListener('keydown',e=>{if(e.key==='Enter')go.click()});closeBtn.onclick=()=>{if(detailHls){detailHls.destroy();detailHls=null}modal.className='modal'};modal.onclick=e=>{if(e.target===modal){if(detailHls){detailHls.destroy();detailHls=null}modal.className='modal'}};renderLocalRows();load(false);
 </script>
 </body>
 </html>`;
@@ -522,23 +527,63 @@ async function tmdbList(pathname, params, type) {
     .map((item) => normalizeTmdbItem(item, type));
 }
 
-async function getCatalogRows() {
-  return cachedJson("catalog:v3", async () => {
-    const rows = await Promise.all([
-      tmdbList("/movie/popular", { page: "1" }, "movie").then((items) => ({ id: "popular-movies", group: "movie", title: "Films populaires", items })),
-      tmdbList("/movie/now_playing", { page: "1" }, "movie").then((items) => ({ id: "new-movies", group: "movie", title: "Nouveautes cinema", items })),
-      tmdbList("/discover/movie", { sort_by: "popularity.desc", with_genres: "27,53", page: "1" }, "movie").then((items) => ({ id: "dark-movies", group: "movie", title: "Films sombres", items })),
-      tmdbList("/discover/movie", { sort_by: "popularity.desc", with_genres: "10749", page: "1" }, "movie").then((items) => ({ id: "romance", group: "movie", title: "Romance", items })),
-      tmdbList("/discover/movie", { sort_by: "popularity.desc", with_genres: "28", page: "1" }, "movie").then((items) => ({ id: "action", group: "movie", title: "Action", items })),
-      tmdbList("/discover/movie", { sort_by: "popularity.desc", with_genres: "878", page: "1" }, "movie").then((items) => ({ id: "science-fiction", group: "movie", title: "Science-fiction", items })),
-      tmdbList("/tv/popular", { page: "1" }, "tv").then((items) => ({ id: "popular-series", group: "series", title: "Series populaires", items })),
-      tmdbList("/tv/top_rated", { page: "1" }, "tv").then((items) => ({ id: "top-series", group: "series", title: "Series les mieux notees", items })),
-      tmdbList("/discover/tv", { sort_by: "popularity.desc", with_genres: "16", page: "1" }, "tv").then((items) => ({ id: "anime", group: "anime", title: "Animation et anime", items })),
-      tmdbList("/discover/tv", { sort_by: "popularity.desc", with_original_language: "ja", page: "1" }, "tv").then((items) => ({ id: "anime-jp", group: "anime", title: "Animes japonais", items }))
-    ]);
+async function catalogRow(id, group, title, pathname, params, type) {
+  const pages = params && params.pages ? Number(params.pages) : 1;
+  const cleanParams = Object.assign({}, params || {});
+  delete cleanParams.pages;
+  const lists = [];
+  for (let page = 1; page <= pages; page += 1) {
+    lists.push(tmdbList(pathname, Object.assign({}, cleanParams, { page: String(page) }), type));
+  }
+  const seen = new Set();
+  const items = (await Promise.all(lists))
+    .flat()
+    .filter((item) => {
+      const key = item.type + ":" + item.id;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    })
+    .slice(0, 36);
+  return { id, group, title, items };
+}
 
+async function getCatalogRows(forceRefresh) {
+  const cacheKey = "catalog:v4";
+  if (forceRefresh) memoryCache.delete(cacheKey);
+  return cachedJson(cacheKey, async () => {
+    const rows = await Promise.all([
+      catalogRow("trending-day", "movie", "Tendances du jour", "/trending/movie/day", { pages: 2 }, "movie"),
+      catalogRow("trending-week", "movie", "Tendances de la semaine", "/trending/movie/week", { pages: 2 }, "movie"),
+      catalogRow("new-movies", "movie", "Sorties cinema France", "/movie/now_playing", { pages: 2 }, "movie"),
+      catalogRow("upcoming-movies", "movie", "Bientot au cinema", "/movie/upcoming", { pages: 2 }, "movie"),
+      catalogRow("popular-movies", "movie", "Films populaires", "/movie/popular", { pages: 2 }, "movie"),
+      catalogRow("top-movies", "movie", "Films les mieux notes", "/movie/top_rated", { pages: 2 }, "movie"),
+      catalogRow("action", "movie", "Action", "/discover/movie", { sort_by: "popularity.desc", with_genres: "28", pages: 2 }, "movie"),
+      catalogRow("thriller", "movie", "Thriller", "/discover/movie", { sort_by: "popularity.desc", with_genres: "53", pages: 2 }, "movie"),
+      catalogRow("horror", "movie", "Horreur", "/discover/movie", { sort_by: "popularity.desc", with_genres: "27", pages: 2 }, "movie"),
+      catalogRow("comedy", "movie", "Comedies", "/discover/movie", { sort_by: "popularity.desc", with_genres: "35", pages: 2 }, "movie"),
+      catalogRow("romance", "movie", "Romance", "/discover/movie", { sort_by: "popularity.desc", with_genres: "10749", pages: 2 }, "movie"),
+      catalogRow("sci-fi", "movie", "Science-fiction", "/discover/movie", { sort_by: "popularity.desc", with_genres: "878", pages: 2 }, "movie"),
+      catalogRow("family", "movie", "Famille", "/discover/movie", { sort_by: "popularity.desc", with_genres: "10751", pages: 2 }, "movie"),
+      catalogRow("french-movies", "movie", "Films francais", "/discover/movie", { sort_by: "popularity.desc", with_original_language: "fr", pages: 2 }, "movie"),
+      catalogRow("popular-series", "series", "Series populaires", "/tv/popular", { pages: 2 }, "tv"),
+      catalogRow("airing-series", "series", "Episodes en diffusion", "/tv/on_the_air", { pages: 2 }, "tv"),
+      catalogRow("top-series", "series", "Series les mieux notees", "/tv/top_rated", { pages: 2 }, "tv"),
+      catalogRow("drama-series", "series", "Series drama", "/discover/tv", { sort_by: "popularity.desc", with_genres: "18", pages: 2 }, "tv"),
+      catalogRow("crime-series", "series", "Crime et enquete", "/discover/tv", { sort_by: "popularity.desc", with_genres: "80", pages: 2 }, "tv"),
+      catalogRow("comedy-series", "series", "Series comedie", "/discover/tv", { sort_by: "popularity.desc", with_genres: "35", pages: 2 }, "tv"),
+      catalogRow("french-series", "series", "Series francaises", "/discover/tv", { sort_by: "popularity.desc", with_original_language: "fr", pages: 2 }, "tv"),
+      catalogRow("anime", "anime", "Animation et anime", "/discover/tv", { sort_by: "popularity.desc", with_genres: "16", pages: 2 }, "tv"),
+      catalogRow("anime-jp", "anime", "Animes japonais", "/discover/tv", { sort_by: "popularity.desc", with_original_language: "ja", pages: 2 }, "tv"),
+      catalogRow("animated-movies", "anime", "Films animation", "/discover/movie", { sort_by: "popularity.desc", with_genres: "16", pages: 2 }, "movie")
+    ]);
+    const generatedAt = new Date();
     return {
-      generatedAt: new Date().toISOString(),
+      generatedAt: generatedAt.toISOString(),
+      nextRefreshAt: new Date(generatedAt.getTime() + CATALOG_CACHE_TTL_MS).toISOString(),
+      cacheTtlMs: CATALOG_CACHE_TTL_MS,
+      autoUpdate: "Le catalogue est reconstruit automatiquement depuis TMDB quand le cache expire.",
       rows
     };
   }, CATALOG_CACHE_TTL_MS);
@@ -618,6 +663,7 @@ function getConfig(req) {
       searchMs: SEARCH_CACHE_TTL_MS,
       streamsMs: STREAM_CACHE_TTL_MS,
       diagnosticsMs: DIAGNOSTIC_CACHE_TTL_MS,
+      catalogMs: CATALOG_CACHE_TTL_MS,
       entries: memoryCache.size
     }
   };
@@ -1063,7 +1109,7 @@ const server = http.createServer(async (req, res) => {
     }
 
     if (url.pathname === "/catalog.json") {
-      sendJson(res, 200, await getCatalogRows());
+      sendJson(res, 200, await getCatalogRows(url.searchParams.get("refresh") === "1"));
       return;
     }
 

@@ -38,6 +38,12 @@ Le service Render gratuit peut dormir. Si la page met du temps au premier charge
 | `assets/brand.svg` | Logo public du site |
 | `docs/provider-sources/fr/` | Sources Kotlin FR a porter en JavaScript |
 
+## Catalogue automatique
+
+Le catalogue du site est genere depuis TMDB avec un cache court. Il affiche plusieurs rails : tendances du jour, tendances de la semaine, sorties cinema France, bientot au cinema, films populaires, genres, series, animes et contenus francais.
+
+Quand TMDB ajoute un nouveau film ou met a jour une sortie, le site le recupere automatiquement a la prochaine regeneration du cache. Par defaut, la verification se fait toutes les 30 minutes. Le bouton **Actualiser maintenant** sur le catalogue force une regeneration immediate.
+
 ## Providers actifs
 
 Films et series :
