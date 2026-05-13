@@ -1,57 +1,40 @@
-# Plugins Nuvio FR
+# Madrador Film - Plugins Nuvio FR
 
-Providers francais pour **Nuvio** et site hebergeable **Madrador Film**.
+Depot de providers francais pour **Nuvio** avec un site public **Madrador Film**.
 
-Ce depot sert deux usages :
+L'objectif est simple : installer facilement les sources FR dans Nuvio, ou utiliser le site web avec catalogue, fiches, favoris et lecteur integre.
 
-- charger des providers dans Nuvio avec un `manifest.json` public ;
-- proposer un site de streaming web avec catalogue, fiches, favoris et lecteur integre.
+## Installer dans Nuvio
 
-## Liens rapides
-
-| Usage | URL |
-|---|---|
-| Nuvio | `https://raw.githubusercontent.com/Madrador60/Plugins-nuvio/refs/heads/main/` |
-| Catalogue / page publique | `https://madrador60-stremio-addon.onrender.com/` |
-| Catalogue direct | `https://madrador60-stremio-addon.onrender.com/catalog` |
-| Lecteur de test | `https://madrador60-stremio-addon.onrender.com/test-player` |
-| Providers | `https://madrador60-stremio-addon.onrender.com/providers` |
-| Statut providers | `https://madrador60-stremio-addon.onrender.com/status` |
-| Diagnostic JSON | `https://madrador60-stremio-addon.onrender.com/diagnostics.json` |
-
-## Installation
-
-### Nuvio
-
-Dans Nuvio, ajoute cette URL dans **Settings > Plugins** ou **Local Scrapers** :
+Dans **Nuvio > Settings > Plugins** ou **Local Scrapers**, ajoute cette URL :
 
 ```text
 https://raw.githubusercontent.com/Madrador60/Plugins-nuvio/refs/heads/main/
 ```
 
-Ensuite, rafraichis la liste et active les providers souhaites.
+Ensuite, rafraichis la liste des providers et active ceux que tu veux.
 
-### Madrador Film
+## Ouvrir le site
 
-Ouvre simplement le site :
+| Page | Lien |
+| --- | --- |
+| Catalogue | https://madrador60-stremio-addon.onrender.com/ |
+| Lecteur | https://madrador60-stremio-addon.onrender.com/test-player |
+| Providers | https://madrador60-stremio-addon.onrender.com/providers |
 
-```text
-https://madrador60-stremio-addon.onrender.com/
-```
+Le service Render gratuit peut dormir. Si la page met du temps au premier chargement, attends 30 a 60 secondes puis recharge.
 
-## Fonctionnalites
+## Ce qu'il y a dedans
 
-| Fonction | Description |
-|---|---|
-| Providers Nuvio | Fichiers `providers/*.js` compatibles avec le manifest Nuvio |
-| Site Madrador Film | Serveur HTTP sans dependance externe obligatoire |
-| Proxy media | Ajoute les headers requis et expose des URLs compatibles MP4/HLS |
-| Catalogue | Recherche integree, fiches detail, boutons Lire, favoris et historique local |
-| Test player | Interface web bleu/violet avec recherche TMDB, filtres et lecteur |
-| Diagnostic | Pages `/status`, `/providers` et endpoint `/diagnostics.json` |
-| Deploiement | Pret pour Render avec `render.yaml` |
+| Partie | Role |
+| --- | --- |
+| `manifest.json` | Liste publique des providers pour Nuvio |
+| `providers/` | Providers JavaScript actifs |
+| `domains.json` | Domaines connus et fallbacks |
+| `stremio/server.js` | Serveur web Madrador Film |
+| `docs/provider-sources/fr/` | Sources Kotlin FR a porter en JavaScript |
 
-## Providers
+## Providers actifs
 
 Films et series :
 
@@ -66,59 +49,26 @@ Anime-Sama, VoirAnime, Vostfree, French-Anime, AnimeVOSTFR, AnimesUltra,
 JetAnimes, Mugiwara-no-Streaming, AnimoFlix, Sekai, AnimeSite
 ```
 
-Details : [docs/PROVIDERS.md](docs/PROVIDERS.md)
+Sources FR ajoutees en reference, a porter en JavaScript :
+
+```text
+AfterDark, FrenchManga, Frembed, Kidraz, Otakufr, 1Jour1Film, Wiflix
+```
+
+Voir le detail : [docs/FRENCH_SOURCES.md](docs/FRENCH_SOURCES.md)
 
 ## Documentation
 
-| Document | Role |
-|---|---|
-| [docs/INSTALL.md](docs/INSTALL.md) | Installation Nuvio, site web, local |
-| [docs/PROVIDERS.md](docs/PROVIDERS.md) | Liste et etat des providers |
-| [docs/FRENCH_SOURCES.md](docs/FRENCH_SOURCES.md) | Sources francaises actives et sources Kotlin a porter |
-| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Structure technique du projet |
-| [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) | Problemes courants et solutions |
+| Document | Contenu |
+| --- | --- |
+| [docs/INSTALL.md](docs/INSTALL.md) | Installation Nuvio, site public, lancement local |
+| [docs/PROVIDERS.md](docs/PROVIDERS.md) | Etat des providers actifs |
+| [docs/FRENCH_SOURCES.md](docs/FRENCH_SOURCES.md) | Sources francaises actives et sources a porter |
+| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Structure technique |
+| [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) | Problemes courants |
 | [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md) | Ajouter ou maintenir un provider |
-| [docs/SECURITY.md](docs/SECURITY.md) | Securite, secrets et limites |
+| [docs/SECURITY.md](docs/SECURITY.md) | Securite et limites |
 | [TESTING.md](TESTING.md) | Derniers tests manuels |
-
-## Organisation
-
-```text
-Plugins-nuvio/
-  assets/                  Images et logos
-  docs/                    Documentation detaillee
-  providers/               Providers Nuvio
-  scripts/                 Outils de maintenance et de test
-  stremio/                 Serveur web Madrador Film
-  domains.json             Domaines connus et fallbacks
-  manifest.json            Manifest Nuvio public
-  package.json             Commandes du projet
-  render.yaml              Deploiement Render
-```
-
-Les fichiers a la racine restent volontairement visibles parce que GitHub, Nuvio et Render les utilisent directement.
-
-## Tests
-
-Verifier la syntaxe :
-
-```powershell
-node --check stremio\server.js
-node --check scripts\test-providers.js
-node --check scripts\update-manifest.js
-```
-
-Tester les providers principaux :
-
-```powershell
-node scripts\test-providers.js --only=frenchstream,movix,nakios,toflix --timeout=60000
-```
-
-Tester tous les providers :
-
-```powershell
-node scripts\test-providers.js --timeout=60000
-```
 
 ## Lancer en local
 
@@ -132,17 +82,18 @@ Puis ouvre :
 http://127.0.0.1:7000/
 ```
 
+## Tester
+
+```powershell
+node --check stremio\server.js
+node --check scripts\test-providers.js
+node scripts\test-providers.js --only=frenchstream,movix,nakios,toflix --timeout=60000
+```
+
 ## Notes
 
-- Ce depot ne contient aucune video.
+- Le depot ne contient aucune video.
 - Les providers cherchent des liens depuis des sources externes.
-- Les domaines changent souvent, donc un provider peut tomber temporairement.
-- Les utilisateurs sont responsables de leur utilisation et du respect des lois applicables.
-
-## Feuille de route
-
-| Priorite | Etat | Sujet |
-|---|---|---|
-| 1 | Fait | Proxy MP4/HLS plus robuste, cache TMDB/streams, page status bleu/violet |
-| 2 | Partiel | Etats providers publics, domaines visibles dans `/providers`, providers instables marques |
-| 3 | Partiel | Filtres MP4/HLS/VF/VOSTFR/MULTI, page providers publique, branding Madrador Film |
+- Certains domaines changent souvent.
+- Les sources Kotlin ajoutees en reference ne sont pas activees tant qu'elles ne sont pas portees en JavaScript.
+- Chaque utilisateur reste responsable de son utilisation et du respect des lois applicables.

@@ -33,7 +33,7 @@ Madrador Film
 | `/` | Catalogue films/series |
 | `/catalog` | Alias du catalogue |
 | `/test-player` | Lecteur de test avec recherche et filtres MP4/HLS |
-| `/status` | Diagnostic providers |
+| `/diagnostics.json` | Diagnostic technique providers |
 | `/providers` | Etat public des providers, langues, formats et domaines |
 
 ## Lecture

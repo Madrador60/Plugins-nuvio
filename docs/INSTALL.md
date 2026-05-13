@@ -28,12 +28,6 @@ Page de test :
 https://madrador60-stremio-addon.onrender.com/test-player
 ```
 
-Page de statut :
-
-```text
-https://madrador60-stremio-addon.onrender.com/status
-```
-
 Sur Render gratuit, le service peut dormir. Le premier chargement peut donc prendre 30 a 60 secondes.
 
 ## Site local

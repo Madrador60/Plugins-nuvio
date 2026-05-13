@@ -51,3 +51,12 @@ node scripts\test-providers.js --timeout=60000
 | `ERROR` | Erreur JavaScript, reseau ou timeout |
 
 Un `ZERO` ne veut pas toujours dire que le provider est mort. Le titre peut simplement etre absent de cette source.
+
+## Sources en attente de port JavaScript
+
+Ces sources francaises sont conservees dans `docs/provider-sources/fr/` et referencees dans le manifest avec `enabled: false`.
+Elles apparaissent dans la page Providers, mais ne sont pas chargees par le moteur tant que le fichier `providers/*.js` correspondant n'existe pas.
+
+```text
+AfterDark, FrenchManga, Frembed, Kidraz, Otakufr, 1Jour1Film, Wiflix
+```
