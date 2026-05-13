@@ -7,8 +7,8 @@ L'addon Stremio reutilise les providers Nuvio du dossier `providers/`.
 | Usage | URL |
 |---|---|
 | Manifest | `https://madrador60-stremio-addon.onrender.com/manifest.json` |
-| Accueil | `https://madrador60-stremio-addon.onrender.com/` |
-| Catalogue | `https://madrador60-stremio-addon.onrender.com/catalog` |
+| Catalogue / accueil | `https://madrador60-stremio-addon.onrender.com/` |
+| Catalogue direct | `https://madrador60-stremio-addon.onrender.com/catalog` |
 | Test player | `https://madrador60-stremio-addon.onrender.com/test-player` |
 | Providers | `https://madrador60-stremio-addon.onrender.com/providers` |
 | Statut | `https://madrador60-stremio-addon.onrender.com/status` |
@@ -18,7 +18,7 @@ L'addon Stremio reutilise les providers Nuvio du dossier `providers/`.
 
 | Endpoint | Role |
 |---|---|
-| `/` | Page d'accueil |
+| `/` | Catalogue public |
 | `/manifest.json` | Manifest Stremio |
 | `/health.json` | Statut minimal du serveur |
 | `/config.json` | Configuration active |

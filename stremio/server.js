@@ -921,7 +921,7 @@ const server = http.createServer(async (req, res) => {
     }
 
     if (url.pathname === "/") {
-      sendHtml(res, 200, renderHomePage(req));
+      sendHtml(res, 200, renderCatalogPage());
       return;
     }
 
