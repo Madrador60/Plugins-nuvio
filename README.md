@@ -20,11 +20,11 @@ Ensuite, rafraichis la liste des providers et active ceux que tu veux.
 
 | Page | Lien |
 | --- | --- |
-| Catalogue | https://madrador-film.onrender.com/ |
-| Lecteur | https://madrador-film.onrender.com/test-player |
-| Providers | https://madrador-film.onrender.com/providers |
+| Catalogue | [Ouvrir](https://madrador60-stremio-addon.onrender.com/) |
+| Lecteur | [Ouvrir](https://madrador60-stremio-addon.onrender.com/test-player) |
+| Providers | [Ouvrir](https://madrador60-stremio-addon.onrender.com/providers) |
 
-Le service Render gratuit peut dormir. Si la page met du temps au premier chargement, attends 30 a 60 secondes puis recharge.
+Le service Render gratuit peut dormir. Si la page met du temps au premier chargement, attends 30 a 60 secondes puis recharge. L'adresse technique Render peut garder son ancien nom meme si le site s'appelle Madrador Film.
 
 ## Ce qu'il y a dedans
 

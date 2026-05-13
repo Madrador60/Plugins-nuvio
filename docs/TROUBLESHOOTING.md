@@ -2,9 +2,9 @@
 
 ## Le site ne charge pas
 
-1. Ouvre `https://madrador-film.onrender.com/health.json`.
+1. Ouvre [health.json](https://madrador60-stremio-addon.onrender.com/health.json).
 2. Si Render etait en veille, attends le premier reveil puis recharge la page.
-3. Teste aussi `https://madrador-film.onrender.com/catalog.json`.
+3. Teste aussi [catalog.json](https://madrador60-stremio-addon.onrender.com/catalog.json).
 
 ## Aucune source trouvee
 

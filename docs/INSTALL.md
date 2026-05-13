@@ -18,17 +18,13 @@ Puis :
 
 Ouvre le site :
 
-```text
-https://madrador-film.onrender.com/
-```
+[Catalogue Madrador Film](https://madrador60-stremio-addon.onrender.com/)
 
 Page de test :
 
-```text
-https://madrador-film.onrender.com/test-player
-```
+[Lecteur Madrador Film](https://madrador60-stremio-addon.onrender.com/test-player)
 
-Sur Render gratuit, le service peut dormir. Le premier chargement peut donc prendre 30 a 60 secondes.
+Sur Render gratuit, le service peut dormir. Le premier chargement peut donc prendre 30 a 60 secondes. L'adresse technique Render peut garder son ancien nom meme si le site s'appelle Madrador Film.
 
 ## Site local
 
