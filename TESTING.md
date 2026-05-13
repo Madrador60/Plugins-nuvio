@@ -15,8 +15,9 @@ Dernier test manuel : 2026-05-13
 | `/catalog.json` | OK | Catalogue TMDB mis en cache |
 | `/details.json?type=movie&id=157336` | OK | Donnees de fiche film |
 | `/providers` | OK | Etat public des providers |
-| `/providers` filtre | OK | Recherche provider/domaine/format |
+| `/providers` filtre | OK | Recherche provider/domaine/format/type |
 | `/providers` test | OK | Diagnostic rapide par provider |
+| `/providers` tout tester | OK | Bouton de test automatique des providers actifs |
 | `/search.json?type=movie&q=Interstellar` | OK | Recherche TMDB |
 | `/stream/movie/tt0816692.json` | OK | Retourne des sources MP4/HLS quand les providers en trouvent |
 | Proxy MP4 | OK | Supporte `Range`, `Content-Range` et `Accept-Ranges` |
