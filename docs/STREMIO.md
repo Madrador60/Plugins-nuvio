@@ -2,47 +2,49 @@
 
 L'addon Stremio reutilise les providers Nuvio du dossier `providers/`.
 
-## URL publique
+## URLs publiques
 
-```text
-https://madrador60-stremio-addon.onrender.com/manifest.json
-```
-
-Page publique :
-
-```text
-https://madrador60-stremio-addon.onrender.com/
-```
-
-Page de test avec recherche :
-
-```text
-https://madrador60-stremio-addon.onrender.com/test-player
-```
+| Usage | URL |
+|---|---|
+| Manifest | `https://madrador60-stremio-addon.onrender.com/manifest.json` |
+| Accueil | `https://madrador60-stremio-addon.onrender.com/` |
+| Test player | `https://madrador60-stremio-addon.onrender.com/test-player` |
+| Statut | `https://madrador60-stremio-addon.onrender.com/status` |
+| Diagnostic | `https://madrador60-stremio-addon.onrender.com/diagnostics.json` |
 
 ## Endpoints
 
-| URL | Role |
+| Endpoint | Role |
 |---|---|
-| `/` | Page d'accueil lisible |
+| `/` | Page d'accueil |
 | `/manifest.json` | Manifest Stremio |
-| `/health.json` | Statut du serveur |
+| `/health.json` | Statut minimal du serveur |
 | `/config.json` | Configuration active |
 | `/providers.json` | Providers actifs |
 | `/diagnostics.json` | Test rapide des providers principaux |
-| `/search.json?type=movie&q=Interstellar` | Recherche TMDB pour la page de test |
+| `/search.json?type=movie&q=Interstellar` | Recherche TMDB |
 | `/test-player` | Lecteur web de diagnostic |
-| `/status` | Page de statut des providers |
+| `/status` | Page de statut providers |
 | `/stream/movie/:id.json` | Streams films |
 | `/stream/series/:id:season:episode.json` | Streams series |
+| `/proxy/:payload/stream.ext` | Proxy media MP4/HLS |
+
+## Lecture video
+
+Le serveur renvoie a Stremio :
+
+- des streams MP4 en priorite quand ils existent ;
+- des streams HLS en second choix ;
+- des URLs proxifiees pour ajouter les headers requis ;
+- `filename`, `bingeGroup` et `notWebReady` dans `behaviorHints`.
 
 ## Si Stremio Web ne lance pas la video
 
-1. Teste la meme recherche sur `/test-player`.
+1. Teste le meme titre sur `/test-player`.
 2. Si `/test-player` lit la video, le proxy fonctionne.
 3. Supprime puis rajoute l'addon dans Stremio.
-4. Essaie en priorite les streams `MP4`, puis les streams `M3U8`.
-5. Si Stremio Web bloque encore, teste l'application Stremio Desktop : elle gere parfois mieux certains streams que le site web.
+4. Essaie en priorite les sources `MP4`.
+5. Teste Stremio Desktop si Stremio Web bloque encore.
 
 ## Variables utiles
 

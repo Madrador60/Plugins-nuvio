@@ -2,40 +2,52 @@
 
 ## Films et series
 
-| Provider | Langue | Etat |
-|---|---|---|
-| Frenchstream | FR | Fonctionne, domaines fallback inclus |
-| Movix | FR | Fonctionne |
-| Nakios | FR/EN | Fonctionne |
-| Purstream | FR/EN | Fonctionne |
-| ToFlix | FR/EN | Fonctionne |
-| VIDEASY | Multi dont FR | Fonctionne mais peut etre lent |
-| CinemaCity | Multi dont FR | Limite, peut demander un acces/cookie |
+| Provider | Langue | Etat | Notes |
+|---|---|---|---|
+| Frenchstream | FR | OK | Domaines fallback inclus |
+| Movix | FR | OK | Source rapide pour films/series |
+| Nakios | FR/EN | OK | MP4 et HLS, souvent prioritaire |
+| Purstream | FR/EN | OK | VF/VOSTFR/MULTI |
+| ToFlix | FR/EN | OK | MP4 utile pour Stremio Web |
+| VIDEASY | Multi dont FR | Lent | Peut necessiter un timeout plus haut |
+| CinemaCity | Multi dont FR | Limite | Peut demander un acces/cookie |
 
 ## Animes
 
-| Provider | Langue | Etat |
-|---|---|---|
-| Anime-Sama | FR | Fonctionne |
-| VoirAnime | FR | Fonctionne |
-| Vostfree | FR | Fonctionne |
-| French-Anime | FR | Fonctionne |
-| AnimeVOSTFR | FR | Fonctionne |
-| AnimesUltra | FR | Fonctionne |
-| JetAnimes | FR | Fonctionne mais parfois lent |
-| Mugiwara-no-Streaming | FR | Fonctionne |
-| AnimoFlix | FR | Instable selon les tests |
-| Sekai | FR | Limite selon les contenus |
-| AnimeSite | FR | Instable selon les tests |
+| Provider | Langue | Etat | Notes |
+|---|---|---|---|
+| Anime-Sama | FR | OK | Gros catalogue anime |
+| VoirAnime | FR | OK | VF/VOSTFR |
+| Vostfree | FR | OK | VF/VOSTFR |
+| French-Anime | FR | OK | VF/VOSTFR |
+| AnimeVOSTFR | FR | OK | VF/VOSTFR |
+| AnimesUltra | FR | OK | Anime VF/VOSTFR |
+| JetAnimes | FR | OK, lent | Tester avec timeout plus haut |
+| Mugiwara-no-Streaming | FR | OK | Anime via API Next.js |
+| AnimoFlix | FR | Instable | Peut timeout |
+| Sekai | FR | Limite | Peut retourner 0 selon le contenu |
+| AnimeSite | FR | Instable | Timeout observe |
 
 ## Tester
 
-```powershell
-node scripts\test-providers.js --timeout=45000
-```
-
-Tester seulement quelques providers :
+Providers films principaux :
 
 ```powershell
-node scripts\test-providers.js --only=frenchstream,movix,nakios
+node scripts\test-providers.js --only=frenchstream,movix,nakios,toflix --timeout=60000
 ```
+
+Tous les providers :
+
+```powershell
+node scripts\test-providers.js --timeout=60000
+```
+
+## Interpreting results
+
+| Resultat | Signification |
+|---|---|
+| `OK` | Le provider retourne au moins un stream |
+| `ZERO` | Aucun stream trouve pour ce titre |
+| `ERROR` | Erreur JavaScript, reseau ou timeout |
+
+Un `ZERO` ne veut pas toujours dire que le provider est mort. Le titre peut simplement etre absent de cette source.

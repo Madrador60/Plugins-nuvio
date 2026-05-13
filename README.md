@@ -1,65 +1,105 @@
 # Plugins Nuvio FR
 
-Providers francais pour **Nuvio** + addon **Stremio** hebergeable.
+Providers francais pour **Nuvio** et addon local/hebergeable pour **Stremio**.
 
-## Installation rapide
+Ce depot sert deux usages :
+
+- charger des providers dans Nuvio avec un `manifest.json` public ;
+- proposer une interface Stremio + une page de test web avec recherche et lecteur integre.
+
+## Liens rapides
+
+| Usage | URL |
+|---|---|
+| Nuvio | `https://raw.githubusercontent.com/Madrador60/Plugins-nuvio/refs/heads/main/` |
+| Stremio | `https://madrador60-stremio-addon.onrender.com/manifest.json` |
+| Page publique | `https://madrador60-stremio-addon.onrender.com/` |
+| Lecteur de test | `https://madrador60-stremio-addon.onrender.com/test-player` |
+| Statut providers | `https://madrador60-stremio-addon.onrender.com/status` |
+| Diagnostic JSON | `https://madrador60-stremio-addon.onrender.com/diagnostics.json` |
+
+## Installation
 
 ### Nuvio
 
-Ajoute cette URL dans **Settings > Plugins** ou **Local Scrapers** :
+Dans Nuvio, ajoute cette URL dans **Settings > Plugins** ou **Local Scrapers** :
 
 ```text
 https://raw.githubusercontent.com/Madrador60/Plugins-nuvio/refs/heads/main/
 ```
 
+Ensuite, rafraichis la liste et active les providers souhaites.
+
 ### Stremio
 
-Ajoute cette URL dans Stremio :
+Dans Stremio, ajoute :
 
 ```text
 https://madrador60-stremio-addon.onrender.com/manifest.json
 ```
 
-Page publique de l'addon :
-
-```text
-https://madrador60-stremio-addon.onrender.com/
-```
-
-Page de test avec recherche :
+Si Stremio Web ne lit pas une source, teste la meme recherche sur :
 
 ```text
 https://madrador60-stremio-addon.onrender.com/test-player
 ```
 
-Statut des providers :
+## Fonctionnalites
 
-```text
-https://madrador60-stremio-addon.onrender.com/status
-```
-
-Sur Render gratuit, le premier chargement peut prendre un peu de temps si le serveur etait en veille.
-
-## Ce qu'il y a dedans
-
-| Partie | Description |
+| Fonction | Description |
 |---|---|
-| `manifest.json` | Liste des providers pour Nuvio |
-| `providers/` | Scrapers Nuvio |
-| `stremio/` | Serveur addon Stremio |
-| `docs/` | Guides courts |
-| `scripts/` | Tests des providers |
-| `domains.json` | Domaines connus / fallbacks |
+| Providers Nuvio | Fichiers `providers/*.js` compatibles avec le manifest Nuvio |
+| Addon Stremio | Serveur HTTP sans dependance externe obligatoire |
+| Proxy media | Ajoute les headers requis et expose des URLs compatibles MP4/HLS |
+| Test player | Interface web bleu/violet avec recherche TMDB et lecteur integre |
+| Diagnostic | Page `/status` et endpoint `/diagnostics.json` |
+| Deploiement | Pret pour Render avec `render.yaml` |
 
 ## Providers
 
-Films et series : Frenchstream, Movix, Nakios, Purstream, ToFlix, VIDEASY, CinemaCity.
+Films et series :
 
-Animes : Anime-Sama, VoirAnime, Vostfree, French-Anime, AnimeVOSTFR, AnimesUltra, JetAnimes, Mugiwara-no-Streaming, AnimoFlix, Sekai, AnimeSite.
+```text
+Frenchstream, Movix, Nakios, Purstream, ToFlix, VIDEASY, CinemaCity
+```
 
-Liste detaillee : [docs/PROVIDERS.md](docs/PROVIDERS.md)
+Animes :
 
-## Tester
+```text
+Anime-Sama, VoirAnime, Vostfree, French-Anime, AnimeVOSTFR, AnimesUltra,
+JetAnimes, Mugiwara-no-Streaming, AnimoFlix, Sekai, AnimeSite
+```
+
+Details : [docs/PROVIDERS.md](docs/PROVIDERS.md)
+
+## Documentation
+
+| Document | Role |
+|---|---|
+| [docs/INSTALL.md](docs/INSTALL.md) | Installation Nuvio, Stremio, local |
+| [docs/STREMIO.md](docs/STREMIO.md) | Endpoints, variables, diagnostic Stremio |
+| [docs/PROVIDERS.md](docs/PROVIDERS.md) | Liste et etat des providers |
+| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Structure technique du projet |
+| [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) | Problemes courants et solutions |
+| [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md) | Ajouter ou maintenir un provider |
+| [docs/SECURITY.md](docs/SECURITY.md) | Securite, secrets et limites |
+| [TESTING.md](TESTING.md) | Derniers tests manuels |
+
+## Structure
+
+```text
+Plugins-nuvio/
+  Assets/              Images et logos
+  docs/                Documentation projet
+  providers/           Providers Nuvio
+  scripts/             Outils de test
+  stremio/             Serveur addon Stremio
+  domains.json         Domaines connus et fallbacks
+  manifest.json        Manifest Nuvio
+  render.yaml          Deploiement Render
+```
+
+## Tests
 
 Verifier la syntaxe :
 
@@ -68,29 +108,17 @@ node --check stremio\server.js
 node --check scripts\test-providers.js
 ```
 
-Tester quelques providers :
+Tester les providers principaux :
 
 ```powershell
-node scripts\test-providers.js --only=frenchstream,movix,nakios --timeout=45000
+node scripts\test-providers.js --only=frenchstream,movix,nakios,toflix --timeout=60000
 ```
 
 Tester tous les providers :
 
 ```powershell
-node scripts\test-providers.js
+node scripts\test-providers.js --timeout=60000
 ```
-
-## Heberger l'addon Stremio
-
-Le repo est pret pour Render avec [render.yaml](render.yaml).
-
-1. Va sur [Render](https://render.com)
-2. Choisis **New > Blueprint**
-3. Selectionne `Madrador60/Plugins-nuvio`
-4. Lance le deploiement
-5. Mets l'URL `/manifest.json` dans Stremio
-
-Guide complet : [docs/STREMIO.md](docs/STREMIO.md)
 
 ## Lancer en local
 
@@ -104,14 +132,9 @@ Puis ouvre :
 http://127.0.0.1:7000/
 ```
 
-## Pourquoi un provider peut ne pas marcher ?
-
-- Le site a change de domaine.
-- Le contenu n'existe pas sur cette source.
-- Le site bloque temporairement les requetes.
-- Le provider est lent et depasse le timeout.
-- Certains liens demandent des headers speciaux selon le lecteur.
-
 ## Notes
 
-Ce repo ne contient aucune video et n'heberge aucun contenu. Les providers cherchent des liens depuis des sites externes. Utilise ce projet en respectant les lois applicables dans ton pays.
+- Ce depot ne contient aucune video.
+- Les providers cherchent des liens depuis des sources externes.
+- Les domaines changent souvent, donc un provider peut tomber temporairement.
+- Les utilisateurs sont responsables de leur utilisation et du respect des lois applicables.
