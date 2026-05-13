@@ -8,6 +8,18 @@ L'addon Stremio reutilise les providers Nuvio du dossier `providers/`.
 https://madrador60-stremio-addon.onrender.com/manifest.json
 ```
 
+Page publique :
+
+```text
+https://madrador60-stremio-addon.onrender.com/
+```
+
+Page de test avec recherche :
+
+```text
+https://madrador60-stremio-addon.onrender.com/test-player
+```
+
 ## Endpoints
 
 | URL | Role |
@@ -16,8 +28,18 @@ https://madrador60-stremio-addon.onrender.com/manifest.json
 | `/manifest.json` | Manifest Stremio |
 | `/health.json` | Statut du serveur |
 | `/providers.json` | Providers actifs |
+| `/search.json?type=movie&q=Interstellar` | Recherche TMDB pour la page de test |
+| `/test-player` | Lecteur web de diagnostic |
 | `/stream/movie/:id.json` | Streams films |
 | `/stream/series/:id:season:episode.json` | Streams series |
+
+## Si Stremio Web ne lance pas la video
+
+1. Teste la meme recherche sur `/test-player`.
+2. Si `/test-player` lit la video, le proxy fonctionne.
+3. Supprime puis rajoute l'addon dans Stremio.
+4. Essaie en priorite les streams `MP4`, puis les streams `M3U8`.
+5. Si Stremio Web bloque encore, teste l'application Stremio Desktop : elle gere parfois mieux certains streams que le site web.
 
 ## Variables utiles
 

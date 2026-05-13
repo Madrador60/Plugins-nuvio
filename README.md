@@ -26,6 +26,12 @@ Page publique de l'addon :
 https://madrador60-stremio-addon.onrender.com/
 ```
 
+Page de test avec recherche :
+
+```text
+https://madrador60-stremio-addon.onrender.com/test-player
+```
+
 Sur Render gratuit, le premier chargement peut prendre un peu de temps si le serveur etait en veille.
 
 ## Ce qu'il y a dedans
