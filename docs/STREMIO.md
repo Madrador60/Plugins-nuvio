@@ -25,6 +25,9 @@ L'addon Stremio reutilise les providers Nuvio du dossier `providers/`.
 | `/providers.json` | Providers actifs |
 | `/providers` | Page publique des providers, etats, formats et domaines |
 | `/catalog` | Page catalogue films/series |
+| `/catalog/movie/madrador-movies.json` | Catalogue films expose a Stremio |
+| `/catalog/series/madrador-series.json` | Catalogue series expose a Stremio |
+| `/catalog/:type/:id/search=query.json` | Recherche catalogue exposee a Stremio |
 | `/catalog.json` | Donnees catalogue TMDB avec cache |
 | `/details.json?type=movie&id=157336` | Fiche detail TMDB |
 | `/diagnostics.json` | Test rapide des providers principaux |
@@ -44,6 +47,14 @@ Le serveur renvoie a Stremio :
 - des streams HLS en second choix ;
 - des URLs proxifiees pour ajouter les headers requis ;
 - `filename`, `bingeGroup` et `notWebReady` dans `behaviorHints`.
+
+## Integration Stremio
+
+Le manifest declare maintenant :
+
+- `stream` avec `types` et `idPrefixes: ["tt"]`, pour que Stremio demande les streams sur les fiches Cinemeta IMDb ;
+- `catalog`, avec un catalogue films et un catalogue series visibles dans Stremio ;
+- la recherche catalogue via l'extra `search`.
 
 ## Si Stremio Web ne lance pas la video
 

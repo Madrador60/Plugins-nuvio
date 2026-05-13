@@ -537,6 +537,47 @@ async function getCatalogRows() {
   }, 30 * 60 * 1000);
 }
 
+async function toStremioMetaPreview(item) {
+  try {
+    const external = await getTmdbExternalId(item.id, item.type);
+    if (!external.imdbId) return null;
+    return {
+      id: external.imdbId,
+      type: item.type === "series" ? "series" : "movie",
+      name: item.title,
+      poster: item.poster || undefined,
+      background: item.backdrop || undefined,
+      description: item.overview || undefined,
+      releaseInfo: item.year || undefined,
+      imdbRating: item.rating ? String(Number(item.rating).toFixed(1)) : undefined
+    };
+  } catch (_) {
+    return null;
+  }
+}
+
+async function getStremioCatalog(type, catalogId, extra) {
+  const stremioType = type === "series" ? "series" : "movie";
+  const expectedId = stremioType === "series" ? "madrador-series" : "madrador-movies";
+  if (catalogId !== expectedId) return { metas: [] };
+
+  const search = String(extra.search || "").trim();
+  const skip = Math.max(0, Number(extra.skip || 0) || 0);
+  const page = String(Math.floor(skip / 18) + 1);
+  const cacheKey = ["stremio-catalog", stremioType, catalogId, search.toLowerCase(), page].join(":");
+
+  return cachedJson(cacheKey, async () => {
+    const items = search
+      ? await searchTmdb(search, stremioType)
+      : stremioType === "series"
+        ? await tmdbList("/tv/popular", { page }, "tv")
+        : await tmdbList("/movie/popular", { page }, "movie");
+
+    const metas = (await Promise.all(items.slice(0, 18).map(toStremioMetaPreview))).filter(Boolean);
+    return { metas };
+  }, SEARCH_CACHE_TTL_MS);
+}
+
 async function runDiagnostics(req) {
   const ids = (req.url && new URL(req.url, "http://localhost").searchParams.get("providers") || "movix,frenchstream,nakios,toflix")
     .split(",")
@@ -643,6 +684,25 @@ function parseStreamPath(pathname) {
     mediaType: stremioType === "series" ? "tv" : "movie",
     season: parts[1] ? Number(parts[1]) : undefined,
     episode: parts[2] ? Number(parts[2]) : undefined
+  };
+}
+
+function parseCatalogPath(pathname) {
+  const match = pathname.match(/^\/catalog\/([^/]+)\/([^/]+)(?:\/(.+))?\.json$/);
+  if (!match) return null;
+
+  const extra = {};
+  if (match[3]) {
+    const params = new URLSearchParams(decodeURIComponent(match[3]));
+    for (const [key, value] of params.entries()) {
+      extra[key] = value;
+    }
+  }
+
+  return {
+    type: decodeURIComponent(match[1]),
+    id: decodeURIComponent(match[2]),
+    extra
   };
 }
 
@@ -1071,6 +1131,12 @@ const server = http.createServer(async (req, res) => {
         return;
       }
       sendJson(res, 200, { results: await searchTmdb(query, mediaType) });
+      return;
+    }
+
+    const catalogRequest = parseCatalogPath(url.pathname);
+    if (catalogRequest) {
+      sendJson(res, 200, await getStremioCatalog(catalogRequest.type, catalogRequest.id, catalogRequest.extra));
       return;
     }
 
