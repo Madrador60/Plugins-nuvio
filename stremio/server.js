@@ -144,13 +144,35 @@ function renderHomePage(req) {
 function renderTestPlayerPage() {
   return "<!doctype html>" +
     "<html lang=\"fr\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">" +
-    "<title>Test lecture</title><style>body{margin:0;background:#111315;color:#f5f7fa;font-family:Segoe UI,Arial,sans-serif}main{width:min(960px,calc(100% - 32px));margin:0 auto;padding:34px 0}video{width:100%;max-height:70vh;background:#000;border-radius:8px}button{min-height:42px;padding:0 14px;border-radius:8px;border:1px solid #30353b;background:#8b5cf6;color:white;font-weight:700}pre{white-space:pre-wrap;background:#080a0c;border:1px solid #30353b;border-radius:8px;padding:12px;color:#cbd5e1;overflow:auto}</style></head>" +
-    "<body><main><h1>Test lecture Stremio</h1><p>Ce test lance le premier stream trouve pour Interstellar.</p><video id=\"video\" controls playsinline></video><p><button id=\"load\">Charger un stream</button></p><pre id=\"log\">Pret.</pre></main>" +
+    "<title>Test lecture</title><style>:root{color-scheme:dark;--bg:#111315;--panel:#1a1d20;--line:#30353b;--text:#f5f7fa;--muted:#aab2bd;--accent:#8b5cf6}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Segoe UI,Arial,sans-serif;line-height:1.5}main{width:min(1020px,calc(100% - 32px));margin:0 auto;padding:34px 0}video{width:100%;max-height:62vh;background:#000;border-radius:8px;border:1px solid var(--line)}button,input,select{min-height:42px;border-radius:8px;border:1px solid var(--line);font:inherit}button{padding:0 14px;background:var(--accent);color:white;font-weight:700;cursor:pointer}input,select{background:#080a0c;color:var(--text);padding:0 12px}.search{display:grid;grid-template-columns:1fr 140px auto;gap:10px;margin:18px 0}.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px}.panel{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:12px}.item{width:100%;text-align:left;background:#080a0c;border-color:var(--line);margin:0 0 8px;color:var(--text);font-weight:600}.item small{display:block;color:var(--muted);font-weight:400}.stream{background:#080a0c}.muted{color:var(--muted)}pre{white-space:pre-wrap;background:#080a0c;border:1px solid var(--line);border-radius:8px;padding:12px;color:#cbd5e1;overflow:auto;max-height:220px}@media(max-width:760px){.search,.grid{grid-template-columns:1fr}}</style></head>" +
+    "<body><main><h1>Test lecture</h1><p class=\"muted\">Cherche un film ou une serie, choisis un resultat, puis teste un stream directement dans le navigateur.</p><video id=\"video\" controls playsinline></video>" +
+    "<div class=\"search\"><input id=\"query\" placeholder=\"Exemple : Interstellar, One Piece, Game of Thrones\" value=\"Interstellar\"><select id=\"type\"><option value=\"movie\">Film</option><option value=\"series\">Serie</option></select><button id=\"search\">Rechercher</button></div>" +
+    "<div class=\"grid\"><section class=\"panel\"><h2>Resultats</h2><div id=\"results\" class=\"muted\">Aucune recherche lancee.</div></section><section class=\"panel\"><h2>Streams</h2><div id=\"streams\" class=\"muted\">Choisis un resultat.</div></section></div><pre id=\"log\">Pret.</pre></main>" +
     "<script src=\"https://cdn.jsdelivr.net/npm/hls.js@1\"></script><script>" +
-    "const log=document.getElementById('log');const video=document.getElementById('video');const btn=document.getElementById('load');" +
-    "function write(x){log.textContent += '\\n' + x}" +
-    "btn.onclick=async()=>{try{log.textContent='Chargement...';const data=await fetch('/stream/movie/tt0816692.json').then(r=>r.json());write('Streams: '+data.streams.length);const s=data.streams[0];write(JSON.stringify(s,null,2));if(!s) return; if(s.url.includes('.m3u8')){if(window.Hls&&Hls.isSupported()){const hls=new Hls();hls.loadSource(s.url);hls.attachMedia(video);hls.on(Hls.Events.ERROR,(e,d)=>write('HLS error: '+JSON.stringify(d)));}else if(video.canPlayType('application/vnd.apple.mpegurl')){video.src=s.url}else{write('HLS non supporte dans ce navigateur')}}else{video.src=s.url} await video.play().catch(e=>write('play blocked: '+e.message));}catch(e){write('Erreur: '+(e.stack||e.message||e))}};" +
+    "const log=document.getElementById('log'),video=document.getElementById('video'),q=document.getElementById('query'),type=document.getElementById('type'),searchBtn=document.getElementById('search'),results=document.getElementById('results'),streamsBox=document.getElementById('streams');let hls=null;" +
+    "function write(x){log.textContent+='\\n'+x}function setLog(x){log.textContent=x}function esc(x){return String(x||'').replace(/[&<>\\\"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\\\"':'&quot;'}[c]))}" +
+    "async function search(){const query=q.value.trim();if(!query)return;setLog('Recherche: '+query);results.textContent='Recherche...';streamsBox.textContent='Choisis un resultat.';const data=await fetch('/search.json?type='+encodeURIComponent(type.value)+'&q='+encodeURIComponent(query)).then(r=>r.json());results.innerHTML=data.results.map(r=>'<button class=\"item\" data-id=\"'+r.id+'\" data-type=\"'+r.type+'\">'+esc(r.title)+'<small>'+esc(r.year||'')+' - TMDB '+r.id+'</small></button>').join('')||'Aucun resultat';results.querySelectorAll('button').forEach(b=>b.onclick=()=>loadStreams(b.dataset.type,b.dataset.id,b.textContent.trim()));write('Resultats: '+data.results.length)}" +
+    "async function loadStreams(mediaType,id,label){setLog('Streams pour '+label+'...');streamsBox.textContent='Chargement...';const endpoint='/stream/'+mediaType+'/'+id+'.json';const data=await fetch(endpoint).then(r=>r.json());streamsBox.innerHTML=data.streams.map((s,i)=>'<button class=\"item stream\" data-i=\"'+i+'\">'+esc(s.name)+'<small>'+esc(s.title)+'<br>'+esc(s.url.split('/').pop())+'</small></button>').join('')||'Aucun stream';streamsBox.querySelectorAll('button').forEach(b=>b.onclick=()=>play(data.streams[Number(b.dataset.i)]));write('Streams: '+data.streams.length);if(data.streams[0]) play(data.streams[0])}" +
+    "async function play(s){write('Lecture: '+s.name+' - '+s.title);write(s.url);if(hls){hls.destroy();hls=null}video.removeAttribute('src');video.load();if(s.url.includes('.m3u8')){if(window.Hls&&Hls.isSupported()){hls=new Hls();hls.loadSource(s.url);hls.attachMedia(video);hls.on(Hls.Events.ERROR,(e,d)=>write('HLS error: '+JSON.stringify(d)))}else if(video.canPlayType('application/vnd.apple.mpegurl')){video.src=s.url}else{write('HLS non supporte dans ce navigateur');return}}else{video.src=s.url}await video.play().catch(e=>write('play blocked: '+e.message))}" +
+    "searchBtn.onclick=()=>search().catch(e=>setLog('Erreur: '+(e.stack||e.message||e)));q.addEventListener('keydown',e=>{if(e.key==='Enter')searchBtn.click()});" +
     "</script></body></html>";
+}
+
+async function searchTmdb(query, mediaType) {
+  const type = mediaType === "series" || mediaType === "tv" ? "tv" : "movie";
+  const endpoint = "https://api.themoviedb.org/3/search/" + type +
+    "?api_key=" + encodeURIComponent(TMDB_API_KEY) +
+    "&language=fr-FR&query=" + encodeURIComponent(query);
+  const response = await fetch(endpoint);
+  if (!response.ok) throw new Error("TMDB search failed: HTTP " + response.status);
+  const data = await response.json();
+  return (data.results || []).slice(0, 10).map((item) => ({
+    id: String(item.id),
+    type: type === "tv" ? "series" : "movie",
+    title: item.title || item.name || "Sans titre",
+    year: String(item.release_date || item.first_air_date || "").slice(0, 4),
+    poster: item.poster_path ? "https://image.tmdb.org/t/p/w185" + item.poster_path : null
+  }));
 }
 
 function parseStreamPath(pathname) {
@@ -475,6 +497,17 @@ const server = http.createServer(async (req, res) => {
         movie: getProviderSummary("movie"),
         series: getProviderSummary("tv")
       });
+      return;
+    }
+
+    if (url.pathname === "/search.json") {
+      const query = url.searchParams.get("q") || "";
+      const mediaType = url.searchParams.get("type") || "movie";
+      if (!query.trim()) {
+        sendJson(res, 400, { error: "Missing q" });
+        return;
+      }
+      sendJson(res, 200, { results: await searchTmdb(query, mediaType) });
       return;
     }
 
