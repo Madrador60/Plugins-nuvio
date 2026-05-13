@@ -10,6 +10,8 @@ Checked on 2026-05-13:
 |---|---|---|
 | `/manifest.json` | OK | HTTP 200, CORS enabled |
 | `/test-player` | OK | Page loads and can search |
+| `/catalog` | OK | 6 rows, 108 posters, no browser console errors locally |
+| `/catalog.json` | OK | Returns cached TMDB rows for films and series |
 | `/search.json?type=movie&q=Interstellar` | OK | Returns TMDB results |
 | `/stream/movie/tt0816692.json` | OK | Returns proxied MP4/M3U8 streams |
 | MP4 proxy range | OK | HTTP 206, `Content-Range`, `Accept-Ranges`, exposed CORS headers |

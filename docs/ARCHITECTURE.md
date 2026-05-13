@@ -25,6 +25,15 @@ Stremio
 | `domains.json` | Domaines connus et fallbacks |
 | `render.yaml` | Deploiement Render |
 
+## Pages web
+
+| Page | Role |
+|---|---|
+| `/` | Accueil de l'addon |
+| `/catalog` | Catalogue films/series en rangees d'affiches |
+| `/test-player` | Lecteur de test avec recherche et filtres MP4/HLS |
+| `/status` | Diagnostic providers |
+
 ## Flux Stremio
 
 1. Stremio demande `/manifest.json`.
@@ -42,3 +51,7 @@ Le proxy sert a :
 - exposer `Content-Range`, `Accept-Ranges`, `Content-Length` pour les lecteurs web ;
 - reecrire les playlists HLS pour que les segments passent aussi par le proxy ;
 - donner une extension visible (`stream.mp4`, `stream.m3u8`) aux lecteurs.
+
+## Cache
+
+Le serveur utilise un cache memoire simple pour reduire les appels repetes a TMDB, notamment pour le catalogue.

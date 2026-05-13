@@ -14,6 +14,7 @@ Ce depot sert deux usages :
 | Nuvio | `https://raw.githubusercontent.com/Madrador60/Plugins-nuvio/refs/heads/main/` |
 | Stremio | `https://madrador60-stremio-addon.onrender.com/manifest.json` |
 | Page publique | `https://madrador60-stremio-addon.onrender.com/` |
+| Catalogue | `https://madrador60-stremio-addon.onrender.com/catalog` |
 | Lecteur de test | `https://madrador60-stremio-addon.onrender.com/test-player` |
 | Statut providers | `https://madrador60-stremio-addon.onrender.com/status` |
 | Diagnostic JSON | `https://madrador60-stremio-addon.onrender.com/diagnostics.json` |
@@ -51,6 +52,7 @@ https://madrador60-stremio-addon.onrender.com/test-player
 | Providers Nuvio | Fichiers `providers/*.js` compatibles avec le manifest Nuvio |
 | Addon Stremio | Serveur HTTP sans dependance externe obligatoire |
 | Proxy media | Ajoute les headers requis et expose des URLs compatibles MP4/HLS |
+| Catalogue | Rangees films/series inspirees des plateformes de streaming |
 | Test player | Interface web bleu/violet avec recherche TMDB et lecteur integre |
 | Diagnostic | Page `/status` et endpoint `/diagnostics.json` |
 | Deploiement | Pret pour Render avec `render.yaml` |

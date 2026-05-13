@@ -8,6 +8,7 @@ L'addon Stremio reutilise les providers Nuvio du dossier `providers/`.
 |---|---|
 | Manifest | `https://madrador60-stremio-addon.onrender.com/manifest.json` |
 | Accueil | `https://madrador60-stremio-addon.onrender.com/` |
+| Catalogue | `https://madrador60-stremio-addon.onrender.com/catalog` |
 | Test player | `https://madrador60-stremio-addon.onrender.com/test-player` |
 | Statut | `https://madrador60-stremio-addon.onrender.com/status` |
 | Diagnostic | `https://madrador60-stremio-addon.onrender.com/diagnostics.json` |
@@ -21,6 +22,8 @@ L'addon Stremio reutilise les providers Nuvio du dossier `providers/`.
 | `/health.json` | Statut minimal du serveur |
 | `/config.json` | Configuration active |
 | `/providers.json` | Providers actifs |
+| `/catalog` | Page catalogue films/series |
+| `/catalog.json` | Donnees catalogue TMDB avec cache |
 | `/diagnostics.json` | Test rapide des providers principaux |
 | `/search.json?type=movie&q=Interstellar` | Recherche TMDB |
 | `/test-player` | Lecteur web de diagnostic |
