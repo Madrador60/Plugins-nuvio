@@ -13,7 +13,7 @@ const HOST = process.env.HOST || "0.0.0.0";
 const PORT = Number(process.env.PORT || 7000);
 const TMDB_API_KEY = process.env.TMDB_API_KEY || "8265bd1679663a7ea12ac168da84d2e8";
 const PROVIDER_TIMEOUT_MS = Number(process.env.PROVIDER_TIMEOUT_MS || 45000);
-const PROVIDER_FILTER = (process.env.STREMIO_PROVIDERS || "")
+const PROVIDER_FILTER = (process.env.PROVIDER_FILTER || "")
   .split(",")
   .map((item) => item.trim())
   .filter(Boolean);
@@ -268,36 +268,6 @@ async function play(s,button){if(!s)return;streamsBox.querySelectorAll('.active'
 function setFilter(value){streamFilter=value;filterAll.className=value==='all'?'secondary':'ghost';filterMp4.className=value==='mp4'?'secondary':'ghost';filterHls.className=value==='hls'?'secondary':'ghost';renderStreams()}
 function setLanguageFilter(value){languageFilter=value;filterVf.className=value==='vf'?'secondary':'ghost';filterVostfr.className=value==='vostfr'?'secondary':'ghost';filterMulti.className=value==='multi'?'secondary':'ghost';renderStreams()}
 copyBtn.onclick=async()=>{if(!currentUrl)return;await navigator.clipboard.writeText(currentUrl).catch(()=>{});write('URL copiee')};openBtn.onclick=()=>{if(currentUrl)window.open(currentUrl,'_blank')};filterAll.onclick=()=>setFilter('all');filterMp4.onclick=()=>setFilter('mp4');filterHls.onclick=()=>setFilter('hls');filterVf.onclick=()=>setLanguageFilter(languageFilter==='vf'?'all':'vf');filterVostfr.onclick=()=>setLanguageFilter(languageFilter==='vostfr'?'all':'vostfr');filterMulti.onclick=()=>setLanguageFilter(languageFilter==='multi'?'all':'multi');video.addEventListener('error',()=>write('Video error code: '+(video.error&&video.error.code)));searchBtn.onclick=()=>search(false).catch(e=>setLog('Erreur: '+(e.stack||e.message||e)));q.addEventListener('keydown',e=>{if(e.key==='Enter')searchBtn.click()});if(params.get('id')){setTimeout(()=>loadStreams(type.value,params.get('id'),q.value||'Titre choisi',params.get('year')||''),250)}else if(params.get('q'))setTimeout(()=>search(params.get('autoload')==='1'),250);
-</script>
-</body>
-</html>`;
-}
-
-function renderStatusPage() {
-  return `<!doctype html>
-<html lang="fr">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Statut Madrador Film</title>
-<link rel="icon" href="/logo.png">
-<style>
-:root{color-scheme:dark;--bg:#060714;--panel:#111426;--line:#2d335c;--text:#fff;--muted:#b8c0e0;--violet:#7c3aed;--blue:#2563eb;--ok:#38bdf8;--warn:#f59e0b;--bad:#fb7185}
-*{box-sizing:border-box}body{margin:0;background:#060714;color:#fff;font-family:Inter,Segoe UI,Arial,sans-serif;line-height:1.45}body:before{content:"";position:fixed;inset:0;background:radial-gradient(circle at 12% 0%,rgba(124,58,237,.34),transparent 34%),radial-gradient(circle at 88% 8%,rgba(37,99,235,.26),transparent 30%),linear-gradient(180deg,rgba(0,0,0,.16),#060714 64%);pointer-events:none}main{position:relative;z-index:1;width:min(1180px,calc(100% - 32px));margin:0 auto;padding:22px 0 56px}.nav{height:54px;display:flex;align-items:center;justify-content:space-between;gap:16px}.brand{font-weight:900;font-size:24px;color:#a78bfa;text-shadow:0 0 24px rgba(124,58,237,.6)}.nav a{color:#eef2ff;text-decoration:none;font-weight:800;font-size:14px;margin-left:14px}.hero{padding:30px 0 22px;border-bottom:1px solid var(--line)}h1{font-size:clamp(38px,6vw,72px);line-height:1;margin:0 0 10px}.lead{max-width:720px;color:#dbeafe;font-size:18px}.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}button,.btn{display:inline-flex;align-items:center;justify-content:center;min-height:42px;border-radius:7px;border:1px solid #303866;font:inherit;text-decoration:none;color:#fff;font-weight:900;padding:0 14px;cursor:pointer;background:linear-gradient(135deg,var(--violet),var(--blue))}.btn.secondary,button.secondary{background:#10142b}.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:22px 0}.card{background:rgba(17,20,38,.92);border:1px solid var(--line);border-radius:8px;padding:16px}.card strong{display:block;font-size:28px}.card span{color:var(--muted)}table{width:100%;border-collapse:collapse;background:rgba(17,20,38,.92);border:1px solid var(--line);border-radius:8px;overflow:hidden;margin-top:16px}th,td{text-align:left;padding:12px;border-bottom:1px solid var(--line);vertical-align:top}th{color:var(--muted)}tr:last-child td{border-bottom:0}.ok{color:var(--ok);font-weight:900}.warn{color:var(--warn);font-weight:900}.bad{color:var(--bad);font-weight:900}.muted{color:var(--muted)}pre{white-space:pre-wrap;background:#050714;border:1px solid var(--line);border-radius:8px;padding:12px;color:#cbd5e1;overflow:auto}.pill{display:inline-flex;align-items:center;min-height:24px;border-radius:999px;padding:0 9px;background:#1d2446;color:#dbeafe;font-weight:900;font-size:12px}@media(max-width:780px){main{width:min(100% - 20px,1180px)}.nav{height:auto;display:grid}.nav a{margin:0 10px 0 0}.cards{grid-template-columns:1fr 1fr}table{font-size:13px}}
-</style>
-</head>
-<body>
-<main>
-  <header class="nav"><div class="brand">MADRADOR FILM</div><nav><a href="/">Accueil</a><a href="/test-player">Lecteur</a><a href="/providers">Providers</a><a href="/catalog">Catalogue</a></nav></header>
-  <section class="hero"><span class="pill">Diagnostic live</span><h1>Statut providers</h1><p class="lead">Controle rapide des sources principales avec cache court, temps de reponse et etat lisible.</p><div class="actions"><button id="run">Lancer le diagnostic</button><a class="btn secondary" href="/diagnostics.json">JSON</a></div></section>
-  <div id="cards" class="cards"><div class="card"><strong>-</strong><span>OK</span></div><div class="card"><strong>-</strong><span>Instables</span></div><div class="card"><strong>-</strong><span>Streams</span></div><div class="card"><strong>-</strong><span>Generation</span></div></div>
-  <div id="out" class="muted">Pret.</div>
-</main>
-<script>
-const out=document.getElementById('out'),cards=document.getElementById('cards'),run=document.getElementById('run');
-function esc(x){return String(x||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
-function render(data){const ok=data.results.filter(r=>r.status==='OK').length,unstable=data.results.filter(r=>r.status!=='OK').length,streams=data.results.reduce((n,r)=>n+r.streams,0);cards.innerHTML='<div class="card"><strong>'+ok+'</strong><span>OK</span></div><div class="card"><strong>'+unstable+'</strong><span>A surveiller</span></div><div class="card"><strong>'+streams+'</strong><span>Streams trouves</span></div><div class="card"><strong>'+new Date(data.generatedAt).toLocaleTimeString('fr-FR')+'</strong><span>Generation</span></div>';out.innerHTML='<table><thead><tr><th>Provider</th><th>Statut</th><th>Streams</th><th>Temps</th><th>Note</th></tr></thead><tbody>'+data.results.map(r=>{const cls=r.status==='OK'?'ok':r.status==='ZERO'?'warn':'bad';return '<tr><td>'+esc(r.provider)+'</td><td class="'+cls+'">'+esc(r.status)+'</td><td>'+r.streams+'</td><td>'+r.timeMs+'ms</td><td>'+esc(r.error||'')+'</td></tr>'}).join('')+'</tbody></table><pre>'+esc(JSON.stringify(data,null,2))+'</pre>'}
-run.onclick=async()=>{out.textContent='Diagnostic en cours...';try{render(await fetch('/diagnostics.json').then(r=>r.json()))}catch(e){out.textContent='Erreur: '+(e.message||e)}};run.click();
 </script>
 </body>
 </html>`;
@@ -984,16 +954,6 @@ const server = http.createServer(async (req, res) => {
 
     if (url.pathname === "/providers") {
       sendHtml(res, 200, renderProvidersPage());
-      return;
-    }
-
-    if (url.pathname === "/status") {
-      sendHtml(res, 200, renderStatusPage());
-      return;
-    }
-
-    if (url.pathname === "/manifest.json") {
-      sendJson(res, 404, { error: "Addon removed. Use the Madrador Film website instead." });
       return;
     }
 

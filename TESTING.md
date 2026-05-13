@@ -1,93 +1,60 @@
-# Provider Test Report
+# Rapport de tests
 
-Last manual test: 2026-05-13
+Dernier test manuel : 2026-05-13
 
-## Stremio / Render checks
+## Site Madrador Film
 
-Checked on 2026-05-13:
-
-| Check | Result | Notes |
+| Verification | Resultat | Notes |
 |---|---|---|
-| `/manifest.json` | OK | HTTP 200, CORS enabled |
-| `/test-player` | OK | Page loads and can search |
-| `/catalog` | OK | 6 rows, 108 posters, no browser console errors locally |
-| `/catalog.json` | OK | Returns cached TMDB rows for films and series |
-| `/details.json?type=movie&id=157336` | OK | Returns detail page data |
-| `/providers` | OK | Public provider state page |
-| `/stremio-open.json?type=movie&id=157336` | OK | Returns Desktop/Web Stremio links |
-| `/search.json?type=movie&q=Interstellar` | OK | Returns TMDB results |
-| `/stream/movie/tt0816692.json` | OK | Returns proxied MP4/M3U8 streams |
-| MP4 proxy range | OK | HTTP 206, `Content-Range`, `Accept-Ranges`, exposed CORS headers |
+| `/` | OK | Catalogue en premiere page |
+| `/catalog` | OK | Alias du catalogue |
+| `/test-player` | OK | Recherche, filtres et lecteur integre |
+| `/catalog.json` | OK | Catalogue TMDB mis en cache |
+| `/details.json?type=movie&id=157336` | OK | Donnees de fiche film |
+| `/providers` | OK | Etat public des providers |
+| `/search.json?type=movie&q=Interstellar` | OK | Recherche TMDB |
+| `/stream/movie/tt0816692.json` | OK | Retourne des sources MP4/HLS quand les providers en trouvent |
+| Proxy MP4 | OK | Supporte `Range`, `Content-Range` et `Accept-Ranges` |
+| Proxy HLS | OK | Reecrit les playlists pour passer les segments par le proxy |
 
-Last important commits:
-
-```text
-1c61647 Add provider diagnostics and Stremio hints
-68bec26 Harden Stremio web playback headers
-e162620 Add searchable test player
-```
-
-Latest public Render diagnostic:
-
-```text
-https://madrador60-stremio-addon.onrender.com/diagnostics.json
-```
-
-Result on 2026-05-13:
-
-| Status | Provider | Streams | Time |
-|---|---|---:|---:|
-| OK | `movix` | 2 | 1399ms |
-| OK | `frenchstream` | 2 | 12603ms |
-| OK | `nakios` | 3 | 501ms |
-| OK | `toflix` | 1 | 598ms |
-
-Command used:
+## Commandes utiles
 
 ```powershell
-node scripts\test-providers.js --timeout=45000
-```
-
-Quick movie-provider test:
-
-```powershell
+node --check site\server.js
+node --check scripts\test-providers.js
 node scripts\test-providers.js --only=frenchstream,movix,nakios,toflix --timeout=60000
 ```
 
-Result:
+## Providers films
 
-| Status | Provider | Streams | Time |
-|---|---|---:|---:|
-| OK | `movix` | 2 | 674ms |
-| OK | `frenchstream` | 2 | 2134ms |
-| OK | `nakios` | 3 | 370ms |
-| OK | `toflix` | 1 | 460ms |
-
-## Current Status
-
-| Status | Provider | Notes |
+| Statut | Provider | Notes |
 |---|---|---|
-| OK | `anime-sama` | Returned streams for One Piece S1E1 |
-| OK | `voiranime` | Returned streams for One Piece S1E1 |
-| OK | `vostfree` | Returned streams for One Piece S1E1 |
-| Unstable | `animoflix` | Worked once, then timed out on a later run |
-| OK | `french-anime` | Returned streams for One Piece S1E1 |
-| OK | `animevostfr` | Returned streams for One Piece S1E1 |
-| OK | `animesultra` | Returned streams for One Piece S1E1 |
-| OK, slow | `jetanimes` | Returned streams with a 45s timeout |
-| Zero | `sekai` | Returned 0 streams for One Piece S1E1 |
-| OK | `movix` | Returned streams for Interstellar |
-| OK | `mugiwarastream` | Returned streams for One Piece S1E1 |
-| Timeout | `animesite` | Timed out during latest tests |
-| OK | `frenchstream` | Returned streams for Interstellar |
-| OK | `nakios` | Returned streams for Interstellar |
-| OK | `purstream` | Returned streams for Interstellar |
-| OK | `toflix` | Returned streams for Interstellar |
-| OK, slow | `videasy` | Returned streams with a 45s timeout |
-| Zero | `cinemacity` | Returned 0 streams without private cookie/access |
+| OK | `movix` | Retourne des sources rapidement |
+| OK | `frenchstream` | Fonctionne, parfois plus lent |
+| OK | `nakios` | Retourne plusieurs sources |
+| OK | `purstream` | Fonctionne selon les titres |
+| OK | `toflix` | Retourne au moins une source sur les tests |
+| OK, lent | `videasy` | Peut demander un timeout plus long |
+| Limite | `cinemacity` | A garder documente tant qu'un acces public fiable n'est pas confirme |
+
+## Providers animes
+
+| Statut | Provider | Notes |
+|---|---|---|
+| OK | `anime-sama` | Sources trouvees sur les tests |
+| OK | `voiranime` | Sources trouvees sur les tests |
+| OK | `vostfree` | Sources trouvees sur les tests |
+| Instable | `animoflix` | Peut fonctionner puis timeout |
+| OK | `french-anime` | Sources trouvees sur les tests |
+| OK | `animevostfr` | Sources trouvees sur les tests |
+| OK | `animesultra` | Sources trouvees sur les tests |
+| OK, lent | `jetanimes` | Mieux avec `--timeout=45000` ou plus |
+| Zero | `sekai` | Peut ne rien trouver selon le titre |
+| OK | `mugiwarastream` | Sources trouvees sur les tests |
+| Timeout | `animesite` | A surveiller |
 
 ## Notes
 
-- A provider returning `0` is not always dead. It can mean the tested title is missing, the site changed layout, or the domain requires access.
-- Timeout-sensitive providers should be tested with `--timeout=45000` or higher.
-- CinemaCity should stay documented as limited unless a public, cookie-free path is confirmed.
+- Un provider qui retourne `0` n'est pas forcement mort : le titre peut manquer ou le domaine peut avoir change.
+- Les providers lents doivent etre testes avec un timeout plus haut.
+- Le site ne contient aucune video et affiche seulement les sources trouvees par les providers externes.

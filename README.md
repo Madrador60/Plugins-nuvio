@@ -18,9 +18,9 @@ Ensuite, rafraichis la liste des providers et active ceux que tu veux.
 
 | Page | Lien |
 | --- | --- |
-| Catalogue | https://madrador60-stremio-addon.onrender.com/ |
-| Lecteur | https://madrador60-stremio-addon.onrender.com/test-player |
-| Providers | https://madrador60-stremio-addon.onrender.com/providers |
+| Catalogue | https://madrador-film.onrender.com/ |
+| Lecteur | https://madrador-film.onrender.com/test-player |
+| Providers | https://madrador-film.onrender.com/providers |
 
 Le service Render gratuit peut dormir. Si la page met du temps au premier chargement, attends 30 a 60 secondes puis recharge.
 
@@ -31,7 +31,7 @@ Le service Render gratuit peut dormir. Si la page met du temps au premier charge
 | `manifest.json` | Liste publique des providers pour Nuvio |
 | `providers/` | Providers JavaScript actifs |
 | `domains.json` | Domaines connus et fallbacks |
-| `stremio/server.js` | Serveur web Madrador Film |
+| `site/server.js` | Serveur web Madrador Film |
 | `docs/provider-sources/fr/` | Sources Kotlin FR a porter en JavaScript |
 
 ## Providers actifs
@@ -73,7 +73,7 @@ Voir le detail : [docs/FRENCH_SOURCES.md](docs/FRENCH_SOURCES.md)
 ## Lancer en local
 
 ```powershell
-node stremio\server.js
+node site\server.js
 ```
 
 Puis ouvre :
@@ -85,7 +85,7 @@ http://127.0.0.1:7000/
 ## Tester
 
 ```powershell
-node --check stremio\server.js
+node --check site\server.js
 node --check scripts\test-providers.js
 node scripts\test-providers.js --only=frenchstream,movix,nakios,toflix --timeout=60000
 ```

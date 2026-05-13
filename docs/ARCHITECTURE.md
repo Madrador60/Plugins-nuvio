@@ -20,7 +20,7 @@ Madrador Film
 | `assets/` | Images et logos publics |
 | `manifest.json` | Manifest Nuvio |
 | `providers/` | Providers compatibles Nuvio |
-| `stremio/server.js` | Serveur web Madrador Film |
+| `site/server.js` | Serveur web Madrador Film |
 | `scripts/test-providers.js` | Test manuel des providers |
 | `scripts/update-manifest.js` | Ajout automatique des nouveaux providers au manifest |
 | `domains.json` | Domaines connus et fallbacks |

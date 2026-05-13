@@ -2,9 +2,9 @@
 
 ## Le site ne charge pas
 
-1. Ouvre `https://madrador60-stremio-addon.onrender.com/health.json`.
+1. Ouvre `https://madrador-film.onrender.com/health.json`.
 2. Si Render etait en veille, attends le premier reveil puis recharge la page.
-3. Teste aussi `https://madrador60-stremio-addon.onrender.com/catalog.json`.
+3. Teste aussi `https://madrador-film.onrender.com/catalog.json`.
 
 ## Aucune source trouvee
 
@@ -23,7 +23,7 @@ Certains films recents ou rares ne sont pas disponibles chez les providers actif
 ## Tests rapides
 
 ```powershell
-node --check stremio\server.js
+node --check site\server.js
 node --check scripts\test-providers.js
-node stremio\server.js
+node site\server.js
 ```

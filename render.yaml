@@ -1,10 +1,10 @@
 services:
   - type: web
-    name: madrador60-stremio-addon
+    name: madrador-film
     env: node
     plan: free
     buildCommand: ""
-    startCommand: node stremio/server.js
+    startCommand: node site/server.js
     envVars:
       - key: HOST
         value: 0.0.0.0
@@ -12,5 +12,5 @@ services:
         value: 45000
       - key: VIDEASY_SERVER_TIMEOUT_MS
         value: 22000
-      - key: STREMIO_PROVIDERS
+      - key: PROVIDER_FILTER
         value: frenchstream,movix,nakios,purstream,toflix,videasy

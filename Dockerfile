@@ -9,4 +9,4 @@ ENV PORT=7000
 
 EXPOSE 7000
 
-CMD ["node", "stremio/server.js"]
+CMD ["node", "site/server.js"]

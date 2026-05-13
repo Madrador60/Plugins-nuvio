@@ -19,13 +19,13 @@ Puis :
 Ouvre le site :
 
 ```text
-https://madrador60-stremio-addon.onrender.com/
+https://madrador-film.onrender.com/
 ```
 
 Page de test :
 
 ```text
-https://madrador60-stremio-addon.onrender.com/test-player
+https://madrador-film.onrender.com/test-player
 ```
 
 Sur Render gratuit, le service peut dormir. Le premier chargement peut donc prendre 30 a 60 secondes.
@@ -35,7 +35,7 @@ Sur Render gratuit, le service peut dormir. Le premier chargement peut donc pren
 Depuis la racine du depot :
 
 ```powershell
-node stremio\server.js
+node site\server.js
 ```
 
 Puis ouvre :
@@ -48,7 +48,7 @@ http://127.0.0.1:7000/
 
 ```powershell
 $env:PORT='7100'
-$env:STREMIO_PROVIDERS='frenchstream,movix,nakios,toflix'
+$env:PROVIDER_FILTER='frenchstream,movix,nakios,toflix'
 $env:PROVIDER_TIMEOUT_MS='60000'
-node stremio\server.js
+node site\server.js
 ```
