@@ -11,6 +11,13 @@ const HEADERS = {
 const API = 'https://enc-dec.app/api';
 const TMDB_API_KEY = 'd131017ccc6e5462a81c9304d21476de';
 const TMDB_BASE_URL = 'https://api.themoviedb.org/3';
+const VIDEASY_SERVER_TIMEOUT_MS = Number(
+  (typeof process !== 'undefined' && process.env && process.env.VIDEASY_SERVER_TIMEOUT_MS) || 22000
+);
+const VIDEASY_SERVER_FILTER = (typeof process !== 'undefined' && process.env && process.env.VIDEASY_SERVERS || '')
+  .split(',')
+  .map(function(item) { return item.trim(); })
+  .filter(Boolean);
 
 // VideoEasy server configurations
 const SERVERS = {
@@ -578,6 +585,32 @@ function fetchFromServer(serverName, serverConfig, mediaType, title, year, tmdbI
     });
 }
 
+function withServerTimeout(promise, serverName) {
+  return new Promise((resolve) => {
+    const timer = setTimeout(() => {
+      console.log(`[VideoEasy] Timeout from ${serverName} after ${VIDEASY_SERVER_TIMEOUT_MS}ms`);
+      resolve([]);
+    }, VIDEASY_SERVER_TIMEOUT_MS);
+
+    Promise.resolve(promise)
+      .then(resolve)
+      .catch(() => resolve([]))
+      .finally(() => clearTimeout(timer));
+  });
+}
+
+function getDefaultServerNames(mediaType) {
+  if (VIDEASY_SERVER_FILTER.length > 0) {
+    return VIDEASY_SERVER_FILTER.filter(function(serverName) { return SERVERS[serverName]; });
+  }
+
+  if (mediaType === 'movie') {
+    return ['Chamber', 'Yoru', 'Neon', 'Sage', 'Omen'];
+  }
+
+  return ['Neon', 'Sage', 'Omen', 'Breach', 'Vyse'];
+}
+
 // Main function to extract streaming links for Nuvio
 function getStreams(tmdbId, mediaType, seasonNum, episodeNum) {
   console.log(`[VideoEasy] Starting extraction for TMDB ID: ${tmdbId}, Type: ${mediaType}`);
@@ -588,9 +621,10 @@ function getStreams(tmdbId, mediaType, seasonNum, episodeNum) {
       .then((mediaDetails) => {
         console.log(`[VideoEasy] Found: ${mediaDetails.title} (${mediaDetails.year})`);
 
-        const serverPromises = Object.keys(SERVERS).map(serverName => {
+        const serverNames = getDefaultServerNames(mediaDetails.mediaType);
+        const serverPromises = serverNames.map(serverName => {
           const serverConfig = SERVERS[serverName];
-          return fetchFromServer(
+          return withServerTimeout(fetchFromServer(
             serverName,
             serverConfig,
             mediaDetails.mediaType,
@@ -600,7 +634,7 @@ function getStreams(tmdbId, mediaType, seasonNum, episodeNum) {
             mediaDetails.imdbId,
             seasonNum,
             episodeNum
-          );
+          ), serverName);
         });
 
         return Promise.all(serverPromises)

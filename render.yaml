@@ -10,5 +10,7 @@ services:
         value: 0.0.0.0
       - key: PROVIDER_TIMEOUT_MS
         value: 45000
+      - key: VIDEASY_SERVER_TIMEOUT_MS
+        value: 22000
       - key: STREMIO_PROVIDERS
         value: frenchstream,movix,nakios,purstream,toflix,videasy

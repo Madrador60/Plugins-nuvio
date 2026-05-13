@@ -876,7 +876,7 @@ function toStremioStream(stream, provider, req) {
     url: proxied ? getProxyUrl(req, stream) : stream.url,
     description: titleParts.join("\n"),
     behaviorHints: {
-      notWebReady: extension !== "mp4",
+      notWebReady: proxied ? false : extension !== "mp4",
       bingeGroup: getBingeGroup(provider, stream),
       filename: safeFilename(stream.title || provider.name || provider.id, extension)
     }
@@ -905,12 +905,11 @@ async function getStreams(request, req) {
   ].join(":");
 
   const rawStreams = await cachedJson(cacheKey, async () => {
-    const rows = [];
-
-    for (const provider of providers) {
+    const providerRuns = providers.map(async (provider) => {
+      const rows = [];
       try {
         const module = loadProvider(provider);
-        if (!module || typeof module.getStreams !== "function") continue;
+        if (!module || typeof module.getStreams !== "function") return rows;
 
         const result = await withTimeout(
           module.getStreams(resolved.tmdbId, resolved.mediaType, request.season, request.episode),
@@ -928,9 +927,10 @@ async function getStreams(request, req) {
       } catch (error) {
         console.warn("[Stremio] " + provider.id + ": " + (error && error.message ? error.message : error));
       }
-    }
+      return rows;
+    });
 
-    return rows;
+    return (await Promise.all(providerRuns)).flat();
   }, STREAM_CACHE_TTL_MS);
 
   const streams = [];
