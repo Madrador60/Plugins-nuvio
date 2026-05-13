@@ -13,6 +13,7 @@ Ce depot sert deux usages :
 |---|---|
 | Nuvio | `https://raw.githubusercontent.com/Madrador60/Plugins-nuvio/refs/heads/main/` |
 | Stremio | `https://madrador60-stremio-addon.onrender.com/v3/manifest.json` |
+| Installation Stremio guidee | `https://madrador60-stremio-addon.onrender.com/install` |
 | Catalogue / page publique | `https://madrador60-stremio-addon.onrender.com/` |
 | Catalogue direct | `https://madrador60-stremio-addon.onrender.com/catalog` |
 | Lecteur de test | `https://madrador60-stremio-addon.onrender.com/test-player` |

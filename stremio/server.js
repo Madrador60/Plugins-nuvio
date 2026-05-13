@@ -432,6 +432,42 @@ function renderProvidersPage() {
 </html>`;
 }
 
+function renderInstallPage(req) {
+  const baseUrl = getPublicBaseUrl(req);
+  const manifestUrl = baseUrl + "/v3/manifest.json";
+  const stremioUrl = "stremio://" + manifestUrl.replace(/^https?:\/\//, "");
+  const webAddonsUrl = "https://web.stremio.com/#/addons";
+
+  return `<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Installer Madrador Film FR</title>
+<link rel="icon" href="/logo.png">
+<style>
+:root{color-scheme:dark;--bg:#060714;--panel:#111426;--line:#303866;--text:#fff;--muted:#b8c0e0;--violet:#7c3aed;--blue:#2563eb;--ok:#38bdf8}
+*{box-sizing:border-box}body{margin:0;background:#060714;color:#fff;font-family:Inter,Segoe UI,Arial,sans-serif;line-height:1.5}body:before{content:"";position:fixed;inset:0;background:radial-gradient(circle at 16% 0%,rgba(124,58,237,.34),transparent 34%),radial-gradient(circle at 82% 8%,rgba(37,99,235,.26),transparent 30%),linear-gradient(180deg,rgba(0,0,0,.12),#060714 62%);pointer-events:none}main{position:relative;z-index:1;width:min(920px,calc(100% - 28px));margin:0 auto;padding:34px 0 56px}.brand{font-weight:900;color:#a78bfa;font-size:24px;margin-bottom:24px}h1{font-size:clamp(38px,7vw,74px);line-height:.98;margin:0 0 12px}.lead{color:#dbeafe;font-size:18px;max-width:760px}.card{background:rgba(17,20,38,.92);border:1px solid var(--line);border-radius:8px;padding:18px;margin:16px 0}.actions{display:flex;flex-wrap:wrap;gap:10px;margin:18px 0}a,button{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 16px;border-radius:7px;border:1px solid var(--line);color:#fff;text-decoration:none;font-weight:900;background:#10142b}a.primary,button.primary{border:0;background:linear-gradient(135deg,var(--violet),var(--blue))}code{display:block;background:#050817;border:1px solid var(--line);border-radius:7px;padding:13px;overflow:auto;color:#dbeafe}.steps{counter-reset:item;display:grid;gap:10px;margin-top:12px}.step{display:grid;grid-template-columns:36px 1fr;gap:10px;align-items:start}.step:before{counter-increment:item;content:counter(item);display:grid;place-items:center;width:30px;height:30px;border-radius:999px;background:linear-gradient(135deg,var(--violet),var(--blue));font-weight:900}.muted{color:var(--muted)}.ok{color:var(--ok);font-weight:900}@media(max-width:620px){main{width:100%;padding:22px 12px 42px}.actions{display:grid}a,button{width:100%}.card{padding:14px}h1{font-size:38px}}
+</style>
+</head>
+<body>
+<main>
+  <div class="brand">MADRADOR FILM</div>
+  <h1>Installation Stremio propre</h1>
+  <p class="lead">Cette page utilise l'URL versionnee qui evite le vieux cache de Stremio Web.</p>
+  <div class="actions"><a class="primary" href="${escapeHtml(stremioUrl)}">Installer dans Stremio Desktop</a><a href="${escapeHtml(webAddonsUrl)}" target="_blank">Ouvrir Stremio Web Addons</a><a href="/v3/manifest.json" target="_blank">Voir le manifest</a></div>
+  <div class="card"><strong>URL a copier dans Add addon</strong><code id="manifest">${escapeHtml(manifestUrl)}</code><div class="actions"><button class="primary" id="copy">Copier l'URL</button><button id="test">Tester Mario</button></div><p id="out" class="muted">Pret.</p></div>
+  <div class="card"><strong>Etapes exactes</strong><div class="steps"><div class="step">Dans Stremio, supprime tous les anciens addons Madrador.</div><div class="step">Va dans Addons puis clique Add addon.</div><div class="step">Colle exactement l'URL ci-dessus et installe Madrador Film FR.</div><div class="step">Retourne sur ton film et fais Ctrl+F5 si tu es sur Stremio Web.</div></div></div>
+</main>
+<script>
+const manifest=document.getElementById('manifest').textContent,out=document.getElementById('out');
+document.getElementById('copy').onclick=async()=>{await navigator.clipboard.writeText(manifest).catch(()=>{});out.innerHTML='<span class="ok">URL copiee.</span>'};
+document.getElementById('test').onclick=async()=>{out.textContent='Test en cours...';try{const data=await fetch('/v3/stream/movie/tt28650488.json').then(r=>r.json());out.innerHTML='<span class="ok">'+(data.streams||[]).length+' streams trouves pour Mario.</span>'}catch(e){out.textContent='Erreur test: '+(e.message||e)}};
+</script>
+</body>
+</html>`;
+}
+
 async function searchTmdb(query, mediaType) {
   const type = mediaType === "series" || mediaType === "tv" ? "tv" : "movie";
   const normalizedQuery = query.trim().toLowerCase();
@@ -1059,6 +1095,11 @@ const server = http.createServer(async (req, res) => {
 
     if (url.pathname === "/providers") {
       sendHtml(res, 200, renderProvidersPage());
+      return;
+    }
+
+    if (url.pathname === "/install") {
+      sendHtml(res, 200, renderInstallPage(req));
       return;
     }
 
