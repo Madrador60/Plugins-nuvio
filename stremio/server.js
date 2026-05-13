@@ -29,6 +29,16 @@ const animeProviders = new Set([
   "animesite"
 ]);
 
+function corsHeaders(extra) {
+  return Object.assign({
+    "access-control-allow-origin": "*",
+    "access-control-allow-methods": "GET,HEAD,OPTIONS",
+    "access-control-allow-headers": "*",
+    "access-control-expose-headers": "Content-Length,Content-Range,Accept-Ranges,Content-Type",
+    "cross-origin-resource-policy": "cross-origin"
+  }, extra || {});
+}
+
 function base64UrlEncode(value) {
   return Buffer.from(value, "utf8")
     .toString("base64")
@@ -43,19 +53,16 @@ function base64UrlDecode(value) {
 }
 
 function sendJson(res, status, payload) {
-  res.writeHead(status, {
+  res.writeHead(status, corsHeaders({
     "content-type": "application/json; charset=utf-8",
-    "access-control-allow-origin": "*",
-    "access-control-allow-headers": "*"
-  });
+  }));
   res.end(JSON.stringify(payload));
 }
 
 function sendHtml(res, status, html) {
-  res.writeHead(status, {
-    "content-type": "text/html; charset=utf-8",
-    "access-control-allow-origin": "*"
-  });
+  res.writeHead(status, corsHeaders({
+    "content-type": "text/html; charset=utf-8"
+  }));
   res.end(html);
 }
 
@@ -87,6 +94,16 @@ function escapeHtml(value) {
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;");
+}
+
+function safeFilename(value, extension) {
+  const base = String(value || "stream")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-zA-Z0-9._-]+/g, ".")
+    .replace(/^\.+|\.+$/g, "")
+    .slice(0, 80) || "stream";
+  return base + "." + (extension || "mp4");
 }
 
 function getProviderSummary(mediaType) {
@@ -290,10 +307,9 @@ function rewritePlaylist(content, sourceUrl, req, headers) {
 }
 
 function copyProxyHeaders(upstream, res, contentLengthOverride) {
-  const headers = {
-    "access-control-allow-origin": "*",
+  const headers = corsHeaders({
     "accept-ranges": upstream.headers.get("accept-ranges") || "bytes"
-  };
+  });
 
   const contentType = upstream.headers.get("content-type");
   const contentLength = typeof contentLengthOverride === "number" ? String(contentLengthOverride) : upstream.headers.get("content-length");
@@ -324,16 +340,20 @@ async function proxyMedia(req, res, proxyRequest) {
   if (isPlaylistUrl(proxyRequest.url) || contentType.includes("mpegurl") || contentType.includes("m3u8")) {
     const text = await upstream.text();
     const rewritten = rewritePlaylist(text, proxyRequest.url, req, proxyRequest.headers);
-    res.writeHead(upstream.status, {
+    res.writeHead(upstream.status, corsHeaders({
       "content-type": "application/vnd.apple.mpegurl; charset=utf-8",
-      "access-control-allow-origin": "*",
       "cache-control": "no-store"
-    });
-    res.end(rewritten);
+    }));
+    res.end(req.method === "HEAD" ? undefined : rewritten);
     return;
   }
 
   res.writeHead(upstream.status, copyProxyHeaders(upstream, res));
+  if (req.method === "HEAD") {
+    res.end();
+    return;
+  }
+
   if (!upstream.body) {
     res.end();
     return;
@@ -399,7 +419,8 @@ function toStremioStream(stream, provider, req) {
     title: titleParts.join("\n"),
     url: proxied ? getProxyUrl(req, stream) : stream.url,
     behaviorHints: {
-      notWebReady: false
+      notWebReady: false,
+      filename: safeFilename(stream.title || provider.name || provider.id, getProxyExtension(stream.url))
     }
   };
 
@@ -459,10 +480,7 @@ const server = http.createServer(async (req, res) => {
     const url = new URL(req.url, "http://" + (req.headers.host || "localhost"));
 
     if (req.method === "OPTIONS") {
-      res.writeHead(204, {
-        "access-control-allow-origin": "*",
-        "access-control-allow-headers": "*"
-      });
+      res.writeHead(204, corsHeaders());
       res.end();
       return;
     }
