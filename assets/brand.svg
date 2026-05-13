@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" role="img" aria-labelledby="title">
+  <title id="title">Logo Madrador Film</title>
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#2563eb"/>
+      <stop offset=".55" stop-color="#7c3aed"/>
+      <stop offset="1" stop-color="#c026d3"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="#060714"/>
+  <rect x="38" y="38" width="436" height="436" rx="92" fill="url(#g)" opacity=".95"/>
+  <rect x="74" y="86" width="364" height="284" rx="34" fill="#080b1d" stroke="#dbeafe" stroke-width="12"/>
+  <path d="M114 158h284M114 232h284M114 306h284" stroke="#1d4ed8" stroke-width="10" opacity=".5"/>
+  <path d="M146 338V174h45l45 86 45-86h45v164h-39V241l-36 70h-31l-36-70v97z" fill="#fff"/>
+  <circle cx="386" cy="126" r="28" fill="#38bdf8"/>
+</svg>

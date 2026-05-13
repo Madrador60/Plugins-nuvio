@@ -9,9 +9,13 @@ Dernier test manuel : 2026-05-13
 | `/` | OK | Catalogue en premiere page |
 | `/catalog` | OK | Alias du catalogue |
 | `/test-player` | OK | Recherche, filtres et lecteur integre |
+| `/brand.svg` | OK | Logo public du site |
+| `/banner.svg` | OK | Banniere GitHub |
 | `/catalog.json` | OK | Catalogue TMDB mis en cache |
 | `/details.json?type=movie&id=157336` | OK | Donnees de fiche film |
 | `/providers` | OK | Etat public des providers |
+| `/providers` filtre | OK | Recherche provider/domaine/format |
+| `/providers` test | OK | Diagnostic rapide par provider |
 | `/search.json?type=movie&q=Interstellar` | OK | Recherche TMDB |
 | `/stream/movie/tt0816692.json` | OK | Retourne des sources MP4/HLS quand les providers en trouvent |
 | Proxy MP4 | OK | Supporte `Range`, `Content-Range` et `Accept-Ranges` |

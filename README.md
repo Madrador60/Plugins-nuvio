@@ -1,5 +1,7 @@
 # Madrador Film - Plugins Nuvio FR
 
+![Madrador Film](assets/banner.svg)
+
 Depot de providers francais pour **Nuvio** avec un site public **Madrador Film**.
 
 L'objectif est simple : installer facilement les sources FR dans Nuvio, ou utiliser le site web avec catalogue, fiches, favoris et lecteur integre.
@@ -32,6 +34,8 @@ Le service Render gratuit peut dormir. Si la page met du temps au premier charge
 | `providers/` | Providers JavaScript actifs |
 | `domains.json` | Domaines connus et fallbacks |
 | `site/server.js` | Serveur web Madrador Film |
+| `assets/banner.svg` | Banniere GitHub Madrador Film |
+| `assets/brand.svg` | Logo public du site |
 | `docs/provider-sources/fr/` | Sources Kotlin FR a porter en JavaScript |
 
 ## Providers actifs

@@ -8,7 +8,7 @@ const nuvioManifest = require(path.join(ROOT, "manifest.json"));
 const domains = require(path.join(ROOT, "domains.json"));
 
 const SITE_NAME = "Madrador Film";
-const SITE_VERSION = "1.5.0";
+const SITE_VERSION = "1.6.0";
 const HOST = process.env.HOST || "0.0.0.0";
 const PORT = Number(process.env.PORT || 7000);
 const TMDB_API_KEY = process.env.TMDB_API_KEY || "8265bd1679663a7ea12ac168da84d2e8";
@@ -21,6 +21,8 @@ const CACHE_TTL_MS = Number(process.env.CACHE_TTL_MS || 10 * 60 * 1000);
 const SEARCH_CACHE_TTL_MS = Number(process.env.SEARCH_CACHE_TTL_MS || 10 * 60 * 1000);
 const STREAM_CACHE_TTL_MS = Number(process.env.STREAM_CACHE_TTL_MS || 3 * 60 * 1000);
 const DIAGNOSTIC_CACHE_TTL_MS = Number(process.env.DIAGNOSTIC_CACHE_TTL_MS || 2 * 60 * 1000);
+const CATALOG_CACHE_TTL_MS = Number(process.env.CATALOG_CACHE_TTL_MS || 30 * 60 * 1000);
+const CACHE_MAX_ENTRIES = Number(process.env.CACHE_MAX_ENTRIES || 300);
 const memoryCache = new Map();
 
 const animeProviders = new Set([
@@ -181,6 +183,15 @@ function getCached(key) {
 }
 
 function setCached(key, value, ttlMs) {
+  if (memoryCache.size >= CACHE_MAX_ENTRIES) {
+    const now = Date.now();
+    for (const [entryKey, entry] of memoryCache) {
+      if (entry.expiresAt <= now || memoryCache.size >= CACHE_MAX_ENTRIES) {
+        memoryCache.delete(entryKey);
+      }
+      if (memoryCache.size < CACHE_MAX_ENTRIES) break;
+    }
+  }
   memoryCache.set(key, {
     value,
     expiresAt: Date.now() + (ttlMs || CACHE_TTL_MS)
@@ -216,6 +227,7 @@ main{position:relative;z-index:1;width:min(1280px,calc(100% - 32px));margin:0 au
 pre{white-space:pre-wrap;background:#050505;border:1px solid #222;border-radius:8px;padding:12px;color:#cbd5e1;overflow:auto;max-height:170px;margin:0}.empty{color:var(--muted);background:#101010;border:1px dashed #333;border-radius:8px;padding:18px}
 @media(max-width:980px){.hero{grid-template-columns:1fr}video{min-height:300px}.streamGrid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:620px){main{width:min(100% - 20px,1280px);padding:14px 0 34px}.nav{height:auto;align-items:flex-start;display:grid;gap:8px}.brand{font-size:20px}.navlinks{display:grid;grid-template-columns:1fr 1fr;width:100%;gap:6px}.navlinks a{background:#10142b;text-align:center;padding:10px 8px}.hero{gap:14px;margin-top:8px}.player{border-radius:6px}video{min-height:220px;max-height:42vh}.shade{padding:16px 14px 34px}.shade h1{font-size:28px}.shade p{font-size:13px}.searchBox,.now,.streamsPanel,.logPanel{padding:12px}.searchGrid,.tools,.filters,.streamGrid{grid-template-columns:1fr}.rail{grid-auto-columns:132px}.poster{width:132px;height:210px}.poster img{height:154px}pre{max-height:120px}.stream{min-height:76px}}
 @media(max-width:520px){body{overflow-x:hidden}main{width:100%;padding:12px 10px calc(92px + env(safe-area-inset-bottom))}.brand{padding-left:2px}.hero{min-height:210px;padding:16px;border-radius:0;margin:8px -10px 18px;background-position:center top}.hero .chip{font-size:11px;min-height:26px}h1{font-size:34px;max-width:330px}.lead{font-size:14px;max-width:330px}.search{margin-top:14px}.search input,.search select,.search button{min-height:48px;border-radius:8px;font-size:15px}.row{margin:20px 0}.rowHead{padding:0 2px}.rowHead .chip{white-space:nowrap}.rail{grid-auto-columns:42vw;gap:10px;margin:0 -10px;padding:2px 10px 16px;scroll-padding-left:10px}.poster{width:42vw;height:calc(42vw * 1.55);border-radius:7px}.poster:hover{transform:none}.poster img{height:calc(42vw * 1.16)}.poster strong{font-size:12px;padding:7px 7px 0}.poster small{font-size:11px;padding:2px 7px}.modal{align-items:stretch;padding-top:env(safe-area-inset-top)}.sheet{height:100dvh;max-height:100dvh;border:0;border-radius:0;overflow:auto}.detailHero{min-height:100%;display:block;padding:56px 16px 24px;background-position:center top}.detailPoster{width:118px;float:left;margin:0 14px 8px 0}.detailText h2{font-size:30px;line-height:1.02}.meta{font-size:13px}.overview{clear:both;max-height:none;font-size:14px;line-height:1.5}.detailActions{display:grid;grid-template-columns:1fr;gap:9px;margin-top:18px}.detailActions button{min-height:48px}.close{position:fixed;right:12px;top:calc(12px + env(safe-area-inset-top));z-index:30;border-radius:999px}.bottomNav{left:8px;right:8px;bottom:calc(8px + env(safe-area-inset-bottom));padding:7px;border-radius:12px}.bottomNav a{font-size:12px;min-height:42px;display:flex;align-items:center;justify-content:center}}@media(max-width:360px){.rail{grid-auto-columns:46vw}.poster{width:46vw;height:calc(46vw * 1.58)}.poster img{height:calc(46vw * 1.18)}h1{font-size:30px}.detailPoster{width:104px}}
+.brand{display:flex;align-items:center;gap:10px}.brand img{width:34px;height:34px;border-radius:8px}.categoryBar{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0 6px}.categoryBar button{min-height:36px;border:1px solid #303866;background:#10142b;border-radius:999px;padding:0 13px}.categoryBar button.active{background:linear-gradient(135deg,#7c3aed,#2563eb);border-color:transparent}.sourcePlayer{display:none;margin:0 0 14px;background:#020617;border:1px solid #303866;border-radius:8px;overflow:hidden}.sourcePlayer.open{display:block}.sourcePlayer video{display:block;width:100%;max-height:360px;background:#000}.sourcePlayerInfo{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:10px 12px;background:#0b1028;color:#dbeafe}.sourceStatus{color:#bfdbfe;font-size:13px}.sourceCard.best{border-color:#38bdf8;box-shadow:0 0 0 1px rgba(56,189,248,.55)}.sourceCard.best:before{content:"Meilleur choix";display:inline-flex;margin-bottom:8px;min-height:22px;align-items:center;border-radius:999px;padding:0 8px;background:#075985;color:#e0f2fe;font-size:11px;font-weight:900}.empty strong{color:#fff}.empty .hint{display:block;margin-top:6px;color:#b8c0e0}.skeleton{min-height:220px;background:linear-gradient(90deg,#111426,#1d2446,#111426);background-size:240% 100%;animation:pulse 1.2s linear infinite;border-radius:8px}@keyframes pulse{to{background-position:-240% 0}}@media(max-width:520px){.categoryBar{display:grid;grid-template-columns:1fr 1fr}.categoryBar button{min-height:42px}.sourcePlayer video{max-height:280px}.sourcePlayerInfo{display:grid}.brand img{width:30px;height:30px}}
 </style>
 </head>
 <body>
@@ -288,8 +300,9 @@ function renderCatalogPage() {
 </head>
 <body>
 <main>
-  <header class="nav"><div class="brand">MADRADOR FILM</div><nav><a href="/test-player">Lecteur</a><a href="/providers">Providers</a></nav></header>
+  <header class="nav"><div class="brand"><img src="/brand.svg" alt="">MADRADOR FILM</div><nav><a href="/test-player">Lecteur</a><a href="/providers">Providers</a></nav></header>
   <section class="hero"><div><span class="chip good">Madrador Film</span><h1>Films et series</h1><p class="lead">Un catalogue simple, rapide et pense pour lancer les sources FR sans passer par un addon externe.</p><div class="searchShell"><div class="search"><input id="query" placeholder="Rechercher un titre..." value="" autocomplete="off"><select id="type"><option value="movie">Film</option><option value="series">Serie</option></select><button id="go">Rechercher</button></div><div id="suggestions" class="suggestions"></div></div><div class="quick"><button data-q="Mario" data-type="movie">Mario</button><button data-q="Interstellar" data-type="movie">Interstellar</button><button data-q="One Piece" data-type="series">One Piece</button><button data-q="The Last of Us" data-type="series">The Last of Us</button></div></div></section>
+  <section class="categoryBar" aria-label="Filtres catalogue"><button class="active" data-filter="all">Tout</button><button data-filter="movie">Films</button><button data-filter="series">Series</button><button data-filter="anime">Animes</button></section>
   <section class="stats"><div class="stat"><strong id="statTitles">...</strong><span>Titres affiches</span></div><div class="stat"><strong>FR</strong><span>Sources prioritaires</span></div><div class="stat"><strong>MP4/HLS</strong><span>Tri automatique</span></div><div class="stat"><strong>Mobile</strong><span>Interface adaptee</span></div></section>
   <section id="favoritesRow" class="row hidden"></section>
   <section id="historyRow" class="row hidden"></section>
@@ -298,8 +311,9 @@ function renderCatalogPage() {
 </main>
 <nav class="bottomNav"><a href="/">Accueil</a><a href="/test-player">Lecteur</a><a href="/providers">Sources</a></nav>
 <div id="modal" class="modal"><button id="close" class="close">X</button><div id="sheet" class="sheet"></div></div>
+<script src="https://cdn.jsdelivr.net/npm/hls.js@1"></script>
 <script>
-const rows=document.getElementById('rows'),searchResults=document.getElementById('searchResults'),query=document.getElementById('query'),type=document.getElementById('type'),go=document.getElementById('go'),modal=document.getElementById('modal'),sheet=document.getElementById('sheet'),closeBtn=document.getElementById('close'),suggestions=document.getElementById('suggestions'),favoritesRow=document.getElementById('favoritesRow'),historyRow=document.getElementById('historyRow'),statTitles=document.getElementById('statTitles');
+const rows=document.getElementById('rows'),searchResults=document.getElementById('searchResults'),query=document.getElementById('query'),type=document.getElementById('type'),go=document.getElementById('go'),modal=document.getElementById('modal'),sheet=document.getElementById('sheet'),closeBtn=document.getElementById('close'),suggestions=document.getElementById('suggestions'),favoritesRow=document.getElementById('favoritesRow'),historyRow=document.getElementById('historyRow'),statTitles=document.getElementById('statTitles'),categoryBtns=[...document.querySelectorAll('.categoryBar button')];let detailHls=null,activeCatalogFilter='all';
 const noPoster='data:image/svg+xml;charset=utf-8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="312" height="464"><rect width="100%" height="100%" fill="#111426"/><text x="50%" y="48%" fill="#8b5cf6" font-family="Arial" font-size="26" text-anchor="middle">MADRADOR</text><text x="50%" y="56%" fill="#60a5fa" font-family="Arial" font-size="20" text-anchor="middle">FILM</text></svg>');
 function esc(x){return String(x||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
 function playerUrl(item){return '/test-player?q='+encodeURIComponent(item.title)+'&type='+encodeURIComponent(item.type)+'&id='+encodeURIComponent(item.id||'')+'&year='+encodeURIComponent(item.year||'')+'&autoload=1'}
@@ -312,12 +326,76 @@ function toggleFav(item){const key=keyFor(item),list=readStore('madradorFavorite
 function card(item){return '<button class="poster" data-title="'+esc(item.title)+'" data-type="'+item.type+'" data-id="'+esc(item.id)+'" data-year="'+esc(item.year||'')+'"><img src="'+esc(item.poster||noPoster)+'" alt=""><strong>'+esc(item.title)+'</strong><small>'+esc(item.year||'')+' · '+esc(item.type==='series'?'Serie':'Film')+'</small></button>'}
 function bindPosters(root){root.querySelectorAll('.poster').forEach(b=>b.onclick=()=>openDetails({id:b.dataset.id,type:b.dataset.type,title:b.dataset.title,year:b.dataset.year}))}
 function renderLocalRows(){const favs=readStore('madradorFavorites'),hist=readStore('madradorHistory');favoritesRow.className='row '+(favs.length?'':'hidden');favoritesRow.innerHTML=favs.length?'<div class="rowHead"><h2>Favoris</h2><button class="miniBtn" id="clearFavs">Vider</button></div><div class="rail">'+favs.map(card).join('')+'</div>':'';historyRow.className='row '+(hist.length?'':'hidden');historyRow.innerHTML=hist.length?'<div class="rowHead"><h2>Recemment ouverts</h2><button class="miniBtn" id="clearHistory">Vider</button></div><div class="rail">'+hist.map(card).join('')+'</div>':'';bindPosters(favoritesRow);bindPosters(historyRow);const cf=document.getElementById('clearFavs'),ch=document.getElementById('clearHistory');if(cf)cf.onclick=()=>{writeStore('madradorFavorites',[]);renderLocalRows()};if(ch)ch.onclick=()=>{writeStore('madradorHistory',[]);renderLocalRows()}}
-function renderSources(streams){if(!streams.length)return '<div class="empty">Aucune source trouvee pour le moment.</div>';return '<div class="sourceList">'+streams.slice(0,12).map((s,i)=>{const text=[s.title||s.description].filter(Boolean).join(' · ');const format=s.format||(/m3u8/i.test(s.url||'')?'HLS':/\\.mp4/i.test(s.url||'')?'MP4':'Direct');const language=s.language||'FR';const quality=s.quality||'HD';return '<button class="sourceCard" data-index="'+i+'"><strong>'+esc(s.name||('Source '+(i+1)))+'</strong><small>'+esc(text.slice(0,130)||'Source detectee automatiquement')+'</small><div class="badges"><span class="chip good">'+esc(format)+'</span><span class="chip">'+esc(language)+'</span><span class="chip">'+esc(quality)+'</span></div></button>'}).join('')+'</div>'}
-async function openDetails(item){modal.className='modal open';sheet.innerHTML='<div class="empty">Chargement de la fiche...</div>';try{const d=await fetch('/details.json?type='+encodeURIComponent(item.type)+'&id='+encodeURIComponent(item.id)).then(r=>r.json());saveRecent({id:d.id,type:d.type,title:d.title,year:d.year,poster:d.poster});const play=playerUrl(d);const favLabel=isFav(d)?'Retirer des favoris':'Ajouter aux favoris';sheet.innerHTML='<div class="detailHero" style="background-image:linear-gradient(90deg,rgba(8,10,25,.98),rgba(8,10,25,.68)),url('+esc(d.backdrop||'')+')"><img class="detailPoster" src="'+esc(d.poster||noPoster)+'" alt=""><div class="detailText"><span class="chip">'+esc(d.type==='series'?'Serie':'Film')+'</span><h2>'+esc(d.title)+'</h2><div class="meta">'+esc([d.year,d.rating?('TMDB '+Number(d.rating).toFixed(1)):'',d.genres&&d.genres.join(', ')].filter(Boolean).join(' · '))+'</div><p class="overview">'+esc(d.overview||'Aucun resume disponible.')+'</p><div class="detailActions"><button id="playNow">Lire maintenant</button><button id="favBtn" class="miniBtn">'+favLabel+'</button><button id="copyBtn" class="miniBtn">Copier le lien</button></div></div></div><div class="sourcePanel"><div class="sourceHead"><div><strong>Sources disponibles</strong><div class="meta" id="sourceMeta">Recherche automatique en cours...</div></div><button class="miniBtn" id="refreshSources">Relancer</button></div><div id="sourceList" class="empty">Chargement des sources...</div></div>';document.getElementById('playNow').onclick=()=>location.href=play;document.getElementById('copyBtn').onclick=()=>navigator.clipboard.writeText(location.origin+play);document.getElementById('favBtn').onclick=()=>{document.getElementById('favBtn').textContent=toggleFav({id:d.id,type:d.type,title:d.title,year:d.year,poster:d.poster})?'Retirer des favoris':'Ajouter aux favoris'};async function loadSources(){const list=document.getElementById('sourceList'),meta=document.getElementById('sourceMeta');list.className='empty';list.textContent='Chargement des sources...';try{const data=await fetch('/stream/'+encodeURIComponent(d.type)+'/'+encodeURIComponent(d.id)+'.json').then(r=>r.json());const streams=data.streams||[];meta.textContent=streams.length+' source'+(streams.length>1?'s':'')+' trouvee'+(streams.length>1?'s':'');list.className='';list.innerHTML=renderSources(streams);list.querySelectorAll('.sourceCard').forEach(btn=>btn.onclick=()=>{const s=streams[Number(btn.dataset.index)];if(s&&s.url)location.href=s.url})}catch(e){meta.textContent='Erreur pendant la recherche';list.className='empty';list.textContent='Impossible de charger les sources: '+(e.message||e)}}document.getElementById('refreshSources').onclick=loadSources;renderLocalRows();loadSources()}catch(e){sheet.innerHTML='<div class="empty">Impossible de charger la fiche: '+esc(e.message||e)+'</div>'}}
+function renderSources(streams){if(!streams.length)return '<div class="empty"><strong>Aucune source trouvee.</strong><span class="hint">Essaie un autre titre, ou relance la recherche si le provider vient de changer de domaine.</span></div>';return '<div class="sourceList">'+streams.slice(0,12).map((s,i)=>{const text=[s.title||s.description].filter(Boolean).join(' · ');const format=s.format||(/m3u8/i.test(s.url||'')?'HLS':/\\.mp4/i.test(s.url||'')?'MP4':'Direct');const language=s.language||'FR';const quality=s.quality||'HD';return '<button class="sourceCard '+(i===0?'best':'')+'" data-index="'+i+'"><strong>'+esc(s.name||('Source '+(i+1)))+'</strong><small>'+esc(text.slice(0,130)||'Source detectee automatiquement')+'</small><div class="badges"><span class="chip good">'+esc(format)+'</span><span class="chip">'+esc(language)+'</span><span class="chip">'+esc(quality)+'</span></div></button>'}).join('')+'</div>'}
+async function openDetails(item){
+  modal.className='modal open';
+  if(detailHls){detailHls.destroy();detailHls=null}
+  sheet.innerHTML='<div class="skeleton"></div>';
+  try{
+    const d=await fetch('/details.json?type='+encodeURIComponent(item.type)+'&id='+encodeURIComponent(item.id)).then(r=>r.json());
+    saveRecent({id:d.id,type:d.type,title:d.title,year:d.year,poster:d.poster});
+    const play=playerUrl(d);
+    const favLabel=isFav(d)?'Retirer des favoris':'Ajouter aux favoris';
+    sheet.innerHTML='<div class="detailHero" style="background-image:linear-gradient(90deg,rgba(8,10,25,.98),rgba(8,10,25,.68)),url('+esc(d.backdrop||'')+')"><img class="detailPoster" src="'+esc(d.poster||noPoster)+'" alt=""><div class="detailText"><span class="chip">'+esc(d.type==='series'?'Serie':'Film')+'</span><h2>'+esc(d.title)+'</h2><div class="meta">'+esc([d.year,d.rating?('TMDB '+Number(d.rating).toFixed(1)):'',d.genres&&d.genres.join(', ')].filter(Boolean).join(' · '))+'</div><p class="overview">'+esc(d.overview||'Aucun resume disponible.')+'</p><div class="detailActions"><button id="playNow">Ouvrir dans le lecteur</button><button id="favBtn" class="miniBtn">'+favLabel+'</button><button id="copyBtn" class="miniBtn">Copier le lien</button></div></div></div><div class="sourcePanel"><div class="sourcePlayer" id="sourcePlayer"><video id="detailVideo" controls playsinline></video><div class="sourcePlayerInfo"><strong id="detailNow">Lecture</strong><span class="sourceStatus" id="detailStatus">Pret</span></div></div><div class="sourceHead"><div><strong>Sources disponibles</strong><div class="meta" id="sourceMeta">Recherche automatique en cours...</div></div><button class="miniBtn" id="refreshSources">Relancer</button></div><div id="sourceList" class="empty">Chargement des sources...</div></div>';
+    document.getElementById('playNow').onclick=()=>location.href=play;
+    document.getElementById('copyBtn').onclick=()=>navigator.clipboard.writeText(location.origin+play);
+    document.getElementById('favBtn').onclick=()=>{document.getElementById('favBtn').textContent=toggleFav({id:d.id,type:d.type,title:d.title,year:d.year,poster:d.poster})?'Retirer des favoris':'Ajouter aux favoris'};
+    async function playSource(s,button){
+      if(!s||!s.url)return;
+      document.querySelectorAll('.sourceCard.active').forEach(x=>x.classList.remove('active'));
+      if(button)button.classList.add('active');
+      const box=document.getElementById('sourcePlayer'),video=document.getElementById('detailVideo'),now=document.getElementById('detailNow'),status=document.getElementById('detailStatus');
+      box.className='sourcePlayer open';
+      now.textContent=(s.name||'Source')+' · '+(s.format||'Direct');
+      status.textContent='Chargement...';
+      if(detailHls){detailHls.destroy();detailHls=null}
+      video.removeAttribute('src');video.load();
+      if(String(s.url).includes('.m3u8')){
+        if(window.Hls&&Hls.isSupported()){
+          detailHls=new Hls({enableWorker:true,lowLatencyMode:false});
+          detailHls.loadSource(s.url);
+          detailHls.attachMedia(video);
+          detailHls.on(Hls.Events.ERROR,(e,data)=>{status.textContent=data.fatal?'Erreur HLS':'Lecture HLS ajustee'});
+        }else if(video.canPlayType('application/vnd.apple.mpegurl')){
+          video.src=s.url;
+        }else{
+          status.textContent='HLS non supporte ici';
+          return;
+        }
+      }else{
+        video.src=s.url;
+      }
+      await video.play().then(()=>{status.textContent='Lecture en cours'}).catch(e=>{status.textContent='Clique sur lecture si le navigateur bloque';});
+    }
+    async function loadSources(){
+      const list=document.getElementById('sourceList'),meta=document.getElementById('sourceMeta');
+      list.className='empty';
+      list.innerHTML='<strong>Recherche des sources...</strong><span class="hint">Les providers FR sont testes en parallele.</span>';
+      try{
+        const data=await fetch('/stream/'+encodeURIComponent(d.type)+'/'+encodeURIComponent(d.id)+'.json').then(r=>r.json());
+        const streams=data.streams||[];
+        meta.textContent=streams.length+' source'+(streams.length>1?'s':'')+' trouvee'+(streams.length>1?'s':'')+' · MP4/VF priorises';
+        list.className='';
+        list.innerHTML=renderSources(streams);
+        list.querySelectorAll('.sourceCard').forEach(btn=>btn.onclick=()=>playSource(streams[Number(btn.dataset.index)],btn));
+      }catch(e){
+        meta.textContent='Erreur pendant la recherche';
+        list.className='empty';
+        list.innerHTML='<strong>Impossible de charger les sources.</strong><span class="hint">'+esc(e.message||e)+'</span>';
+      }
+    }
+    document.getElementById('refreshSources').onclick=loadSources;
+    renderLocalRows();
+    loadSources();
+  }catch(e){
+    sheet.innerHTML='<div class="empty">Impossible de charger la fiche: '+esc(e.message||e)+'</div>';
+  }
+}
 async function searchCatalog(){const q=query.value.trim();if(!q)return;searchResults.innerHTML='<section class="row"><div class="rowHead"><h2>Recherche</h2><span class="chip">Chargement</span></div><div class="empty">Recherche en cours...</div></section>';const data=await fetch('/search.json?type='+encodeURIComponent(type.value)+'&q='+encodeURIComponent(q)).then(r=>r.json());searchResults.innerHTML='<section class="row"><div class="rowHead"><h2>Recherche</h2><span class="chip">'+data.results.length+' titres</span></div><div class="rail">'+data.results.map(card).join('')+'</div></section>';bindPosters(searchResults)}
 let suggestTimer=0;async function loadSuggestions(){const q=query.value.trim();clearTimeout(suggestTimer);if(q.length<2){suggestions.className='suggestions';suggestions.innerHTML='';return}suggestTimer=setTimeout(async()=>{try{const data=await fetch('/search.json?type='+encodeURIComponent(type.value)+'&q='+encodeURIComponent(q)).then(r=>r.json());const items=(data.results||[]).slice(0,5);suggestions.className='suggestions '+(items.length?'open':'');suggestions.innerHTML=items.map(item=>'<button class="suggestion" data-title="'+esc(item.title)+'" data-type="'+item.type+'" data-id="'+esc(item.id)+'" data-year="'+esc(item.year||'')+'"><img src="'+esc(item.poster||noPoster)+'" alt=""><span><strong>'+esc(item.title)+'</strong><small>'+esc(item.year||'')+' · '+esc(item.type==='series'?'Serie':'Film')+'</small></span><span class="chip">Ouvrir</span></button>').join('');suggestions.querySelectorAll('.suggestion').forEach(b=>b.onclick=()=>{suggestions.className='suggestions';openDetails({id:b.dataset.id,type:b.dataset.type,title:b.dataset.title,year:b.dataset.year})})}catch(e){suggestions.className='suggestions'}},260)}
-async function load(){try{const data=await fetch('/catalog.json').then(r=>r.json());const total=(data.rows||[]).reduce((n,row)=>n+(row.items||[]).length,0);statTitles.textContent=total;rows.innerHTML=data.rows.map(row=>'<section class="row"><div class="rowHead"><h2>'+esc(row.title)+'</h2><span class="chip">'+row.items.length+' titres</span></div><div class="rail">'+row.items.map(card).join('')+'</div></section>').join('');bindPosters(rows)}catch(e){rows.innerHTML='<div class="empty">Erreur catalogue: '+esc(e.message||e)+'</div>';statTitles.textContent='0'}}
-go.onclick=()=>searchCatalog().catch(e=>{searchResults.innerHTML='<div class="empty">Erreur recherche: '+esc(e.message||e)+'</div>'});document.querySelectorAll('.quick button').forEach(b=>b.onclick=()=>{query.value=b.dataset.q;type.value=b.dataset.type;go.click()});query.addEventListener('input',loadSuggestions);type.addEventListener('change',loadSuggestions);query.addEventListener('keydown',e=>{if(e.key==='Enter')go.click()});closeBtn.onclick=()=>modal.className='modal';modal.onclick=e=>{if(e.target===modal)modal.className='modal'};renderLocalRows();load();
+function applyCatalogFilter(){categoryBtns.forEach(btn=>btn.classList.toggle('active',btn.dataset.filter===activeCatalogFilter));rows.querySelectorAll('.row').forEach(row=>{const group=row.dataset.group||'movie';row.style.display=activeCatalogFilter==='all'||group===activeCatalogFilter?'':'none'})}
+async function load(){try{const data=await fetch('/catalog.json').then(r=>r.json());const total=(data.rows||[]).reduce((n,row)=>n+(row.items||[]).length,0);statTitles.textContent=total;rows.innerHTML=data.rows.map(row=>'<section class="row" data-group="'+esc(row.group||'movie')+'"><div class="rowHead"><h2>'+esc(row.title)+'</h2><span class="chip">'+row.items.length+' titres</span></div><div class="rail">'+row.items.map(card).join('')+'</div></section>').join('');bindPosters(rows);applyCatalogFilter()}catch(e){rows.innerHTML='<div class="empty">Erreur catalogue: '+esc(e.message||e)+'</div>';statTitles.textContent='0'}}
+go.onclick=()=>searchCatalog().catch(e=>{searchResults.innerHTML='<div class="empty">Erreur recherche: '+esc(e.message||e)+'</div>'});document.querySelectorAll('.quick button').forEach(b=>b.onclick=()=>{query.value=b.dataset.q;type.value=b.dataset.type;go.click()});categoryBtns.forEach(btn=>btn.onclick=()=>{activeCatalogFilter=btn.dataset.filter;applyCatalogFilter()});query.addEventListener('input',loadSuggestions);type.addEventListener('change',loadSuggestions);query.addEventListener('keydown',e=>{if(e.key==='Enter')go.click()});closeBtn.onclick=()=>{if(detailHls){detailHls.destroy();detailHls=null}modal.className='modal'};modal.onclick=e=>{if(e.target===modal){if(detailHls){detailHls.destroy();detailHls=null}modal.className='modal'}};renderLocalRows();load();
 </script>
 </body>
 </html>`;
@@ -341,7 +419,7 @@ function renderProvidersPage() {
       const domainList = domains[provider.id] || [];
       const state = getProviderState(provider);
       const cls = state === "Actif" ? "ok" : state === "Instable" ? "warn" : "bad";
-      return "<tr data-row=\"" + escapeHtml([provider.name, provider.id, state, languages, formats, domainList.join(" ")].join(" ").toLowerCase()) + "\"><td><strong>" + escapeHtml(provider.name || provider.id) + "</strong><small>" + escapeHtml(provider.id) + "</small></td><td class=\"" + cls + "\">" + escapeHtml(state) + "</td><td>" + escapeHtml(languages) + "</td><td>" + escapeHtml(formats) + "</td><td>" + escapeHtml(domainList.join(", ") || "-") + "</td></tr>";
+      return "<tr data-id=\"" + escapeHtml(provider.id) + "\" data-row=\"" + escapeHtml([provider.name, provider.id, state, languages, formats, domainList.join(" ")].join(" ").toLowerCase()) + "\"><td><strong>" + escapeHtml(provider.name || provider.id) + "</strong><small>" + escapeHtml(provider.id) + "</small></td><td class=\"" + cls + "\">" + escapeHtml(state) + "</td><td>" + escapeHtml(languages) + "</td><td>" + escapeHtml(formats) + "</td><td>" + escapeHtml(domainList.join(", ") || "-") + "</td><td><button class=\"testBtn\" data-id=\"" + escapeHtml(provider.id) + "\">Tester</button></td></tr>";
     })
     .join("");
 
@@ -354,19 +432,20 @@ function renderProvidersPage() {
 <link rel="icon" href="/logo.png">
 <style>
 :root{color-scheme:dark;--bg:#060714;--panel:#111426;--line:#2d335c;--text:#fff;--muted:#b8c0e0;--violet:#7c3aed;--blue:#2563eb;--ok:#38bdf8;--warn:#f59e0b;--bad:#fb7185}
-*{box-sizing:border-box}body{margin:0;background:#060714;color:#fff;font-family:Inter,Segoe UI,Arial,sans-serif;line-height:1.45}body:before{content:"";position:fixed;inset:0;background:radial-gradient(circle at 12% 0%,rgba(124,58,237,.34),transparent 34%),radial-gradient(circle at 88% 8%,rgba(37,99,235,.26),transparent 30%),linear-gradient(180deg,rgba(0,0,0,.16),#060714 64%);pointer-events:none}main{position:relative;z-index:1;width:min(1180px,calc(100% - 32px));margin:0 auto;padding:22px 0 56px}.nav{height:54px;display:flex;align-items:center;justify-content:space-between;gap:16px}.brand{font-weight:900;font-size:24px;color:#a78bfa;text-shadow:0 0 24px rgba(124,58,237,.6)}.nav a{color:#eef2ff;text-decoration:none;font-weight:800;font-size:14px;margin-left:14px}.hero{padding:30px 0 18px;border-bottom:1px solid var(--line)}h1{font-size:clamp(38px,6vw,72px);line-height:1;margin:0 0 10px}.lead{max-width:740px;color:#dbeafe;font-size:18px}.cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:20px 0}.card{background:rgba(17,20,38,.92);border:1px solid var(--line);border-radius:8px;padding:14px}.card strong{display:block;font-size:26px}.card span{color:var(--muted);font-size:13px}.toolbar{display:grid;grid-template-columns:1fr auto;gap:10px;margin-top:18px}input{min-height:44px;border-radius:7px;border:1px solid #303866;background:#080b1d;color:#fff;padding:0 12px;font:inherit}table{width:100%;border-collapse:collapse;background:rgba(17,20,38,.92);border:1px solid var(--line);border-radius:8px;overflow:hidden;margin-top:22px}th,td{text-align:left;padding:12px;border-bottom:1px solid var(--line);vertical-align:top}th{color:var(--muted)}tr:last-child td{border-bottom:0}td small{display:block;color:var(--muted);margin-top:3px}.ok{color:var(--ok);font-weight:900}.warn{color:var(--warn);font-weight:900}.bad{color:var(--bad);font-weight:900}.pill{display:inline-flex;align-items:center;min-height:24px;border-radius:999px;padding:0 9px;background:#1d2446;color:#dbeafe;font-weight:900;font-size:12px}@media(max-width:780px){main{width:min(100% - 20px,1180px)}.nav{height:auto;display:grid}.nav a{margin:0 10px 0 0}.cards{grid-template-columns:1fr 1fr}.toolbar{grid-template-columns:1fr}table{font-size:13px;display:block;overflow-x:auto;white-space:nowrap}}
+*{box-sizing:border-box}body{margin:0;background:#060714;color:#fff;font-family:Inter,Segoe UI,Arial,sans-serif;line-height:1.45}body:before{content:"";position:fixed;inset:0;background:radial-gradient(circle at 12% 0%,rgba(124,58,237,.34),transparent 34%),radial-gradient(circle at 88% 8%,rgba(37,99,235,.26),transparent 30%),linear-gradient(180deg,rgba(0,0,0,.16),#060714 64%);pointer-events:none}main{position:relative;z-index:1;width:min(1180px,calc(100% - 32px));margin:0 auto;padding:22px 0 56px}.nav{height:54px;display:flex;align-items:center;justify-content:space-between;gap:16px}.brand{display:flex;align-items:center;gap:10px;font-weight:900;font-size:24px;color:#a78bfa;text-shadow:0 0 24px rgba(124,58,237,.6)}.brand img{width:34px;height:34px;border-radius:8px}.nav a{color:#eef2ff;text-decoration:none;font-weight:800;font-size:14px;margin-left:14px}.hero{padding:30px 0 18px;border-bottom:1px solid var(--line)}h1{font-size:clamp(38px,6vw,72px);line-height:1;margin:0 0 10px}.lead{max-width:740px;color:#dbeafe;font-size:18px}.cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:20px 0}.card{background:rgba(17,20,38,.92);border:1px solid var(--line);border-radius:8px;padding:14px}.card strong{display:block;font-size:26px}.card span{color:var(--muted);font-size:13px}.toolbar{display:grid;grid-template-columns:1fr auto;gap:10px;margin-top:18px}input{min-height:44px;border-radius:7px;border:1px solid #303866;background:#080b1d;color:#fff;padding:0 12px;font:inherit}table{width:100%;border-collapse:collapse;background:rgba(17,20,38,.92);border:1px solid var(--line);border-radius:8px;overflow:hidden;margin-top:22px}th,td{text-align:left;padding:12px;border-bottom:1px solid var(--line);vertical-align:top}th{color:var(--muted)}tr:last-child td{border-bottom:0}td small{display:block;color:var(--muted);margin-top:3px}.ok{color:var(--ok);font-weight:900}.warn{color:var(--warn);font-weight:900}.bad{color:var(--bad);font-weight:900}.pill{display:inline-flex;align-items:center;min-height:24px;border-radius:999px;padding:0 9px;background:#1d2446;color:#dbeafe;font-weight:900;font-size:12px}.testBtn{min-height:34px;border:1px solid #303866;border-radius:999px;background:linear-gradient(135deg,#7c3aed,#2563eb);color:#fff;font-weight:900;padding:0 12px;cursor:pointer}.testBtn.loading{background:#1d2446}.resultLine{margin-top:14px;color:#dbeafe;background:#10142b;border:1px solid #303866;border-radius:8px;padding:12px}@media(max-width:780px){main{width:min(100% - 20px,1180px)}.nav{height:auto;display:grid}.nav a{margin:0 10px 0 0}.cards{grid-template-columns:1fr 1fr}.toolbar{grid-template-columns:1fr}table{font-size:13px;display:block;overflow-x:auto;white-space:nowrap}.brand img{width:30px;height:30px}}
 </style>
 </head>
 <body>
 <main>
-  <header class="nav"><div class="brand">MADRADOR FILM</div><nav><a href="/">Accueil</a><a href="/test-player">Lecteur</a><a href="/catalog">Catalogue</a></nav></header>
+  <header class="nav"><div class="brand"><img src="/brand.svg" alt="">MADRADOR FILM</div><nav><a href="/">Accueil</a><a href="/test-player">Lecteur</a><a href="/catalog">Catalogue</a></nav></header>
   <section class="hero"><span class="pill">Providers</span><h1>Sources FR</h1><p class="lead">Vue claire des providers actifs, limites ou instables, avec langues, formats et domaines centralises quand ils existent.</p></section>
   <section class="cards"><div class="card"><strong>${summary.total}</strong><span>Total</span></div><div class="card"><strong>${summary.active}</strong><span>Actifs</span></div><div class="card"><strong>${summary.unstable}</strong><span>Instables</span></div><div class="card"><strong>${summary.limited}</strong><span>Limites/desactives</span></div></section>
   <div class="toolbar"><input id="filter" placeholder="Filtrer un provider, domaine, format..."><span class="pill">domains.json centralise</span></div>
-  <table><thead><tr><th>Provider</th><th>Etat</th><th>Langue</th><th>Formats</th><th>Domaines</th></tr></thead><tbody>${providers}</tbody></table>
+  <div id="providerResult" class="resultLine">Clique sur Tester pour lancer un diagnostic rapide sur Interstellar.</div>
+  <table><thead><tr><th>Provider</th><th>Etat</th><th>Langue</th><th>Formats</th><th>Domaines</th><th>Test</th></tr></thead><tbody>${providers}</tbody></table>
 </main>
 <script>
-const filter=document.getElementById('filter');filter.addEventListener('input',()=>{const q=filter.value.trim().toLowerCase();document.querySelectorAll('tbody tr').forEach(row=>{row.style.display=!q||row.dataset.row.includes(q)?'':'none'})});
+const filter=document.getElementById('filter'),result=document.getElementById('providerResult');filter.addEventListener('input',()=>{const q=filter.value.trim().toLowerCase();document.querySelectorAll('tbody tr').forEach(row=>{row.style.display=!q||row.dataset.row.includes(q)?'':'none'})});document.querySelectorAll('.testBtn').forEach(btn=>btn.onclick=async()=>{const id=btn.dataset.id;btn.classList.add('loading');btn.textContent='Test...';result.textContent='Test de '+id+' en cours...';try{const data=await fetch('/diagnostics.json?providers='+encodeURIComponent(id)).then(r=>r.json());const r=data.results&&data.results[0];result.textContent=id+' : '+(r?r.status:'Erreur')+' · '+(r?r.streams:0)+' source(s) · '+(r?r.timeMs:0)+'ms '+(r&&r.error?'- '+r.error:'');}catch(e){result.textContent='Erreur test '+id+' : '+(e.message||e)}finally{btn.classList.remove('loading');btn.textContent='Tester'}});
 </script>
 </body>
 </html>`;
@@ -444,25 +523,25 @@ async function tmdbList(pathname, params, type) {
 }
 
 async function getCatalogRows() {
-  return cachedJson("catalog:v2", async () => {
+  return cachedJson("catalog:v3", async () => {
     const rows = await Promise.all([
-      tmdbList("/movie/popular", { page: "1" }, "movie").then((items) => ({ id: "popular-movies", title: "Populaire en films", items })),
-      tmdbList("/movie/now_playing", { page: "1" }, "movie").then((items) => ({ id: "new-movies", title: "Films recents", items })),
-      tmdbList("/discover/movie", { sort_by: "popularity.desc", with_genres: "27", page: "1" }, "movie").then((items) => ({ id: "horror", title: "Horreur et thriller", items })),
-      tmdbList("/discover/movie", { sort_by: "popularity.desc", with_genres: "10749", page: "1" }, "movie").then((items) => ({ id: "romance", title: "Romance", items })),
-      tmdbList("/discover/movie", { sort_by: "popularity.desc", with_genres: "28", page: "1" }, "movie").then((items) => ({ id: "action", title: "Action", items })),
-      tmdbList("/discover/movie", { sort_by: "popularity.desc", with_genres: "878", page: "1" }, "movie").then((items) => ({ id: "science-fiction", title: "Science-fiction", items })),
-      tmdbList("/discover/movie", { sort_by: "popularity.desc", with_genres: "35", page: "1" }, "movie").then((items) => ({ id: "comedies", title: "Comedies", items })),
-      tmdbList("/tv/popular", { page: "1" }, "tv").then((items) => ({ id: "popular-series", title: "Series populaires", items })),
-      tmdbList("/tv/top_rated", { page: "1" }, "tv").then((items) => ({ id: "top-series", title: "Series les mieux notees", items })),
-      tmdbList("/discover/tv", { sort_by: "popularity.desc", with_genres: "16", page: "1" }, "tv").then((items) => ({ id: "anime", title: "Animation et anime", items }))
+      tmdbList("/movie/popular", { page: "1" }, "movie").then((items) => ({ id: "popular-movies", group: "movie", title: "Films populaires", items })),
+      tmdbList("/movie/now_playing", { page: "1" }, "movie").then((items) => ({ id: "new-movies", group: "movie", title: "Nouveautes cinema", items })),
+      tmdbList("/discover/movie", { sort_by: "popularity.desc", with_genres: "27,53", page: "1" }, "movie").then((items) => ({ id: "dark-movies", group: "movie", title: "Films sombres", items })),
+      tmdbList("/discover/movie", { sort_by: "popularity.desc", with_genres: "10749", page: "1" }, "movie").then((items) => ({ id: "romance", group: "movie", title: "Romance", items })),
+      tmdbList("/discover/movie", { sort_by: "popularity.desc", with_genres: "28", page: "1" }, "movie").then((items) => ({ id: "action", group: "movie", title: "Action", items })),
+      tmdbList("/discover/movie", { sort_by: "popularity.desc", with_genres: "878", page: "1" }, "movie").then((items) => ({ id: "science-fiction", group: "movie", title: "Science-fiction", items })),
+      tmdbList("/tv/popular", { page: "1" }, "tv").then((items) => ({ id: "popular-series", group: "series", title: "Series populaires", items })),
+      tmdbList("/tv/top_rated", { page: "1" }, "tv").then((items) => ({ id: "top-series", group: "series", title: "Series les mieux notees", items })),
+      tmdbList("/discover/tv", { sort_by: "popularity.desc", with_genres: "16", page: "1" }, "tv").then((items) => ({ id: "anime", group: "anime", title: "Animation et anime", items })),
+      tmdbList("/discover/tv", { sort_by: "popularity.desc", with_original_language: "ja", page: "1" }, "tv").then((items) => ({ id: "anime-jp", group: "anime", title: "Animes japonais", items }))
     ]);
 
     return {
       generatedAt: new Date().toISOString(),
       rows
     };
-  }, 30 * 60 * 1000);
+  }, CATALOG_CACHE_TTL_MS);
 }
 
 async function runDiagnostics(req) {
@@ -655,15 +734,16 @@ function getQualityRank(stream) {
 function getStreamRank(stream) {
   if (!stream || !stream.originalUrl && !stream.url) return 50;
   const url = stream.url || "";
-  let rank = getQualityRank(stream);
+  let rank = 0;
   if (isMp4Url(url)) rank += 0;
-  else if (isPlaylistUrl(url)) rank += 10;
-  else if (stream.isDirect) rank += 20;
+  else if (isPlaylistUrl(url)) rank += 20;
+  else if (stream.isDirect) rank += 30;
   else rank += 40;
-
   const language = getStreamLanguage(stream);
-  if (language === "VF" || language === "MULTI") rank -= 2;
-  if (language === "VOSTFR") rank += 1;
+  if (language === "VF" || language === "MULTI") rank += 0;
+  else if (language === "VOSTFR") rank += 4;
+  else rank += 8;
+  rank += getQualityRank(stream);
   return rank;
 }
 
@@ -939,6 +1019,16 @@ const server = http.createServer(async (req, res) => {
 
     if (url.pathname === "/favicon.ico" || url.pathname === "/logo.png") {
       sendFile(res, 200, path.join(ROOT, "assets", "Logo-2.png"), "image/png");
+      return;
+    }
+
+    if (url.pathname === "/brand.svg") {
+      sendFile(res, 200, path.join(ROOT, "assets", "brand.svg"), "image/svg+xml; charset=utf-8");
+      return;
+    }
+
+    if (url.pathname === "/banner.svg") {
+      sendFile(res, 200, path.join(ROOT, "assets", "banner.svg"), "image/svg+xml; charset=utf-8");
       return;
     }
 
