@@ -446,6 +446,186 @@
       ],
       "limited": true,
       "notes": "Returned 0 streams without private cookie/access during latest tests."
+    },
+    {
+      "id": "afterdark",
+      "name": "AfterDark",
+      "description": "Source francaise referencee depuis AfterDarkProvider.kt. Port JS a finaliser avant activation.",
+      "version": "0.1.0",
+      "author": "Streamflix Reborn / Madrador60",
+      "supportedTypes": [
+        "movie",
+        "tv"
+      ],
+      "filename": "providers/afterdark.js",
+      "enabled": false,
+      "logo": "https://afterdark.best/favicon.ico",
+      "contentLanguage": [
+        "fr"
+      ],
+      "formats": [
+        "mp4",
+        "m3u8"
+      ],
+      "limited": true,
+      "disabledPlatforms": [],
+      "supportsExternalPlayer": true,
+      "sourceReference": "docs/provider-sources/fr/AfterDarkProvider.kt",
+      "notes": "Ajoute au depot comme source francaise Kotlin. Non active tant que le port JavaScript n est pas pret."
+    },
+    {
+      "id": "frenchmanga",
+      "name": "FrenchManga",
+      "description": "Films, series et animes FR depuis FrenchManga. Port JS a finaliser avant activation.",
+      "version": "0.1.0",
+      "author": "Streamflix Reborn / Madrador60",
+      "supportedTypes": [
+        "movie",
+        "tv"
+      ],
+      "filename": "providers/frenchmanga.js",
+      "enabled": false,
+      "logo": "https://w16.french-manga.net/logo.png",
+      "contentLanguage": [
+        "fr"
+      ],
+      "formats": [
+        "mp4",
+        "m3u8"
+      ],
+      "limited": true,
+      "disabledPlatforms": [],
+      "supportsExternalPlayer": true,
+      "sourceReference": "docs/provider-sources/fr/FrenchMangaProvider.kt",
+      "notes": "Depend du domaine FrenchStream/FrenchManga qui change. Port JS a faire avec autoupdate domaine."
+    },
+    {
+      "id": "frembed",
+      "name": "Frembed",
+      "description": "Source francaise Frembed. Port JS a finaliser avant activation.",
+      "version": "0.1.0",
+      "author": "Streamflix Reborn / Madrador60",
+      "supportedTypes": [
+        "movie",
+        "tv"
+      ],
+      "filename": "providers/frembed.js",
+      "enabled": false,
+      "logo": "https://frembed.one/favicon.ico",
+      "contentLanguage": [
+        "fr"
+      ],
+      "formats": [
+        "mp4",
+        "m3u8"
+      ],
+      "limited": true,
+      "disabledPlatforms": [],
+      "supportsExternalPlayer": true,
+      "sourceReference": "docs/provider-sources/fr/FrembedProvider.kt",
+      "notes": "Source Kotlin conservee. Activation apres port JS et test Render."
+    },
+    {
+      "id": "kidraz",
+      "name": "Kidraz",
+      "description": "Catalogue jeunesse FR depuis Kidraz. Port JS a finaliser avant activation.",
+      "version": "0.1.0",
+      "author": "Streamflix Reborn / Madrador60",
+      "supportedTypes": [
+        "movie",
+        "tv"
+      ],
+      "filename": "providers/kidraz.js",
+      "enabled": false,
+      "logo": "https://www.kidraz.com/favicon.ico",
+      "contentLanguage": [
+        "fr"
+      ],
+      "formats": [
+        "mp4",
+        "m3u8"
+      ],
+      "limited": true,
+      "disabledPlatforms": [],
+      "supportsExternalPlayer": true,
+      "sourceReference": "docs/provider-sources/fr/KidrazProvider.kt",
+      "notes": "Source francaise ajoutee en reference, non active tant que le JS n existe pas."
+    },
+    {
+      "id": "otakufr",
+      "name": "Otakufr",
+      "description": "Anime FR depuis Otakufr. Port JS a finaliser avant activation.",
+      "version": "0.1.0",
+      "author": "Streamflix Reborn / Madrador60",
+      "supportedTypes": [
+        "tv"
+      ],
+      "filename": "providers/otakufr.js",
+      "enabled": false,
+      "logo": "https://i.ibb.co/GndKBbF/otakufr-logo.webp",
+      "contentLanguage": [
+        "fr"
+      ],
+      "formats": [
+        "mp4",
+        "m3u8"
+      ],
+      "limited": true,
+      "disabledPlatforms": [],
+      "supportsExternalPlayer": true,
+      "sourceReference": "docs/provider-sources/fr/OtakufrProvider.kt",
+      "notes": "Anime uniquement dans le provider Kotlin. A porter en JS avant activation."
+    },
+    {
+      "id": "unjourunfilm",
+      "name": "1Jour1Film",
+      "description": "Films FR depuis 1Jour1Film. Port JS a finaliser avant activation.",
+      "version": "0.1.0",
+      "author": "Streamflix Reborn / Madrador60",
+      "supportedTypes": [
+        "movie"
+      ],
+      "filename": "providers/unjourunfilm.js",
+      "enabled": false,
+      "logo": "https://1jour1film0126b.site/favicon.ico",
+      "contentLanguage": [
+        "fr"
+      ],
+      "formats": [
+        "mp4",
+        "m3u8"
+      ],
+      "limited": true,
+      "disabledPlatforms": [],
+      "supportsExternalPlayer": true,
+      "sourceReference": "docs/provider-sources/fr/UnJourUnFilmProvider.kt",
+      "notes": "Source francaise ajoutee en reference, non active tant que le JS n existe pas."
+    },
+    {
+      "id": "wiflix",
+      "name": "Wiflix",
+      "description": "Films et series FR depuis Wiflix/Flemmix. Port JS a finaliser avant activation.",
+      "version": "0.1.0",
+      "author": "Streamflix Reborn / Madrador60",
+      "supportedTypes": [
+        "movie",
+        "tv"
+      ],
+      "filename": "providers/wiflix.js",
+      "enabled": false,
+      "logo": "http://flemmix.best/favicon.ico",
+      "contentLanguage": [
+        "fr"
+      ],
+      "formats": [
+        "mp4",
+        "m3u8"
+      ],
+      "limited": true,
+      "disabledPlatforms": [],
+      "supportsExternalPlayer": true,
+      "sourceReference": "docs/provider-sources/fr/WiflixProvider.kt",
+      "notes": "Domaine frequentement variable. Port JS a faire avec domains.json avant activation."
     }
   ]
 }

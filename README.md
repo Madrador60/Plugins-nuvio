@@ -74,6 +74,7 @@ Details : [docs/PROVIDERS.md](docs/PROVIDERS.md)
 |---|---|
 | [docs/INSTALL.md](docs/INSTALL.md) | Installation Nuvio, site web, local |
 | [docs/PROVIDERS.md](docs/PROVIDERS.md) | Liste et etat des providers |
+| [docs/FRENCH_SOURCES.md](docs/FRENCH_SOURCES.md) | Sources francaises actives et sources Kotlin a porter |
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Structure technique du projet |
 | [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) | Problemes courants et solutions |
 | [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md) | Ajouter ou maintenir un provider |
