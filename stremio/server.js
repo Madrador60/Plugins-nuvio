@@ -1,10 +1,12 @@
 const http = require("node:http");
+const fs = require("node:fs");
 const path = require("node:path");
 const { URL } = require("node:url");
 
 const ROOT = path.resolve(__dirname, "..");
 const nuvioManifest = require(path.join(ROOT, "manifest.json"));
 const stremioManifest = require("./manifest.json");
+const domains = require(path.join(ROOT, "domains.json"));
 
 const HOST = process.env.HOST || "0.0.0.0";
 const PORT = Number(process.env.PORT || 7000);
@@ -15,6 +17,9 @@ const PROVIDER_FILTER = (process.env.STREMIO_PROVIDERS || "")
   .map((item) => item.trim())
   .filter(Boolean);
 const CACHE_TTL_MS = Number(process.env.CACHE_TTL_MS || 10 * 60 * 1000);
+const SEARCH_CACHE_TTL_MS = Number(process.env.SEARCH_CACHE_TTL_MS || 10 * 60 * 1000);
+const STREAM_CACHE_TTL_MS = Number(process.env.STREAM_CACHE_TTL_MS || 3 * 60 * 1000);
+const DIAGNOSTIC_CACHE_TTL_MS = Number(process.env.DIAGNOSTIC_CACHE_TTL_MS || 2 * 60 * 1000);
 const memoryCache = new Map();
 
 const animeProviders = new Set([
@@ -30,6 +35,8 @@ const animeProviders = new Set([
   "mugiwarastream",
   "animesite"
 ]);
+
+const unstableProviders = new Set(["animoflix", "animesite", "cinemacity", "sekai", "videasy"]);
 
 function corsHeaders(extra) {
   return Object.assign({
@@ -68,6 +75,20 @@ function sendHtml(res, status, html) {
   res.end(html);
 }
 
+function sendFile(res, status, filePath, contentType) {
+  fs.readFile(filePath, (error, data) => {
+    if (error) {
+      sendJson(res, 404, { error: "Not found" });
+      return;
+    }
+    res.writeHead(status, corsHeaders({
+      "content-type": contentType,
+      "cache-control": "public, max-age=86400"
+    }));
+    res.end(data);
+  });
+}
+
 function getPublicBaseUrl(req) {
   const proto = req.headers["x-forwarded-proto"] || "http";
   const host = req.headers["x-forwarded-host"] || req.headers.host || "localhost:" + PORT;
@@ -81,10 +102,26 @@ function getProxyExtension(sourceUrl) {
   return "m3u8";
 }
 
+function getOriginHeaders(sourceUrl, currentHeaders) {
+  const headers = Object.assign({}, currentHeaders || {});
+  try {
+    const parsed = new URL(sourceUrl);
+    if (!headers.Referer && !headers.referer) headers.Referer = parsed.origin + "/";
+    if (!headers.Origin && !headers.origin) headers.Origin = parsed.origin;
+  } catch (_) {
+    // Ignore invalid media URLs; fetch will surface the real error later.
+  }
+  if (!headers["User-Agent"] && !headers["user-agent"]) {
+    headers["User-Agent"] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124 Safari/537.36";
+  }
+  if (!headers.Accept && !headers.accept) headers.Accept = "*/*";
+  return headers;
+}
+
 function getProxyUrl(req, stream) {
   const payload = {
     url: stream.url,
-    headers: stream.headers || {}
+    headers: getOriginHeaders(stream.url, stream.headers || {})
   };
   const extension = getProxyExtension(stream.url);
   return getPublicBaseUrl(req) + "/proxy/" + base64UrlEncode(JSON.stringify(payload)) + "/stream." + extension;
@@ -113,8 +150,18 @@ function getProviderSummary(mediaType) {
     id: provider.id,
     name: provider.name,
     languages: provider.contentLanguage || [],
-    limited: Boolean(provider.limited)
+    limited: Boolean(provider.limited),
+    unstable: unstableProviders.has(provider.id),
+    domains: domains[provider.id] || [],
+    formats: provider.formats || []
   }));
+}
+
+function getProviderState(provider) {
+  if (provider.enabled === false) return "Desactive";
+  if (unstableProviders.has(provider.id)) return "Instable";
+  if (provider.limited) return "Limite";
+  return "Actif";
 }
 
 function getCached(key) {
@@ -149,7 +196,7 @@ function renderHomePage(req) {
   const seriesProviders = getProviderSummary("tv");
   const providerRows = seriesProviders
     .map((provider) => {
-      const state = provider.limited ? "Limite" : "Actif";
+      const state = provider.unstable ? "Instable" : provider.limited ? "Limite" : "Actif";
       const languages = provider.languages.length > 0 ? provider.languages.join(", ").toUpperCase() : "FR";
       return "<tr><td>" + escapeHtml(provider.name) + "</td><td>" + escapeHtml(languages) + "</td><td>" + escapeHtml(state) + "</td></tr>";
     })
@@ -161,6 +208,7 @@ function renderHomePage(req) {
     "<meta charset=\"utf-8\">" +
     "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">" +
     "<title>Madrador60 Stremio Addon</title>" +
+    "<link rel=\"icon\" href=\"/logo.png\">" +
     "<style>" +
     ":root{color-scheme:dark;--bg:#111315;--panel:#1a1d20;--text:#f5f7fa;--muted:#aab2bd;--line:#30353b;--accent:#8b5cf6;--ok:#2dd4bf}" +
     "*{box-sizing:border-box}body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--text);line-height:1.5}" +
@@ -176,7 +224,7 @@ function renderHomePage(req) {
     "</head>" +
     "<body><main>" +
     "<div class=\"hero\"><h1>Madrador60 FR Providers</h1><p class=\"lead\">Addon Stremio heberge pour films, series et animes francais. Ajoute l'URL du manifest dans Stremio et lance ton contenu.</p>" +
-    "<div class=\"actions\"><a class=\"btn primary\" href=\"" + escapeHtml(stremioInstallUrl) + "\">Installer dans Stremio</a><a class=\"btn\" href=\"/catalog\">Catalogue</a><a class=\"btn\" href=\"/manifest.json\">Voir le manifest</a><a class=\"btn\" href=\"/test-player\">Tester la lecture</a><a class=\"btn\" href=\"/status\">Statut</a><a class=\"btn\" href=\"https://github.com/Madrador60/Plugins-nuvio\">GitHub</a></div></div>" +
+    "<div class=\"actions\"><a class=\"btn primary\" href=\"" + escapeHtml(stremioInstallUrl) + "\">Installer dans Stremio</a><a class=\"btn\" href=\"/catalog\">Catalogue</a><a class=\"btn\" href=\"/providers\">Providers</a><a class=\"btn\" href=\"/manifest.json\">Voir le manifest</a><a class=\"btn\" href=\"/test-player\">Tester la lecture</a><a class=\"btn\" href=\"/status\">Statut</a><a class=\"btn\" href=\"https://github.com/Madrador60/Plugins-nuvio\">GitHub</a></div></div>" +
     "<div class=\"grid\"><div class=\"box\"><strong>" + movieProviders.length + "</strong><span>providers films/series</span></div><div class=\"box\"><strong>" + seriesProviders.length + "</strong><span>providers series/animes</span></div><div class=\"box\"><strong>FR</strong><span>sources francaises en priorite</span></div></div>" +
     "<section><h2>URL a mettre dans Stremio</h2><code>" + escapeHtml(manifestUrl) + "</code><p class=\"note\">Sur Render gratuit, le premier chargement peut etre lent si le service etait en veille.</p></section>" +
     "<section><h2>Providers actifs</h2><table><thead><tr><th>Provider</th><th>Langues</th><th>Etat</th></tr></thead><tbody>" + providerRows + "</tbody></table></section>" +
@@ -191,6 +239,7 @@ function renderTestPlayerPage() {
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Madrador Film</title>
+<link rel="icon" href="/logo.png">
 <style>
 :root{color-scheme:dark;--bg:#060714;--panel:#111426;--panel2:#191d36;--line:#2d335c;--text:#fff;--muted:#b8c0e0;--red:#7c3aed;--red2:#2563eb;--green:#38bdf8}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,Segoe UI,Arial,sans-serif;line-height:1.45}
@@ -199,7 +248,7 @@ main{position:relative;z-index:1;width:min(1280px,calc(100% - 32px));margin:0 au
 .nav{height:54px;display:flex;align-items:center;justify-content:space-between;gap:16px}.brand{font-weight:900;font-size:24px;color:#a78bfa;letter-spacing:0;text-shadow:0 0 24px rgba(124,58,237,.6)}.navlinks{display:flex;gap:10px;flex-wrap:wrap}.navlinks a{color:#eef2ff;text-decoration:none;font-weight:700;font-size:14px;padding:8px 10px;border-radius:6px}.navlinks a:hover{background:#1b2144}
 .hero{display:grid;grid-template-columns:minmax(0,1.22fr) minmax(340px,.78fr);gap:22px;align-items:stretch;margin-top:14px}.player{position:relative;background:#000;border-radius:8px;overflow:hidden;box-shadow:0 24px 90px rgba(37,99,235,.18),0 18px 70px rgba(0,0,0,.58)}video{display:block;width:100%;height:100%;min-height:430px;max-height:68vh;background:#000;object-fit:contain}.shade{position:absolute;inset:auto 0 0 0;padding:22px 22px 52px;background:linear-gradient(0deg,rgba(8,10,25,.94),transparent);pointer-events:none}.shade h1{font-size:clamp(30px,5vw,58px);line-height:1;margin:0 0 8px}.shade p{margin:0;color:var(--muted);max-width:720px}
 .side{display:flex;flex-direction:column;gap:14px}.searchBox,.now,.streamsPanel,.logPanel{background:rgba(17,20,38,.92);border:1px solid var(--line);border-radius:8px;padding:14px}.searchGrid{display:grid;grid-template-columns:1fr 110px;gap:10px}input,select,button{font:inherit;min-height:42px;border-radius:6px;border:1px solid #303866}input,select{background:#080b1d;color:#fff;padding:0 12px}button{border:0;background:linear-gradient(135deg,#7c3aed,#2563eb);color:white;font-weight:800;padding:0 14px;cursor:pointer}button:hover{background:linear-gradient(135deg,#8b5cf6,#3b82f6)}button.secondary{background:#232a50}button.ghost{background:#080b1d;border:1px solid #303866}.searchBtn{width:100%;margin-top:10px}
-.label{color:var(--muted);font-size:12px;text-transform:uppercase;font-weight:800;letter-spacing:.08em;margin-bottom:8px}.nowTitle{font-weight:900;font-size:18px}.nowUrl{color:var(--muted);font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.tools{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.label{color:var(--muted);font-size:12px;text-transform:uppercase;font-weight:800;letter-spacing:.08em;margin-bottom:8px}.nowTitle{font-weight:900;font-size:18px}.nowUrl{color:var(--muted);font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.tools{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}.filters{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px}.stremioBtn{width:100%;margin-top:8px;background:linear-gradient(135deg,#2563eb,#7c3aed)}
 .rows{margin-top:26px}.rowHead{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}h2{margin:0;font-size:22px}.rail{display:grid;grid-auto-flow:column;grid-auto-columns:156px;gap:12px;overflow-x:auto;overscroll-behavior-x:contain;padding:2px 0 14px;scrollbar-color:#555 transparent}.poster{height:232px;width:156px;text-align:left;background:#151515;border:1px solid #242424;border-radius:7px;color:#fff;padding:0;overflow:hidden;transition:transform .16s,border-color .16s}.poster:hover{transform:scale(1.04);border-color:#777}.poster img{width:100%;height:178px;object-fit:cover;background:#222}.poster strong{display:block;padding:8px 8px 0;font-size:13px;line-height:1.2}.poster small{display:block;color:var(--muted);padding:3px 8px 8px;font-size:12px}
 .streamGrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.stream{min-height:86px;text-align:left;background:#10142b;border:1px solid #29305c;border-radius:8px;color:#fff;padding:12px}.stream.active{border-color:var(--green);box-shadow:0 0 0 1px var(--green),0 0 24px rgba(56,189,248,.25)}.stream strong{display:block;font-size:15px}.stream small{display:block;color:var(--muted);font-weight:400;font-size:12px;margin-top:5px}.pill{display:inline-flex;align-items:center;min-height:22px;padding:0 8px;border-radius:999px;background:#29305c;color:#fff;font-size:11px;font-weight:900;margin-top:7px}.pill.mp4{background:#2563eb}.pill.hls{background:#6d28d9}
 pre{white-space:pre-wrap;background:#050505;border:1px solid #222;border-radius:8px;padding:12px;color:#cbd5e1;overflow:auto;max-height:170px;margin:0}.empty{color:var(--muted);background:#101010;border:1px dashed #333;border-radius:8px;padding:18px}
@@ -223,12 +272,14 @@ pre{white-space:pre-wrap;background:#050505;border:1px solid #222;border-radius:
         <div class="searchGrid"><input id="query" placeholder="Interstellar, Send Help, One Piece..." value="Interstellar"><select id="type"><option value="movie">Film</option><option value="series">Serie</option></select></div>
         <button id="search" class="searchBtn">Rechercher</button>
         <div class="tools"><button id="filterAll" class="secondary">Tout</button><button id="filterMp4" class="ghost">MP4</button><button id="filterHls" class="ghost">HLS</button></div>
+        <div class="filters"><button id="filterVf" class="ghost">VF</button><button id="filterVostfr" class="ghost">VOSTFR</button><button id="filterMulti" class="ghost">MULTI</button></div>
       </div>
       <div class="now">
         <div class="label">Lecture actuelle</div>
         <div id="nowTitle" class="nowTitle">Aucun stream lance</div>
         <div id="nowUrl" class="nowUrl">Choisis une source pour commencer.</div>
         <div class="tools"><button id="copy" class="secondary">Copier l'URL</button><button id="open" class="ghost">Ouvrir</button></div>
+        <button id="stremio" class="stremioBtn">Tester ce film dans Stremio</button>
       </div>
       <div class="logPanel"><div class="label">Journal</div><pre id="log">Pret.</pre></div>
     </aside>
@@ -244,24 +295,50 @@ pre{white-space:pre-wrap;background:#050505;border:1px solid #222;border-radius:
 </main>
 <script src="https://cdn.jsdelivr.net/npm/hls.js@1"></script>
 <script>
-const log=document.getElementById('log'),video=document.getElementById('video'),q=document.getElementById('query'),type=document.getElementById('type'),searchBtn=document.getElementById('search'),results=document.getElementById('results'),streamsBox=document.getElementById('streams'),nowTitle=document.getElementById('nowTitle'),nowUrl=document.getElementById('nowUrl'),copyBtn=document.getElementById('copy'),openBtn=document.getElementById('open'),heroTitle=document.getElementById('heroTitle'),heroMeta=document.getElementById('heroMeta'),resultCount=document.getElementById('resultCount'),streamCount=document.getElementById('streamCount'),filterAll=document.getElementById('filterAll'),filterMp4=document.getElementById('filterMp4'),filterHls=document.getElementById('filterHls');let hls=null,currentUrl='',allStreams=[],streamFilter='all';const params=new URLSearchParams(location.search);if(params.get('q'))q.value=params.get('q');if(params.get('type'))type.value=params.get('type');const noPoster='data:image/svg+xml;charset=utf-8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="312" height="464"><rect width="100%" height="100%" fill="#151515"/><text x="50%" y="47%" fill="#777" font-family="Arial" font-size="28" text-anchor="middle">MADRADOR</text><text x="50%" y="55%" fill="#555" font-family="Arial" font-size="22" text-anchor="middle">FILM</text></svg>');
+const log=document.getElementById('log'),video=document.getElementById('video'),q=document.getElementById('query'),type=document.getElementById('type'),searchBtn=document.getElementById('search'),results=document.getElementById('results'),streamsBox=document.getElementById('streams'),nowTitle=document.getElementById('nowTitle'),nowUrl=document.getElementById('nowUrl'),copyBtn=document.getElementById('copy'),openBtn=document.getElementById('open'),stremioBtn=document.getElementById('stremio'),heroTitle=document.getElementById('heroTitle'),heroMeta=document.getElementById('heroMeta'),resultCount=document.getElementById('resultCount'),streamCount=document.getElementById('streamCount'),filterAll=document.getElementById('filterAll'),filterMp4=document.getElementById('filterMp4'),filterHls=document.getElementById('filterHls'),filterVf=document.getElementById('filterVf'),filterVostfr=document.getElementById('filterVostfr'),filterMulti=document.getElementById('filterMulti');let hls=null,currentUrl='',currentMeta=null,allStreams=[],streamFilter='all',languageFilter='all';const params=new URLSearchParams(location.search);if(params.get('q'))q.value=params.get('q');if(params.get('type'))type.value=params.get('type');const noPoster='data:image/svg+xml;charset=utf-8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="312" height="464"><rect width="100%" height="100%" fill="#151515"/><text x="50%" y="47%" fill="#777" font-family="Arial" font-size="28" text-anchor="middle">MADRADOR</text><text x="50%" y="55%" fill="#555" font-family="Arial" font-size="22" text-anchor="middle">FILM</text></svg>');
 function write(x){log.textContent+='\\n'+x;log.scrollTop=log.scrollHeight}function setLog(x){log.textContent=x}function esc(x){return String(x||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}function formatUrl(u){const s=String(u||'').replace(location.origin,'');const m=s.match(/^\\/proxy\\/[^/]+\\/(stream\\.[a-z0-9]+)$/i);return m?'/proxy/.../'+m[1]:s}
 async function search(){const query=q.value.trim();if(!query)return;setLog('Recherche: '+query);results.className='empty';results.textContent='Recherche...';streamsBox.className='empty';streamsBox.textContent='Choisis un resultat.';streamCount.textContent='';const data=await fetch('/search.json?type='+encodeURIComponent(type.value)+'&q='+encodeURIComponent(query)).then(r=>r.json());resultCount.textContent=data.results.length+' resultat(s)';results.className='rail';results.innerHTML=data.results.map(r=>'<button class="poster" data-id="'+r.id+'" data-type="'+r.type+'" data-title="'+esc(r.title)+'" data-year="'+esc(r.year||'')+'"><img src="'+esc(r.poster||noPoster)+'" alt=""><strong>'+esc(r.title)+'</strong><small>'+esc(r.year||'Annee inconnue')+' · TMDB '+r.id+'</small></button>').join('')||'<div class="empty">Aucun resultat</div>';results.querySelectorAll('button').forEach(b=>b.onclick=()=>loadStreams(b.dataset.type,b.dataset.id,b.dataset.title,b.dataset.year));write('Resultats: '+data.results.length)}
-function renderStreams(){const visible=allStreams.filter(s=>streamFilter==='all'||(streamFilter==='mp4'&&s.url.includes('.mp4'))||(streamFilter==='hls'&&s.url.includes('.m3u8')));streamCount.textContent=visible.length+' source(s)';streamsBox.className='streamGrid';streamsBox.innerHTML=visible.map((s,i)=>{const originalIndex=allStreams.indexOf(s);const kind=s.url.includes('.mp4')?'MP4':s.url.includes('.m3u8')?'HLS':'LINK';const cls=kind==='MP4'?'mp4':kind==='HLS'?'hls':'';return '<button class="stream" data-i="'+originalIndex+'"><strong>'+esc(s.name)+'</strong><small>'+esc(s.title||s.description||'')+'</small><span class="pill '+cls+'">'+kind+'</span><small>'+esc(formatUrl(s.url))+'</small></button>'}).join('')||'<div class="empty">Aucune source pour ce filtre</div>';streamsBox.querySelectorAll('button').forEach(b=>b.onclick=()=>play(allStreams[Number(b.dataset.i)],b))}
-async function loadStreams(mediaType,id,title,year){heroTitle.textContent=title;heroMeta.textContent=(year?year+' · ':'')+'Recherche des sources...';setLog('Streams pour '+title+'...');streamsBox.className='empty';streamsBox.textContent='Chargement des sources...';const endpoint='/stream/'+mediaType+'/'+id+'.json';const data=await fetch(endpoint).then(r=>r.json());allStreams=data.streams||[];renderStreams();write('Streams: '+allStreams.length);if(allStreams[0]) play(allStreams[0],streamsBox.querySelector('button'))}
+function streamText(s){return [s.name,s.title,s.description,s.url].join(' ').toLowerCase()}
+function matchLanguage(s){const text=streamText(s);if(languageFilter==='all')return true;if(languageFilter==='vf')return /\\bvf\\b|french|francais|français/.test(text);if(languageFilter==='vostfr')return /vostfr|vost|subfrench/.test(text);if(languageFilter==='multi')return /multi|multilang|multiverse/.test(text);return true}
+function renderStreams(){const visible=allStreams.filter(s=>(streamFilter==='all'||(streamFilter==='mp4'&&s.url.includes('.mp4'))||(streamFilter==='hls'&&s.url.includes('.m3u8')))&&matchLanguage(s));streamCount.textContent=visible.length+' source(s)';streamsBox.className='streamGrid';streamsBox.innerHTML=visible.map((s,i)=>{const originalIndex=allStreams.indexOf(s);const kind=s.url.includes('.mp4')?'MP4':s.url.includes('.m3u8')?'HLS':'LINK';const cls=kind==='MP4'?'mp4':kind==='HLS'?'hls':'';return '<button class="stream" data-i="'+originalIndex+'"><strong>'+esc(s.name)+'</strong><small>'+esc(s.title||s.description||'')+'</small><span class="pill '+cls+'">'+kind+'</span><small>'+esc(formatUrl(s.url))+'</small></button>'}).join('')||'<div class="empty">Aucune source pour ce filtre</div>';streamsBox.querySelectorAll('button').forEach(b=>b.onclick=()=>play(allStreams[Number(b.dataset.i)],b))}
+async function loadStreams(mediaType,id,title,year){currentMeta={mediaType,id,title,year};heroTitle.textContent=title;heroMeta.textContent=(year?year+' · ':'')+'Recherche des sources...';setLog('Streams pour '+title+'...');streamsBox.className='empty';streamsBox.textContent='Chargement des sources...';const endpoint='/stream/'+mediaType+'/'+id+'.json';const data=await fetch(endpoint).then(r=>r.json());allStreams=data.streams||[];renderStreams();write('Streams: '+allStreams.length);if(allStreams[0]) play(allStreams[0],streamsBox.querySelector('button'))}
 async function play(s,button){if(!s)return;streamsBox.querySelectorAll('.active').forEach(x=>x.classList.remove('active'));if(button)button.classList.add('active');const kind=s.url.includes('.mp4')?'MP4':s.url.includes('.m3u8')?'HLS':'Lien';currentUrl=s.url;nowTitle.textContent=s.name+' · '+kind;nowUrl.textContent=formatUrl(s.url);heroMeta.textContent=s.title||s.description||kind;write('Lecture: '+s.name+' - '+(s.title||s.description||''));write(s.url);if(hls){hls.destroy();hls=null}video.removeAttribute('src');video.load();if(s.url.includes('.m3u8')){if(window.Hls&&Hls.isSupported()){hls=new Hls({enableWorker:true,lowLatencyMode:false});hls.loadSource(s.url);hls.attachMedia(video);hls.on(Hls.Events.ERROR,(e,d)=>write('HLS error: '+JSON.stringify({type:d.type,details:d.details,fatal:d.fatal})));}else if(video.canPlayType('application/vnd.apple.mpegurl')){video.src=s.url}else{write('HLS non supporte dans ce navigateur');return}}else{video.src=s.url}await video.play().catch(e=>write('Lecture bloquee: '+e.message))}
-function setFilter(value){streamFilter=value;filterAll.className=value==='all'?'secondary':'ghost';filterMp4.className=value==='mp4'?'secondary':'ghost';filterHls.className=value==='hls'?'secondary':'ghost';renderStreams()}copyBtn.onclick=async()=>{if(!currentUrl)return;await navigator.clipboard.writeText(currentUrl).catch(()=>{});write('URL copiee')};openBtn.onclick=()=>{if(currentUrl)window.open(currentUrl,'_blank')};filterAll.onclick=()=>setFilter('all');filterMp4.onclick=()=>setFilter('mp4');filterHls.onclick=()=>setFilter('hls');video.addEventListener('error',()=>write('Video error code: '+(video.error&&video.error.code)));searchBtn.onclick=()=>search().catch(e=>setLog('Erreur: '+(e.stack||e.message||e)));q.addEventListener('keydown',e=>{if(e.key==='Enter')searchBtn.click()});if(params.get('q'))setTimeout(()=>searchBtn.click(),250);
+function setFilter(value){streamFilter=value;filterAll.className=value==='all'?'secondary':'ghost';filterMp4.className=value==='mp4'?'secondary':'ghost';filterHls.className=value==='hls'?'secondary':'ghost';renderStreams()}
+function setLanguageFilter(value){languageFilter=value;filterVf.className=value==='vf'?'secondary':'ghost';filterVostfr.className=value==='vostfr'?'secondary':'ghost';filterMulti.className=value==='multi'?'secondary':'ghost';renderStreams()}
+copyBtn.onclick=async()=>{if(!currentUrl)return;await navigator.clipboard.writeText(currentUrl).catch(()=>{});write('URL copiee')};openBtn.onclick=()=>{if(currentUrl)window.open(currentUrl,'_blank')};stremioBtn.onclick=async()=>{if(!currentMeta){write('Choisis d abord un resultat.');return}const data=await fetch('/stremio-open.json?type='+encodeURIComponent(currentMeta.mediaType)+'&id='+encodeURIComponent(currentMeta.id)).then(r=>r.json());if(data.desktopUrl){write('Ouverture Stremio: '+data.webUrl);location.href=data.desktopUrl;setTimeout(()=>window.open(data.webUrl,'_blank'),700)}else{write('Impossible de generer le lien Stremio: '+(data.error||''))}};filterAll.onclick=()=>setFilter('all');filterMp4.onclick=()=>setFilter('mp4');filterHls.onclick=()=>setFilter('hls');filterVf.onclick=()=>setLanguageFilter(languageFilter==='vf'?'all':'vf');filterVostfr.onclick=()=>setLanguageFilter(languageFilter==='vostfr'?'all':'vostfr');filterMulti.onclick=()=>setLanguageFilter(languageFilter==='multi'?'all':'multi');video.addEventListener('error',()=>write('Video error code: '+(video.error&&video.error.code)));searchBtn.onclick=()=>search().catch(e=>setLog('Erreur: '+(e.stack||e.message||e)));q.addEventListener('keydown',e=>{if(e.key==='Enter')searchBtn.click()});if(params.get('q'))setTimeout(()=>searchBtn.click(),250);
 </script>
 </body>
 </html>`;
 }
 
 function renderStatusPage() {
-  return "<!doctype html>" +
-    "<html lang=\"fr\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">" +
-    "<title>Statut providers</title><style>:root{color-scheme:dark;--bg:#111315;--panel:#1a1d20;--line:#30353b;--text:#f5f7fa;--muted:#aab2bd;--accent:#8b5cf6;--ok:#22c55e;--bad:#ef4444}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Segoe UI,Arial,sans-serif;line-height:1.5}main{width:min(1040px,calc(100% - 32px));margin:0 auto;padding:34px 0}button{min-height:42px;padding:0 14px;border-radius:8px;border:1px solid var(--line);background:var(--accent);color:white;font-weight:700;cursor:pointer}table{width:100%;border-collapse:collapse;background:var(--panel);border:1px solid var(--line);border-radius:8px;overflow:hidden;margin-top:16px}th,td{text-align:left;padding:12px;border-bottom:1px solid var(--line)}th{color:var(--muted)}tr:last-child td{border-bottom:0}.ok{color:var(--ok);font-weight:700}.bad{color:var(--bad);font-weight:700}.muted{color:var(--muted)}pre{white-space:pre-wrap;background:#080a0c;border:1px solid var(--line);border-radius:8px;padding:12px;color:#cbd5e1;overflow:auto}</style></head>" +
-    "<body><main><h1>Statut providers</h1><p class=\"muted\">Teste les providers films principaux avec Interstellar. Le test peut prendre jusqu'a une minute.</p><p><button id=\"run\">Lancer le diagnostic</button> <a style=\"color:#c4b5fd\" href=\"/test-player\">Test player</a></p><div id=\"out\" class=\"muted\">Pret.</div></main>" +
-    "<script>const out=document.getElementById('out');document.getElementById('run').onclick=async()=>{out.textContent='Diagnostic en cours...';try{const data=await fetch('/diagnostics.json').then(r=>r.json());out.innerHTML='<table><thead><tr><th>Provider</th><th>Statut</th><th>Streams</th><th>Temps</th><th>Note</th></tr></thead><tbody>'+data.results.map(r=>'<tr><td>'+r.provider+'</td><td class=\"'+(r.status==='OK'?'ok':'bad')+'\">'+r.status+'</td><td>'+r.streams+'</td><td>'+r.timeMs+'ms</td><td>'+((r.error||'').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])))+'</td></tr>').join('')+'</tbody></table><pre>'+JSON.stringify(data,null,2)+'</pre>'}catch(e){out.textContent='Erreur: '+(e.message||e)}};</script></body></html>";
+  return `<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Statut Madrador Film</title>
+<link rel="icon" href="/logo.png">
+<style>
+:root{color-scheme:dark;--bg:#060714;--panel:#111426;--line:#2d335c;--text:#fff;--muted:#b8c0e0;--violet:#7c3aed;--blue:#2563eb;--ok:#38bdf8;--warn:#f59e0b;--bad:#fb7185}
+*{box-sizing:border-box}body{margin:0;background:#060714;color:#fff;font-family:Inter,Segoe UI,Arial,sans-serif;line-height:1.45}body:before{content:"";position:fixed;inset:0;background:radial-gradient(circle at 12% 0%,rgba(124,58,237,.34),transparent 34%),radial-gradient(circle at 88% 8%,rgba(37,99,235,.26),transparent 30%),linear-gradient(180deg,rgba(0,0,0,.16),#060714 64%);pointer-events:none}main{position:relative;z-index:1;width:min(1180px,calc(100% - 32px));margin:0 auto;padding:22px 0 56px}.nav{height:54px;display:flex;align-items:center;justify-content:space-between;gap:16px}.brand{font-weight:900;font-size:24px;color:#a78bfa;text-shadow:0 0 24px rgba(124,58,237,.6)}.nav a{color:#eef2ff;text-decoration:none;font-weight:800;font-size:14px;margin-left:14px}.hero{padding:30px 0 22px;border-bottom:1px solid var(--line)}h1{font-size:clamp(38px,6vw,72px);line-height:1;margin:0 0 10px}.lead{max-width:720px;color:#dbeafe;font-size:18px}.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}button,.btn{display:inline-flex;align-items:center;justify-content:center;min-height:42px;border-radius:7px;border:1px solid #303866;font:inherit;text-decoration:none;color:#fff;font-weight:900;padding:0 14px;cursor:pointer;background:linear-gradient(135deg,var(--violet),var(--blue))}.btn.secondary,button.secondary{background:#10142b}.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:22px 0}.card{background:rgba(17,20,38,.92);border:1px solid var(--line);border-radius:8px;padding:16px}.card strong{display:block;font-size:28px}.card span{color:var(--muted)}table{width:100%;border-collapse:collapse;background:rgba(17,20,38,.92);border:1px solid var(--line);border-radius:8px;overflow:hidden;margin-top:16px}th,td{text-align:left;padding:12px;border-bottom:1px solid var(--line);vertical-align:top}th{color:var(--muted)}tr:last-child td{border-bottom:0}.ok{color:var(--ok);font-weight:900}.warn{color:var(--warn);font-weight:900}.bad{color:var(--bad);font-weight:900}.muted{color:var(--muted)}pre{white-space:pre-wrap;background:#050714;border:1px solid var(--line);border-radius:8px;padding:12px;color:#cbd5e1;overflow:auto}.pill{display:inline-flex;align-items:center;min-height:24px;border-radius:999px;padding:0 9px;background:#1d2446;color:#dbeafe;font-weight:900;font-size:12px}@media(max-width:780px){main{width:min(100% - 20px,1180px)}.nav{height:auto;display:grid}.nav a{margin:0 10px 0 0}.cards{grid-template-columns:1fr 1fr}table{font-size:13px}}
+</style>
+</head>
+<body>
+<main>
+  <header class="nav"><div class="brand">MADRADOR FILM</div><nav><a href="/">Accueil</a><a href="/test-player">Lecteur</a><a href="/providers">Providers</a><a href="/catalog">Catalogue</a></nav></header>
+  <section class="hero"><span class="pill">Diagnostic live</span><h1>Statut providers</h1><p class="lead">Controle rapide des sources principales avec cache court, temps de reponse et etat lisible.</p><div class="actions"><button id="run">Lancer le diagnostic</button><a class="btn secondary" href="/diagnostics.json">JSON</a></div></section>
+  <div id="cards" class="cards"><div class="card"><strong>-</strong><span>OK</span></div><div class="card"><strong>-</strong><span>Instables</span></div><div class="card"><strong>-</strong><span>Streams</span></div><div class="card"><strong>-</strong><span>Generation</span></div></div>
+  <div id="out" class="muted">Pret.</div>
+</main>
+<script>
+const out=document.getElementById('out'),cards=document.getElementById('cards'),run=document.getElementById('run');
+function esc(x){return String(x||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+function render(data){const ok=data.results.filter(r=>r.status==='OK').length,unstable=data.results.filter(r=>r.status!=='OK').length,streams=data.results.reduce((n,r)=>n+r.streams,0);cards.innerHTML='<div class="card"><strong>'+ok+'</strong><span>OK</span></div><div class="card"><strong>'+unstable+'</strong><span>A surveiller</span></div><div class="card"><strong>'+streams+'</strong><span>Streams trouves</span></div><div class="card"><strong>'+new Date(data.generatedAt).toLocaleTimeString('fr-FR')+'</strong><span>Generation</span></div>';out.innerHTML='<table><thead><tr><th>Provider</th><th>Statut</th><th>Streams</th><th>Temps</th><th>Note</th></tr></thead><tbody>'+data.results.map(r=>{const cls=r.status==='OK'?'ok':r.status==='ZERO'?'warn':'bad';return '<tr><td>'+esc(r.provider)+'</td><td class="'+cls+'">'+esc(r.status)+'</td><td>'+r.streams+'</td><td>'+r.timeMs+'ms</td><td>'+esc(r.error||'')+'</td></tr>'}).join('')+'</tbody></table><pre>'+esc(JSON.stringify(data,null,2))+'</pre>'}
+run.onclick=async()=>{out.textContent='Diagnostic en cours...';try{render(await fetch('/diagnostics.json').then(r=>r.json()))}catch(e){out.textContent='Erreur: '+(e.message||e)}};run.click();
+</script>
+</body>
+</html>`;
 }
 
 function renderCatalogPage() {
@@ -271,6 +348,7 @@ function renderCatalogPage() {
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Catalogue Madrador Film</title>
+<link rel="icon" href="/logo.png">
 <style>
 :root{color-scheme:dark;--bg:#060714;--panel:#111426;--line:#2d335c;--text:#fff;--muted:#b8c0e0;--violet:#7c3aed;--blue:#2563eb}
 *{box-sizing:border-box}body{margin:0;background:#060714;color:#fff;font-family:Inter,Segoe UI,Arial,sans-serif;line-height:1.45}body:before{content:"";position:fixed;inset:0;background:radial-gradient(circle at 16% 0%,rgba(124,58,237,.32),transparent 34%),radial-gradient(circle at 80% 8%,rgba(37,99,235,.24),transparent 30%),linear-gradient(180deg,rgba(0,0,0,.15),#060714 64%);pointer-events:none}main{position:relative;z-index:1;width:min(1320px,calc(100% - 32px));margin:0 auto;padding:22px 0 56px}.nav{height:54px;display:flex;align-items:center;justify-content:space-between;gap:16px}.brand{font-weight:900;font-size:24px;color:#a78bfa;text-shadow:0 0 24px rgba(124,58,237,.6)}.nav a{color:#eef2ff;text-decoration:none;font-weight:800;font-size:14px;margin-left:14px}.hero{min-height:310px;display:flex;align-items:flex-end;border-radius:10px;padding:28px;margin:18px 0 28px;background:linear-gradient(90deg,rgba(6,7,20,.94),rgba(6,7,20,.55)),url('https://image.tmdb.org/t/p/original/8eifdha9GQeZAkexgtD45546XKx.jpg') center/cover;box-shadow:0 22px 90px rgba(37,99,235,.18)}h1{font-size:clamp(42px,7vw,80px);line-height:.95;margin:0 0 12px}.lead{max-width:720px;color:#dbeafe;font-size:18px}.search{display:grid;grid-template-columns:1fr 130px auto;gap:10px;max-width:760px;margin-top:18px}input,select,button{min-height:44px;border-radius:7px;border:1px solid #303866;font:inherit}input,select{background:#080b1d;color:#fff;padding:0 12px}button{border:0;background:linear-gradient(135deg,var(--violet),var(--blue));color:#fff;font-weight:900;padding:0 16px;cursor:pointer}.row{margin:24px 0}.rowHead{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}h2{margin:0;font-size:23px}.rail{display:grid;grid-auto-flow:column;grid-auto-columns:164px;gap:12px;overflow-x:auto;padding:2px 0 16px;scrollbar-color:#4b5563 transparent}.poster{height:250px;width:164px;text-align:left;background:#111426;border:1px solid #29305c;border-radius:8px;color:#fff;padding:0;overflow:hidden;transition:transform .16s,border-color .16s}.poster:hover{transform:scale(1.04);border-color:#8b5cf6}.poster img{width:100%;height:188px;object-fit:cover;background:#172033}.poster strong{display:block;padding:8px 9px 0;font-size:13px;line-height:1.2}.poster small{display:block;color:var(--muted);padding:3px 9px;font-size:12px}.empty{color:var(--muted);border:1px dashed #303866;border-radius:8px;padding:18px;background:#0a0d20}.loading{color:#c4b5fd}.tools{display:flex;gap:8px;flex-wrap:wrap}.chip{display:inline-flex;align-items:center;min-height:30px;border:1px solid #303866;border-radius:999px;padding:0 10px;color:#dbeafe;background:#10142b;font-weight:800;font-size:12px}@media(max-width:760px){main{width:min(100% - 20px,1320px)}.nav{height:auto;display:grid}.nav a{margin:0 10px 0 0}.hero{padding:18px;min-height:270px}.search{grid-template-columns:1fr}.rail{grid-auto-columns:136px}.poster{width:136px;height:220px}.poster img{height:158px}}
@@ -295,21 +373,77 @@ go.onclick=()=>openSearch(query.value.trim(),type.value);query.addEventListener(
 </html>`;
 }
 
+function renderProvidersPage() {
+  const providers = nuvioManifest.scrapers
+    .slice()
+    .sort((a, b) => String(a.name || a.id).localeCompare(String(b.name || b.id)))
+    .map((provider) => {
+      const languages = (provider.contentLanguage || ["fr"]).join(", ").toUpperCase();
+      const formats = (provider.formats || []).join(", ").toUpperCase() || "-";
+      const domainList = domains[provider.id] || [];
+      const state = getProviderState(provider);
+      const cls = state === "Actif" ? "ok" : state === "Instable" ? "warn" : "bad";
+      return "<tr><td><strong>" + escapeHtml(provider.name || provider.id) + "</strong><small>" + escapeHtml(provider.id) + "</small></td><td class=\"" + cls + "\">" + escapeHtml(state) + "</td><td>" + escapeHtml(languages) + "</td><td>" + escapeHtml(formats) + "</td><td>" + escapeHtml(domainList.join(", ") || "-") + "</td></tr>";
+    })
+    .join("");
+
+  return `<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Providers Madrador Film</title>
+<link rel="icon" href="/logo.png">
+<style>
+:root{color-scheme:dark;--bg:#060714;--panel:#111426;--line:#2d335c;--text:#fff;--muted:#b8c0e0;--violet:#7c3aed;--blue:#2563eb;--ok:#38bdf8;--warn:#f59e0b;--bad:#fb7185}
+*{box-sizing:border-box}body{margin:0;background:#060714;color:#fff;font-family:Inter,Segoe UI,Arial,sans-serif;line-height:1.45}body:before{content:"";position:fixed;inset:0;background:radial-gradient(circle at 12% 0%,rgba(124,58,237,.34),transparent 34%),radial-gradient(circle at 88% 8%,rgba(37,99,235,.26),transparent 30%),linear-gradient(180deg,rgba(0,0,0,.16),#060714 64%);pointer-events:none}main{position:relative;z-index:1;width:min(1180px,calc(100% - 32px));margin:0 auto;padding:22px 0 56px}.nav{height:54px;display:flex;align-items:center;justify-content:space-between;gap:16px}.brand{font-weight:900;font-size:24px;color:#a78bfa;text-shadow:0 0 24px rgba(124,58,237,.6)}.nav a{color:#eef2ff;text-decoration:none;font-weight:800;font-size:14px;margin-left:14px}.hero{padding:30px 0 22px;border-bottom:1px solid var(--line)}h1{font-size:clamp(38px,6vw,72px);line-height:1;margin:0 0 10px}.lead{max-width:740px;color:#dbeafe;font-size:18px}table{width:100%;border-collapse:collapse;background:rgba(17,20,38,.92);border:1px solid var(--line);border-radius:8px;overflow:hidden;margin-top:22px}th,td{text-align:left;padding:12px;border-bottom:1px solid var(--line);vertical-align:top}th{color:var(--muted)}tr:last-child td{border-bottom:0}td small{display:block;color:var(--muted);margin-top:3px}.ok{color:var(--ok);font-weight:900}.warn{color:var(--warn);font-weight:900}.bad{color:var(--bad);font-weight:900}.pill{display:inline-flex;align-items:center;min-height:24px;border-radius:999px;padding:0 9px;background:#1d2446;color:#dbeafe;font-weight:900;font-size:12px}@media(max-width:780px){main{width:min(100% - 20px,1180px)}.nav{height:auto;display:grid}.nav a{margin:0 10px 0 0}table{font-size:13px}}
+</style>
+</head>
+<body>
+<main>
+  <header class="nav"><div class="brand">MADRADOR FILM</div><nav><a href="/">Accueil</a><a href="/test-player">Lecteur</a><a href="/status">Statut</a><a href="/catalog">Catalogue</a></nav></header>
+  <section class="hero"><span class="pill">Providers</span><h1>Sources FR</h1><p class="lead">Vue claire des providers actifs, limites ou instables, avec langues, formats et domaines centralises quand ils existent.</p></section>
+  <table><thead><tr><th>Provider</th><th>Etat</th><th>Langue</th><th>Formats</th><th>Domaines</th></tr></thead><tbody>${providers}</tbody></table>
+</main>
+</body>
+</html>`;
+}
+
 async function searchTmdb(query, mediaType) {
   const type = mediaType === "series" || mediaType === "tv" ? "tv" : "movie";
-  const endpoint = "https://api.themoviedb.org/3/search/" + type +
-    "?api_key=" + encodeURIComponent(TMDB_API_KEY) +
-    "&language=fr-FR&query=" + encodeURIComponent(query);
-  const response = await fetch(endpoint);
-  if (!response.ok) throw new Error("TMDB search failed: HTTP " + response.status);
-  const data = await response.json();
-  return (data.results || []).slice(0, 10).map((item) => ({
-    id: String(item.id),
-    type: type === "tv" ? "series" : "movie",
-    title: item.title || item.name || "Sans titre",
-    year: String(item.release_date || item.first_air_date || "").slice(0, 4),
-    poster: item.poster_path ? "https://image.tmdb.org/t/p/w185" + item.poster_path : null
-  }));
+  const normalizedQuery = query.trim().toLowerCase();
+  return cachedJson("search:" + type + ":" + normalizedQuery, async () => {
+    const endpoint = "https://api.themoviedb.org/3/search/" + type +
+      "?api_key=" + encodeURIComponent(TMDB_API_KEY) +
+      "&language=fr-FR&query=" + encodeURIComponent(query);
+    const response = await fetch(endpoint);
+    if (!response.ok) throw new Error("TMDB search failed: HTTP " + response.status);
+    const data = await response.json();
+    return (data.results || []).slice(0, 10).map((item) => ({
+      id: String(item.id),
+      type: type === "tv" ? "series" : "movie",
+      title: item.title || item.name || "Sans titre",
+      year: String(item.release_date || item.first_air_date || "").slice(0, 4),
+      poster: item.poster_path ? "https://image.tmdb.org/t/p/w185" + item.poster_path : null
+    }));
+  }, SEARCH_CACHE_TTL_MS);
+}
+
+async function getTmdbExternalId(tmdbId, mediaType) {
+  const type = mediaType === "series" || mediaType === "tv" ? "tv" : "movie";
+  return cachedJson("external:" + type + ":" + tmdbId, async () => {
+    const endpoint = "https://api.themoviedb.org/3/" + type + "/" + encodeURIComponent(tmdbId) +
+      "?api_key=" + encodeURIComponent(TMDB_API_KEY) +
+      "&append_to_response=external_ids";
+    const response = await fetch(endpoint);
+    if (!response.ok) throw new Error("TMDB details failed: HTTP " + response.status);
+    const data = await response.json();
+    return {
+      imdbId: data.imdb_id || data.external_ids && data.external_ids.imdb_id || "",
+      title: data.title || data.name || "",
+      type: type === "tv" ? "series" : "movie"
+    };
+  }, 24 * 60 * 60 * 1000);
 }
 
 function normalizeTmdbItem(item, type) {
@@ -363,53 +497,60 @@ async function runDiagnostics(req) {
     .split(",")
     .map((item) => item.trim())
     .filter(Boolean);
-  const results = [];
+  const cacheKey = "diagnostics:" + ids.join(",");
 
-  for (const id of ids) {
-    const provider = nuvioManifest.scrapers.find((item) => item.id === id);
-    if (!provider) {
-      results.push({ provider: id, status: "ERROR", streams: 0, timeMs: 0, error: "Unknown provider" });
-      continue;
-    }
+  return cachedJson(cacheKey, async () => {
+    const results = [];
 
-    const started = Date.now();
-    try {
-      const module = loadProvider(provider);
-      if (!module || typeof module.getStreams !== "function") {
-        throw new Error("Missing getStreams");
+    for (const id of ids) {
+      const provider = nuvioManifest.scrapers.find((item) => item.id === id);
+      if (!provider) {
+        results.push({ provider: id, status: "ERROR", streams: 0, timeMs: 0, error: "Unknown provider" });
+        continue;
       }
 
-      const result = await withTimeout(
-        module.getStreams("157336", "movie"),
-        Math.min(PROVIDER_TIMEOUT_MS, 60000),
-        provider.id
-      );
-      const streams = Array.isArray(result.streams) ? result.streams : [];
-      results.push({
-        provider: id,
-        status: streams.length > 0 ? "OK" : result.error ? "ERROR" : "ZERO",
-        streams: streams.length,
-        timeMs: Date.now() - started,
-        error: result.error ? result.error.message : ""
-      });
-    } catch (error) {
-      results.push({
-        provider: id,
-        status: "ERROR",
-        streams: 0,
-        timeMs: Date.now() - started,
-        error: error && error.message ? error.message : String(error)
-      });
-    }
-  }
+      const started = Date.now();
+      try {
+        const module = loadProvider(provider);
+        if (!module || typeof module.getStreams !== "function") {
+          throw new Error("Missing getStreams");
+        }
 
-  return {
-    ok: results.every((item) => item.status === "OK"),
-    test: "Interstellar",
-    tmdbId: "157336",
-    generatedAt: new Date().toISOString(),
-    results
-  };
+        const result = await withTimeout(
+          module.getStreams("157336", "movie"),
+          Math.min(PROVIDER_TIMEOUT_MS, 60000),
+          provider.id
+        );
+        const streams = Array.isArray(result.streams) ? result.streams : [];
+        results.push({
+          provider: id,
+          status: streams.length > 0 ? "OK" : result.error ? "ERROR" : "ZERO",
+          streams: streams.length,
+          timeMs: Date.now() - started,
+          unstable: unstableProviders.has(id),
+          error: result.error ? result.error.message : ""
+        });
+      } catch (error) {
+        results.push({
+          provider: id,
+          status: "ERROR",
+          streams: 0,
+          timeMs: Date.now() - started,
+          unstable: unstableProviders.has(id),
+          error: error && error.message ? error.message : String(error)
+        });
+      }
+    }
+
+    return {
+      ok: results.every((item) => item.status === "OK"),
+      cachedForMs: DIAGNOSTIC_CACHE_TTL_MS,
+      test: "Interstellar",
+      tmdbId: "157336",
+      generatedAt: new Date().toISOString(),
+      results
+    };
+  }, DIAGNOSTIC_CACHE_TTL_MS);
 }
 
 function getConfig(req) {
@@ -419,7 +560,28 @@ function getConfig(req) {
     providers: getEnabledProviders("tv").map((provider) => provider.id),
     movieProviders: getEnabledProviders("movie").map((provider) => provider.id),
     providerTimeoutMs: PROVIDER_TIMEOUT_MS,
-    providerFilter: PROVIDER_FILTER
+    providerFilter: PROVIDER_FILTER,
+    cache: {
+      defaultMs: CACHE_TTL_MS,
+      searchMs: SEARCH_CACHE_TTL_MS,
+      streamsMs: STREAM_CACHE_TTL_MS,
+      diagnosticsMs: DIAGNOSTIC_CACHE_TTL_MS,
+      entries: memoryCache.size
+    }
+  };
+}
+
+async function getStremioOpenInfo(tmdbId, mediaType) {
+  const external = await getTmdbExternalId(tmdbId, mediaType);
+  if (!external.imdbId) throw new Error("Aucun ID IMDb trouve pour ce titre.");
+  const type = external.type === "series" ? "series" : "movie";
+  return {
+    title: external.title,
+    type,
+    tmdbId: String(tmdbId),
+    imdbId: external.imdbId,
+    desktopUrl: "stremio:///detail/" + type + "/" + external.imdbId + "/" + external.imdbId,
+    webUrl: "https://web.stremio.com/#/detail/" + type + "/" + external.imdbId + "/" + external.imdbId
   };
 }
 
@@ -508,8 +670,7 @@ function getStreamRank(stream) {
 
 function shouldProxyStream(stream) {
   if (!stream || !stream.url) return false;
-  if (stream.headers && Object.keys(stream.headers).length > 0) return true;
-  return isPlaylistUrl(stream.url);
+  return /^https?:\/\//i.test(stream.url);
 }
 
 function getBingeGroup(provider, stream) {
@@ -545,7 +706,9 @@ function rewritePlaylist(content, sourceUrl, req, headers) {
 
 function copyProxyHeaders(upstream, res, contentLengthOverride) {
   const headers = corsHeaders({
-    "accept-ranges": upstream.headers.get("accept-ranges") || "bytes"
+    "accept-ranges": upstream.headers.get("accept-ranges") || "bytes",
+    "cache-control": "public, max-age=60",
+    "content-disposition": "inline"
   });
 
   const contentType = upstream.headers.get("content-type");
@@ -560,13 +723,20 @@ function copyProxyHeaders(upstream, res, contentLengthOverride) {
 }
 
 async function proxyMedia(req, res, proxyRequest) {
-  const requestHeaders = Object.assign({}, proxyRequest.headers);
+  const requestHeaders = getOriginHeaders(proxyRequest.url, proxyRequest.headers);
   if (req.headers.range) requestHeaders.Range = req.headers.range;
+  if (req.headers["if-range"]) requestHeaders["If-Range"] = req.headers["if-range"];
 
-  const upstream = await fetch(proxyRequest.url, {
-    headers: requestHeaders,
-    redirect: "follow"
-  });
+  let upstream;
+  try {
+    upstream = await fetch(proxyRequest.url, {
+      headers: requestHeaders,
+      redirect: "follow"
+    });
+  } catch (error) {
+    sendJson(res, 502, { error: "Proxy fetch failed", detail: error && error.message ? error.message : String(error) });
+    return;
+  }
 
   if (!upstream.ok && upstream.status !== 206) {
     sendJson(res, upstream.status, { error: "Upstream HTTP " + upstream.status });
@@ -579,7 +749,8 @@ async function proxyMedia(req, res, proxyRequest) {
     const rewritten = rewritePlaylist(text, proxyRequest.url, req, proxyRequest.headers);
     res.writeHead(upstream.status, corsHeaders({
       "content-type": "application/vnd.apple.mpegurl; charset=utf-8",
-      "cache-control": "no-store"
+      "cache-control": "public, max-age=30",
+      "content-disposition": "inline"
     }));
     res.end(req.method === "HEAD" ? undefined : rewritten);
     return;
@@ -614,30 +785,32 @@ async function resolveTmdb(imdbId, mediaType) {
     return { tmdbId: imdbId, mediaType };
   }
 
-  const url = "https://api.themoviedb.org/3/find/" +
-    encodeURIComponent(imdbId) +
-    "?api_key=" +
-    encodeURIComponent(TMDB_API_KEY) +
-    "&external_source=imdb_id";
+  return cachedJson("find:" + mediaType + ":" + imdbId, async () => {
+    const url = "https://api.themoviedb.org/3/find/" +
+      encodeURIComponent(imdbId) +
+      "?api_key=" +
+      encodeURIComponent(TMDB_API_KEY) +
+      "&external_source=imdb_id";
 
-  const response = await fetch(url);
-  if (!response.ok) throw new Error("TMDB find failed: HTTP " + response.status);
-  const data = await response.json();
+    const response = await fetch(url);
+    if (!response.ok) throw new Error("TMDB find failed: HTTP " + response.status);
+    const data = await response.json();
 
-  if (mediaType === "tv" && data.tv_results && data.tv_results[0]) {
-    return { tmdbId: String(data.tv_results[0].id), mediaType: "tv" };
-  }
+    if (mediaType === "tv" && data.tv_results && data.tv_results[0]) {
+      return { tmdbId: String(data.tv_results[0].id), mediaType: "tv" };
+    }
 
-  if (mediaType === "movie" && data.movie_results && data.movie_results[0]) {
-    return { tmdbId: String(data.movie_results[0].id), mediaType: "movie" };
-  }
+    if (mediaType === "movie" && data.movie_results && data.movie_results[0]) {
+      return { tmdbId: String(data.movie_results[0].id), mediaType: "movie" };
+    }
 
-  const movie = data.movie_results && data.movie_results[0];
-  const tv = data.tv_results && data.tv_results[0];
-  if (movie) return { tmdbId: String(movie.id), mediaType: "movie" };
-  if (tv) return { tmdbId: String(tv.id), mediaType: "tv" };
+    const movie = data.movie_results && data.movie_results[0];
+    const tv = data.tv_results && data.tv_results[0];
+    if (movie) return { tmdbId: String(movie.id), mediaType: "movie" };
+    if (tv) return { tmdbId: String(tv.id), mediaType: "tv" };
 
-  throw new Error("No TMDB match for " + imdbId);
+    throw new Error("No TMDB match for " + imdbId);
+  }, 24 * 60 * 60 * 1000);
 }
 
 function toStremioStream(stream, provider, req) {
@@ -677,34 +850,56 @@ function toStremioStream(stream, provider, req) {
 async function getStreams(request, req) {
   const resolved = await resolveTmdb(request.imdbId, request.mediaType);
   const providers = getEnabledProviders(resolved.mediaType);
+  const cacheKey = [
+    "streams",
+    resolved.mediaType,
+    resolved.tmdbId,
+    request.season || "",
+    request.episode || "",
+    providers.map((provider) => provider.id).join(",")
+  ].join(":");
+
+  const rawStreams = await cachedJson(cacheKey, async () => {
+    const rows = [];
+
+    for (const provider of providers) {
+      try {
+        const module = loadProvider(provider);
+        if (!module || typeof module.getStreams !== "function") continue;
+
+        const result = await withTimeout(
+          module.getStreams(resolved.tmdbId, resolved.mediaType, request.season, request.episode),
+          PROVIDER_TIMEOUT_MS,
+          provider.id
+        );
+
+        if (result.error) {
+          console.warn("[Stremio] " + provider.id + ": " + result.error.message);
+        }
+
+        for (const stream of result.streams) {
+          rows.push({ providerId: provider.id, stream });
+        }
+      } catch (error) {
+        console.warn("[Stremio] " + provider.id + ": " + (error && error.message ? error.message : error));
+      }
+    }
+
+    return rows;
+  }, STREAM_CACHE_TTL_MS);
+
   const streams = [];
   const seen = new Set();
+  const providerById = new Map(providers.map((provider) => [provider.id, provider]));
 
-  for (const provider of providers) {
-    try {
-      const module = loadProvider(provider);
-      if (!module || typeof module.getStreams !== "function") continue;
-
-      const result = await withTimeout(
-        module.getStreams(resolved.tmdbId, resolved.mediaType, request.season, request.episode),
-        PROVIDER_TIMEOUT_MS,
-        provider.id
-      );
-
-      if (result.error) {
-        console.warn("[Stremio] " + provider.id + ": " + result.error.message);
-      }
-
-      for (const stream of result.streams) {
-        const stremioStream = toStremioStream(stream, provider, req);
-        if (!stremioStream || seen.has(stremioStream.url)) continue;
-        seen.add(stremioStream.url);
-        stremioStream._rank = getStreamRank(stream);
-        streams.push(stremioStream);
-      }
-    } catch (error) {
-      console.warn("[Stremio] " + provider.id + ": " + (error && error.message ? error.message : error));
-    }
+  for (const row of rawStreams) {
+    const provider = providerById.get(row.providerId);
+    if (!provider) continue;
+    const stremioStream = toStremioStream(row.stream, provider, req);
+    if (!stremioStream || seen.has(stremioStream.url)) continue;
+    seen.add(stremioStream.url);
+    stremioStream._rank = getStreamRank(row.stream);
+    streams.push(stremioStream);
   }
 
   return streams
@@ -730,6 +925,11 @@ const server = http.createServer(async (req, res) => {
       return;
     }
 
+    if (url.pathname === "/favicon.ico" || url.pathname === "/logo.png") {
+      sendFile(res, 200, path.join(ROOT, "assets", "Logo-2.png"), "image/png");
+      return;
+    }
+
     if (url.pathname === "/test-player") {
       sendHtml(res, 200, renderTestPlayerPage());
       return;
@@ -737,6 +937,11 @@ const server = http.createServer(async (req, res) => {
 
     if (url.pathname === "/catalog") {
       sendHtml(res, 200, renderCatalogPage());
+      return;
+    }
+
+    if (url.pathname === "/providers") {
+      sendHtml(res, 200, renderProvidersPage());
       return;
     }
 
@@ -778,8 +983,27 @@ const server = http.createServer(async (req, res) => {
     if (url.pathname === "/providers.json") {
       sendJson(res, 200, {
         movie: getProviderSummary("movie"),
-        series: getProviderSummary("tv")
+        series: getProviderSummary("tv"),
+        all: nuvioManifest.scrapers.map((provider) => ({
+          id: provider.id,
+          name: provider.name,
+          state: getProviderState(provider),
+          languages: provider.contentLanguage || [],
+          formats: provider.formats || [],
+          domains: domains[provider.id] || []
+        }))
       });
+      return;
+    }
+
+    if (url.pathname === "/stremio-open.json") {
+      const tmdbId = url.searchParams.get("id") || "";
+      const mediaType = url.searchParams.get("type") || "movie";
+      if (!tmdbId.trim()) {
+        sendJson(res, 400, { error: "Missing id" });
+        return;
+      }
+      sendJson(res, 200, await getStremioOpenInfo(tmdbId, mediaType));
       return;
     }
 

@@ -16,6 +16,7 @@ Ce depot sert deux usages :
 | Page publique | `https://madrador60-stremio-addon.onrender.com/` |
 | Catalogue | `https://madrador60-stremio-addon.onrender.com/catalog` |
 | Lecteur de test | `https://madrador60-stremio-addon.onrender.com/test-player` |
+| Providers | `https://madrador60-stremio-addon.onrender.com/providers` |
 | Statut providers | `https://madrador60-stremio-addon.onrender.com/status` |
 | Diagnostic JSON | `https://madrador60-stremio-addon.onrender.com/diagnostics.json` |
 
@@ -53,8 +54,8 @@ https://madrador60-stremio-addon.onrender.com/test-player
 | Addon Stremio | Serveur HTTP sans dependance externe obligatoire |
 | Proxy media | Ajoute les headers requis et expose des URLs compatibles MP4/HLS |
 | Catalogue | Rangees films/series inspirees des plateformes de streaming |
-| Test player | Interface web bleu/violet avec recherche TMDB et lecteur integre |
-| Diagnostic | Page `/status` et endpoint `/diagnostics.json` |
+| Test player | Interface web bleu/violet avec recherche TMDB, filtres et bouton Stremio |
+| Diagnostic | Pages `/status`, `/providers` et endpoint `/diagnostics.json` |
 | Deploiement | Pret pour Render avec `render.yaml` |
 
 ## Providers
@@ -144,3 +145,11 @@ http://127.0.0.1:7000/
 - Les providers cherchent des liens depuis des sources externes.
 - Les domaines changent souvent, donc un provider peut tomber temporairement.
 - Les utilisateurs sont responsables de leur utilisation et du respect des lois applicables.
+
+## Feuille de route
+
+| Priorite | Etat | Sujet |
+|---|---|---|
+| 1 | Fait | Proxy MP4/HLS plus robuste, cache TMDB/streams, bouton Stremio, page status bleu/violet |
+| 2 | Partiel | Etats providers publics, domaines visibles dans `/providers`, providers instables marques |
+| 3 | Partiel | Filtres MP4/HLS/VF/VOSTFR/MULTI, page providers publique, branding Madrador Film |

@@ -35,6 +35,7 @@ Stremio
 | `/catalog` | Catalogue films/series en rangees d'affiches |
 | `/test-player` | Lecteur de test avec recherche et filtres MP4/HLS |
 | `/status` | Diagnostic providers |
+| `/providers` | Etat public des providers, langues, formats et domaines |
 
 ## Flux Stremio
 
@@ -56,4 +57,11 @@ Le proxy sert a :
 
 ## Cache
 
-Le serveur utilise un cache memoire simple pour reduire les appels repetes a TMDB, notamment pour le catalogue.
+Le serveur utilise un cache memoire simple pour reduire les appels repetes a TMDB, aux diagnostics et aux providers.
+
+| Cache | Duree par defaut |
+|---|---|
+| Recherche TMDB | 10 minutes |
+| Streams providers | 3 minutes |
+| Diagnostic | 2 minutes |
+| Catalogue | 30 minutes |

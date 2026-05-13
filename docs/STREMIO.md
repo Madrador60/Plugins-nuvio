@@ -10,6 +10,7 @@ L'addon Stremio reutilise les providers Nuvio du dossier `providers/`.
 | Accueil | `https://madrador60-stremio-addon.onrender.com/` |
 | Catalogue | `https://madrador60-stremio-addon.onrender.com/catalog` |
 | Test player | `https://madrador60-stremio-addon.onrender.com/test-player` |
+| Providers | `https://madrador60-stremio-addon.onrender.com/providers` |
 | Statut | `https://madrador60-stremio-addon.onrender.com/status` |
 | Diagnostic | `https://madrador60-stremio-addon.onrender.com/diagnostics.json` |
 
@@ -22,10 +23,12 @@ L'addon Stremio reutilise les providers Nuvio du dossier `providers/`.
 | `/health.json` | Statut minimal du serveur |
 | `/config.json` | Configuration active |
 | `/providers.json` | Providers actifs |
+| `/providers` | Page publique des providers, etats, formats et domaines |
 | `/catalog` | Page catalogue films/series |
 | `/catalog.json` | Donnees catalogue TMDB avec cache |
 | `/diagnostics.json` | Test rapide des providers principaux |
 | `/search.json?type=movie&q=Interstellar` | Recherche TMDB |
+| `/stremio-open.json?type=movie&id=157336` | Genere les liens Stremio Desktop/Web depuis un ID TMDB |
 | `/test-player` | Lecteur web de diagnostic |
 | `/status` | Page de statut providers |
 | `/stream/movie/:id.json` | Streams films |
@@ -58,3 +61,6 @@ Le serveur renvoie a Stremio :
 | `STREMIO_PROVIDERS` | `frenchstream,movix,nakios` | Limite les providers |
 | `PROVIDER_TIMEOUT_MS` | `45000` | Timeout par provider |
 | `TMDB_API_KEY` | `...` | Cle TMDB personnalisee |
+| `SEARCH_CACHE_TTL_MS` | `600000` | Cache des recherches TMDB |
+| `STREAM_CACHE_TTL_MS` | `180000` | Cache court des streams |
+| `DIAGNOSTIC_CACHE_TTL_MS` | `120000` | Cache du diagnostic providers |
