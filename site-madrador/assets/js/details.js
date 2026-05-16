@@ -28,6 +28,7 @@
     video.removeAttribute("src");
     video.load();
     const kind = streamKind(stream);
+    localStorage.setItem(`madrador:lastSource:${type}:${id}`, String(index));
     state.className = "notice";
     state.textContent = `Lecture: ${stream.name || stream.providerId || "Source"} - ${kind}`;
     if (kind === "HLS" && window.Hls && Hls.isSupported()) {
@@ -68,7 +69,8 @@
     list.querySelectorAll("[data-detail-source]").forEach((button) => {
       button.addEventListener("click", () => playSource(streams[Number(button.dataset.detailSource)], button.dataset.detailSource));
     });
-    playSource(streams[0], 0);
+    const preferred = Number(localStorage.getItem(`madrador:lastSource:${item.type}:${item.id}`) || 0);
+    playSource(streams[preferred] || streams[0], streams[preferred] ? preferred : 0);
   }
 
   function seasonControls(details, item) {
@@ -94,12 +96,11 @@
     return;
   }
   const item = { id: details.id, type: details.type || type, title: details.title };
-  const favKey = `madrador:fav:${item.type}:${item.id}`;
-  const fav = localStorage.getItem(favKey) === "1";
+  Madrador.saveRecent(Object.assign({}, item, { poster: details.poster, year: details.year }));
+  const fav = Madrador.isFavorite(item);
   root.innerHTML = `<section class="panel" style="display:grid;grid-template-columns:minmax(190px,280px) 1fr;gap:22px;align-items:start"><img src="${Madrador.esc(details.poster || Madrador.placeholder)}" alt="" style="width:100%;border-radius:16px;border:1px solid var(--line)"><div><a class="badge info" href="/catalog">Retour catalogue</a><h1 class="page-title" style="margin-top:14px">${Madrador.esc(details.title)}</h1><div class="chips" style="margin:14px 0"><span class="badge">${Madrador.esc(details.year || "Annee inconnue")}</span><span class="badge ok">Note ${Number(details.rating || 0).toFixed(1)}</span>${(details.genres || []).map((g) => `<span class="badge">${Madrador.esc(g)}</span>`).join("")}</div><p style="line-height:1.8;color:var(--muted)">${Madrador.esc(details.overview || "Description indisponible.")}</p><div class="actions"><a class="btn" href="${Madrador.playerUrl(item)}">Ouvrir lecteur plein</a><button class="btn secondary" id="favBtn">${fav ? "Retirer favori" : "Ajouter favori"}</button></div>${seasonControls(details, item)}</div></section><section class="section"><div class="section-head"><div><h2>Lecture et sources</h2><p>Les flux se chargent automatiquement depuis les providers actifs.</p></div><button class="btn ghost" id="reloadDetailsSources">Relancer les flux</button></div><div class="player-layout"><div class="video-shell"><video id="detailVideo" controls playsinline></video></div><aside class="panel"><div id="sourceState" class="notice">Preparation...</div><div class="source-list" id="detailsSources" style="margin-top:12px"></div></aside></div></section>${castSection(details)}`;
   document.getElementById("favBtn").addEventListener("click", () => {
-    const next = localStorage.getItem(favKey) !== "1";
-    localStorage.setItem(favKey, next ? "1" : "0");
+    const next = Madrador.toggleFavorite(Object.assign({}, item, { poster: details.poster, year: details.year }));
     document.getElementById("favBtn").textContent = next ? "Retirer favori" : "Ajouter favori";
   });
   const seasonSelect = document.getElementById("seasonSelect");
@@ -112,12 +113,24 @@
     episodeSelect.innerHTML = Array.from({ length: count }, (_, i) => `<option value="${i + 1}">Episode ${i + 1}</option>`).join("");
   }
   function selectedEpisodeItem() {
-    return Object.assign({}, item, {
+    const selected = Object.assign({}, item, {
       season: seasonSelect ? Number(seasonSelect.value || 1) : undefined,
       episode: episodeSelect ? Number(episodeSelect.value || 1) : undefined
     });
+    if (selected.type === "series" && selected.season && selected.episode) {
+      localStorage.setItem(`madrador:lastEpisode:${selected.type}:${selected.id}`, JSON.stringify({ season: selected.season, episode: selected.episode }));
+    }
+    return selected;
   }
   if (seasonSelect) seasonSelect.addEventListener("change", updateEpisodeOptions);
+  try {
+    const lastEpisode = JSON.parse(localStorage.getItem(`madrador:lastEpisode:${item.type}:${item.id}`) || "null");
+    if (seasonSelect && lastEpisode && lastEpisode.season) {
+      seasonSelect.value = String(lastEpisode.season);
+      updateEpisodeOptions();
+      if (episodeSelect && lastEpisode.episode) episodeSelect.value = String(lastEpisode.episode);
+    }
+  } catch {}
   if (loadEpisode) loadEpisode.addEventListener("click", () => loadSources(selectedEpisodeItem()));
   document.getElementById("reloadDetailsSources").addEventListener("click", () => loadSources(selectedEpisodeItem()));
   loadSources(selectedEpisodeItem());

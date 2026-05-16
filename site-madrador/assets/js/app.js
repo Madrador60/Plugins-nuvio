@@ -20,6 +20,40 @@
     return `/details?type=${encodeURIComponent(typeForUrl(item.type))}&id=${encodeURIComponent(item.id)}&title=${encodeURIComponent(item.title || "")}`;
   }
 
+  function keyFor(item) {
+    return `${typeForUrl(item.type)}:${item.id}`;
+  }
+
+  function readStore(name) {
+    try { return JSON.parse(localStorage.getItem(name) || "[]"); } catch { return []; }
+  }
+
+  function writeStore(name, value, max) {
+    localStorage.setItem(name, JSON.stringify((value || []).slice(0, max || 30)));
+  }
+
+  function saveRecent(item) {
+    if (!item || !item.id) return;
+    const key = keyFor(item);
+    const list = readStore("madrador:history").filter((row) => keyFor(row) !== key);
+    writeStore("madrador:history", [item].concat(list), 30);
+  }
+
+  function toggleFavorite(item) {
+    if (!item || !item.id) return false;
+    const key = keyFor(item);
+    const list = readStore("madrador:favorites");
+    const exists = list.some((row) => keyFor(row) === key);
+    writeStore("madrador:favorites", exists ? list.filter((row) => keyFor(row) !== key) : [item].concat(list), 40);
+    return !exists;
+  }
+
+  function isFavorite(item) {
+    if (!item || !item.id) return false;
+    const key = keyFor(item);
+    return readStore("madrador:favorites").some((row) => keyFor(row) === key);
+  }
+
   function playerUrl(item) {
     return `/player?type=${encodeURIComponent(typeForUrl(item.type))}&id=${encodeURIComponent(item.id)}&title=${encodeURIComponent(item.title || "")}`;
   }
@@ -71,7 +105,7 @@
     input.addEventListener("keydown", (event) => { if (event.key === "Enter") run(); });
   }
 
-  window.Madrador = { esc, card, getJson, detailsUrl, playerUrl, placeholder, typeForUrl };
+  window.Madrador = { esc, card, getJson, detailsUrl, playerUrl, placeholder, typeForUrl, keyFor, readStore, writeStore, saveRecent, toggleFavorite, isFavorite };
   mountNav();
   mountFooter();
   bindHomeSearch();

@@ -680,6 +680,19 @@ const out=document.getElementById('out');document.querySelectorAll('button[data-
 </script></main></body></html>`;
 }
 async function searchTmdb(query, mediaType) {
+  if (mediaType === "all") {
+    const [movies, series] = await Promise.all([
+      searchTmdb(query, "movie"),
+      searchTmdb(query, "series")
+    ]);
+    const seen = new Set();
+    return movies.concat(series).filter((item) => {
+      const key = item.type + ":" + item.id;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    }).slice(0, 20);
+  }
   const type = mediaType === "series" || mediaType === "tv" ? "tv" : "movie";
   const normalizedQuery = query.trim().toLowerCase();
   const looseQuery = normalizedQuery

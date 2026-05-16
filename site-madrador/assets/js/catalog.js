@@ -6,8 +6,11 @@
   const searchType = document.getElementById("catalogType");
   const searchButton = document.getElementById("catalogGo");
   const refreshButton = document.getElementById("refreshCatalog");
+  const suggestions = document.getElementById("suggestions");
+  const localRows = document.getElementById("localRows");
   let catalogRows = [];
   let activeFilter = "all";
+  let suggestionTimer = 0;
 
   function renderRow(row, mode) {
     const items = row.items || [];
@@ -49,6 +52,38 @@
     searchHost.innerHTML = `<div class="skeleton"></div>`;
     const results = await window.MadradorSearch.runSearch(q, searchType ? searchType.value : "movie");
     searchHost.innerHTML = `<div class="section-head"><h2>Recherche</h2><span class="badge info">${results.length} resultats</span></div>${results.length ? `<div class="grid">${results.map(Madrador.card).join("")}</div>` : `<div class="empty">Aucun resultat pour cette recherche.</div>`}`;
+    if (suggestions) suggestions.classList.add("hidden");
+  }
+
+  async function updateSuggestions() {
+    if (!searchInput || !suggestions) return;
+    const q = searchInput.value.trim();
+    clearTimeout(suggestionTimer);
+    if (q.length < 2) {
+      suggestions.classList.add("hidden");
+      suggestions.innerHTML = "";
+      return;
+    }
+    suggestionTimer = setTimeout(async () => {
+      const results = await window.MadradorSearch.runSearch(q, searchType ? searchType.value : "all");
+      const items = results.slice(0, 6);
+      suggestions.classList.toggle("hidden", !items.length);
+      suggestions.innerHTML = items.map((item) => `<a class="badge info" style="margin:4px" href="${Madrador.detailsUrl(item)}">${Madrador.esc(item.title)} ${item.year ? "(" + Madrador.esc(item.year) + ")" : ""}</a>`).join("");
+    }, 240);
+  }
+
+  function renderLocalRows() {
+    if (!localRows) return;
+    const favs = Madrador.readStore("madrador:favorites");
+    const history = Madrador.readStore("madrador:history");
+    localRows.innerHTML = [
+      favs.length ? `<section class="section"><div class="section-head"><h2>Favoris</h2><button class="btn ghost" id="clearFavs">Vider</button></div><div class="rail">${favs.map(Madrador.card).join("")}</div></section>` : "",
+      history.length ? `<section class="section"><div class="section-head"><h2>Reprendre / historique</h2><button class="btn ghost" id="clearHistory">Vider</button></div><div class="rail">${history.map(Madrador.card).join("")}</div></section>` : ""
+    ].join("");
+    const clearFavs = document.getElementById("clearFavs");
+    const clearHistory = document.getElementById("clearHistory");
+    if (clearFavs) clearFavs.onclick = () => { Madrador.writeStore("madrador:favorites", []); renderLocalRows(); };
+    if (clearHistory) clearHistory.onclick = () => { Madrador.writeStore("madrador:history", []); renderLocalRows(); };
   }
 
   async function loadPersonCredits(personId, name) {
@@ -71,6 +106,8 @@
 
   if (searchButton) searchButton.addEventListener("click", doSearch);
   if (searchInput) searchInput.addEventListener("keydown", (event) => { if (event.key === "Enter") doSearch(); });
+  if (searchInput) searchInput.addEventListener("input", updateSuggestions);
+  if (searchType) searchType.addEventListener("change", updateSuggestions);
   if (refreshButton) refreshButton.addEventListener("click", () => loadCatalog(true));
   const params = new URLSearchParams(location.search);
   if (params.get("person")) {
@@ -84,5 +121,6 @@
     const select = document.getElementById("yearFilter");
     if (select) select.insertAdjacentHTML("beforeend", `<option>${year}</option>`);
   }
+  renderLocalRows();
   loadCatalog(false);
 })();

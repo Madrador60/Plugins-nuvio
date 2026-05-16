@@ -17,9 +17,10 @@
           <div class="panel">
             <div class="search-panel">
               <input class="input" id="catalogSearch" placeholder="Interstellar, Naruto, film horreur 2024..." autocomplete="off">
-              <select class="select" id="catalogType"><option value="movie">Films</option><option value="series">Series</option></select>
+              <select class="select" id="catalogType"><option value="all">Tout</option><option value="movie">Films</option><option value="series">Series</option></select>
               <button class="btn" id="catalogGo">Rechercher</button>
             </div>
+            <div id="suggestions" class="panel hidden" style="margin-top:10px;padding:10px"></div>
             <div class="filters" style="margin-top:14px">
               <button class="btn secondary" data-filter="all">Tout</button>
               <button class="btn ghost" data-filter="movie">Films</button>
@@ -31,6 +32,7 @@
           </div>
         </section>
         <section id="searchResults" class="section hidden"></section>
+        <section id="localRows" class="section"></section>
         <section id="catalogRows" class="section"><div class="skeleton"></div></section>
       </div>
     </main>

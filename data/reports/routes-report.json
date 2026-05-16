@@ -1,11 +1,11 @@
 {
-  "generatedAt": "2026-05-16T14:07:00.680Z",
+  "generatedAt": "2026-05-16T14:14:42.028Z",
   "results": [
     {
       "route": "/health",
       "ok": true,
       "status": 200,
-      "timeMs": 2
+      "timeMs": 1
     },
     {
       "route": "/health.json",
@@ -17,31 +17,31 @@
       "route": "/config.json",
       "ok": true,
       "status": 200,
-      "timeMs": 0
+      "timeMs": 1
     },
     {
       "route": "/",
       "ok": true,
       "status": 200,
-      "timeMs": 2
+      "timeMs": 11
     },
     {
       "route": "/site-madrador",
       "ok": true,
       "status": 200,
-      "timeMs": 0
+      "timeMs": 1
     },
     {
       "route": "/site-madrador/",
       "ok": true,
       "status": 200,
-      "timeMs": 1
+      "timeMs": 0
     },
     {
       "route": "/catalog",
       "ok": true,
       "status": 200,
-      "timeMs": 1
+      "timeMs": 9
     },
     {
       "route": "/details?type=movie&id=157336",
@@ -53,13 +53,13 @@
       "route": "/player?type=movie&id=157336&title=Interstellar",
       "ok": true,
       "status": 200,
-      "timeMs": 1
+      "timeMs": 9
     },
     {
       "route": "/providers",
       "ok": true,
       "status": 200,
-      "timeMs": 0
+      "timeMs": 1
     },
     {
       "route": "/providers.json",
@@ -77,13 +77,13 @@
       "route": "/catalog.json",
       "ok": true,
       "status": 200,
-      "timeMs": 1
+      "timeMs": 0
     },
     {
       "route": "/search.json?type=movie&q=Interstellar",
       "ok": true,
       "status": 200,
-      "timeMs": 0
+      "timeMs": 1
     },
     {
       "route": "/details.json?type=movie&id=157336",
@@ -101,13 +101,13 @@
       "route": "/dmca",
       "ok": true,
       "status": 200,
-      "timeMs": 1
+      "timeMs": 0
     },
     {
       "route": "/security",
       "ok": true,
       "status": 200,
-      "timeMs": 0
+      "timeMs": 1
     },
     {
       "route": "/site-madrador/assets/css/style.css",
@@ -119,7 +119,7 @@
       "route": "/site-madrador/assets/js/app.js",
       "ok": true,
       "status": 200,
-      "timeMs": 0
+      "timeMs": 22
     }
   ]
 }

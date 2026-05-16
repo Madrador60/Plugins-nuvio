@@ -10,6 +10,7 @@
   const meta = document.getElementById("playerMeta");
   let hls = null;
   let streams = [];
+  let currentIndex = 0;
 
   function kind(stream) {
     const url = stream.url || "";
@@ -21,6 +22,8 @@
 
   async function play(stream, index) {
     if (!stream || !video) return;
+    currentIndex = Number(index || 0);
+    localStorage.setItem(`madrador:lastSource:${type}:${id}`, String(currentIndex));
     document.querySelectorAll(".source-card").forEach((card) => card.classList.remove("active"));
     const active = document.querySelector(`[data-source-index="${index}"]`);
     if (active) active.classList.add("active");
@@ -55,7 +58,8 @@
     message.textContent = `${streams.length} source(s) trouvee(s). MP4/VF sont priorisees quand disponibles.`;
     list.innerHTML = streams.map((stream, index) => `<button class="source-card" data-source-index="${index}"><strong>${Madrador.esc(stream.name || stream.providerId || "Source")}</strong><small>${Madrador.esc(stream.title || stream.description || "Source externe")}</small><div class="chips" style="margin-top:10px"><span class="badge info">${Madrador.esc(kind(stream))}</span><span class="badge">${Madrador.esc(stream.language || "FR")}</span><span class="badge">${Madrador.esc(stream.quality || "HD")}</span><span class="badge ok">score ${Madrador.esc(stream.score || "?")}</span></div></button>`).join("");
     list.querySelectorAll(".source-card").forEach((button) => button.addEventListener("click", () => play(streams[Number(button.dataset.sourceIndex)], button.dataset.sourceIndex)));
-    play(streams[0], 0);
+    const preferred = Number(localStorage.getItem(`madrador:lastSource:${type}:${id}`) || 0);
+    play(streams[preferred] || streams[0], streams[preferred] ? preferred : 0);
   }
 
   async function load() {
@@ -75,6 +79,11 @@
   }
 
   document.getElementById("reloadSources").addEventListener("click", load);
+  document.getElementById("nextSource").addEventListener("click", () => {
+    if (!streams.length) return;
+    const next = (currentIndex + 1) % streams.length;
+    play(streams[next], next);
+  });
   document.getElementById("fullscreenBtn").addEventListener("click", () => {
     const target = document.querySelector(".video-shell");
     if (target && target.requestFullscreen) target.requestFullscreen();
