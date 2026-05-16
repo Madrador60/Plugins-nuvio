@@ -50,10 +50,27 @@ const unstableProviders = new Set(["animoflix", "animesite", "cinemacity", "seka
 
 const fallbackItems = [
   { id: "157336", type: "movie", title: "Interstellar", year: "2014", poster: null, backdrop: null, rating: 8.4 },
+  { id: "155", type: "movie", title: "The Dark Knight", year: "2008", poster: null, backdrop: null, rating: 8.5 },
   { id: "603", type: "movie", title: "Matrix", year: "1999", poster: null, backdrop: null, rating: 8.2 },
   { id: "550", type: "movie", title: "Fight Club", year: "1999", poster: null, backdrop: null, rating: 8.4 },
+  { id: "27205", type: "movie", title: "Inception", year: "2010", poster: null, backdrop: null, rating: 8.4 },
+  { id: "680", type: "movie", title: "Pulp Fiction", year: "1994", poster: null, backdrop: null, rating: 8.5 },
+  { id: "13", type: "movie", title: "Forrest Gump", year: "1994", poster: null, backdrop: null, rating: 8.5 },
+  { id: "238", type: "movie", title: "Le Parrain", year: "1972", poster: null, backdrop: null, rating: 8.7 },
+  { id: "278", type: "movie", title: "Les Evades", year: "1994", poster: null, backdrop: null, rating: 8.7 },
+  { id: "496243", type: "movie", title: "Parasite", year: "2019", poster: null, backdrop: null, rating: 8.5 },
+  { id: "324857", type: "movie", title: "Spider-Man: New Generation", year: "2018", poster: null, backdrop: null, rating: 8.4 },
+  { id: "429", type: "movie", title: "Le Bon, la Brute et le Truand", year: "1966", poster: null, backdrop: null, rating: 8.5 },
+  { id: "1399", type: "series", title: "Game of Thrones", year: "2011", poster: null, backdrop: null, rating: 8.4 },
+  { id: "1396", type: "series", title: "Breaking Bad", year: "2008", poster: null, backdrop: null, rating: 8.9 },
+  { id: "66732", type: "series", title: "Stranger Things", year: "2016", poster: null, backdrop: null, rating: 8.6 },
+  { id: "60574", type: "series", title: "Peaky Blinders", year: "2013", poster: null, backdrop: null, rating: 8.5 },
   { id: "37854", type: "series", title: "One Piece", year: "1999", poster: null, backdrop: null, rating: 8.7 },
-  { id: "31911", type: "series", title: "Fullmetal Alchemist: Brotherhood", year: "2009", poster: null, backdrop: null, rating: 8.7 }
+  { id: "31911", type: "series", title: "Fullmetal Alchemist: Brotherhood", year: "2009", poster: null, backdrop: null, rating: 8.7 },
+  { id: "46260", type: "series", title: "Naruto", year: "2002", poster: null, backdrop: null, rating: 8.4 },
+  { id: "85937", type: "series", title: "Demon Slayer", year: "2019", poster: null, backdrop: null, rating: 8.7 },
+  { id: "1429", type: "series", title: "L'Attaque des Titans", year: "2013", poster: null, backdrop: null, rating: 8.7 },
+  { id: "95479", type: "series", title: "Jujutsu Kaisen", year: "2020", poster: null, backdrop: null, rating: 8.5 }
 ];
 
 function corsHeaders(extra) {
@@ -613,9 +630,12 @@ async function searchTmdb(query, mediaType) {
   const type = mediaType === "series" || mediaType === "tv" ? "tv" : "movie";
   const normalizedQuery = query.trim().toLowerCase();
   if (!TMDB_API_KEY) {
-    return fallbackItems
+    const matches = fallbackItems
       .filter((item) => item.type === (type === "tv" ? "series" : "movie"))
       .filter((item) => item.title.toLowerCase().includes(normalizedQuery))
+      .slice(0, 10);
+    return matches.length ? matches : fallbackItems
+      .filter((item) => item.type === (type === "tv" ? "series" : "movie"))
       .slice(0, 10);
   }
   return cachedJson("search:" + type + ":" + normalizedQuery, async () => {
@@ -727,6 +747,27 @@ async function getCatalogRows(forceRefresh) {
   const cacheKey = "catalog:v4";
   if (forceRefresh) memoryCache.delete(cacheKey);
   return cachedJson(cacheKey, async () => {
+    if (!TMDB_API_KEY) {
+      const movies = fallbackItems.filter((item) => item.type === "movie");
+      const series = fallbackItems.filter((item) => item.type === "series");
+      const anime = series.filter((item) => /one piece|naruto|demon|attack|attaque|jujutsu|fullmetal/i.test(item.title));
+      const rows = [
+        { id: "trending-day", group: "movie", title: "Tendances du jour", items: movies.slice(0, 12) },
+        { id: "popular-movies", group: "movie", title: "Films populaires", items: movies },
+        { id: "popular-series", group: "series", title: "Series populaires", items: series },
+        { id: "anime", group: "series", title: "Animes", items: anime.length ? anime : series },
+        { id: "french-movies", group: "movie", title: "Films francais", items: movies.slice().reverse() },
+        { id: "new-movies", group: "movie", title: "Nouveautes", items: movies.slice(0, 8) }
+      ];
+      return {
+        rows,
+        generatedAt: new Date().toISOString(),
+        nextRefreshAt: new Date(Date.now() + CATALOG_CACHE_TTL_MS).toISOString(),
+        cacheTtlMs: CATALOG_CACHE_TTL_MS,
+        fallback: true,
+        warning: "TMDB_API_KEY absent: catalogue local de secours."
+      };
+    }
     const rows = await Promise.all([
       catalogRow("trending-day", "movie", "Tendances du jour", "/trending/movie/day", { pages: 2 }, "movie"),
       catalogRow("trending-week", "movie", "Tendances de la semaine", "/trending/movie/week", { pages: 2 }, "movie"),

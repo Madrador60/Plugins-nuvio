@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-16T09:59:46.374Z",
+  "generatedAt": "2026-05-16T10:14:51.144Z",
   "results": [
     {
       "route": "/health",
@@ -23,13 +23,13 @@
       "route": "/",
       "ok": true,
       "status": 200,
-      "timeMs": 2
+      "timeMs": 1
     },
     {
       "route": "/site-madrador",
       "ok": true,
       "status": 200,
-      "timeMs": 0
+      "timeMs": 1
     },
     {
       "route": "/site-madrador/",
@@ -47,13 +47,13 @@
       "route": "/details?type=movie&id=157336",
       "ok": true,
       "status": 200,
-      "timeMs": 1
+      "timeMs": 0
     },
     {
       "route": "/player?type=movie&id=157336&title=Interstellar",
       "ok": true,
       "status": 200,
-      "timeMs": 0
+      "timeMs": 1
     },
     {
       "route": "/providers",
@@ -89,13 +89,13 @@
       "route": "/details.json?type=movie&id=157336",
       "ok": true,
       "status": 200,
-      "timeMs": 1
+      "timeMs": 0
     },
     {
       "route": "/legal",
       "ok": true,
       "status": 200,
-      "timeMs": 0
+      "timeMs": 1
     },
     {
       "route": "/dmca",
@@ -119,7 +119,7 @@
       "route": "/site-madrador/assets/js/app.js",
       "ok": true,
       "status": 200,
-      "timeMs": 1
+      "timeMs": 0
     }
   ]
 }

@@ -28,7 +28,7 @@
     const title = item.title || "Sans titre";
     const poster = item.poster || placeholder;
     const meta = [item.year, typeForUrl(item.type) === "series" ? "Serie" : "Film"].filter(Boolean).join(" · ");
-    return `<a class="poster-card" href="${detailsUrl(item)}"><img src="${esc(poster)}" alt=""><span class="body"><strong>${esc(title)}</strong><small>${esc(meta || "Madrador Film")}</small></span></a>`;
+    return `<a class="poster-card" href="${detailsUrl(item)}"><img src="${esc(poster)}" alt=""><span class="body"><strong>${esc(title)}</strong><small>${esc(meta || "Madrador Film")}</small><span class="badge info" style="margin-top:10px">Voir les flux</span></span></a>`;
   }
 
   async function getJson(url, fallback) {

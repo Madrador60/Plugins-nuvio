@@ -23,7 +23,7 @@ const checks = [
   { name: "app js asset", url: "/site-madrador/assets/js/app.js", expects: ["window.Madrador", "getJson"] },
   { name: "catalog js integration", url: "/site-madrador/assets/js/catalog.js", expects: ["/catalog.json", "MadradorSearch.runSearch"] },
   { name: "search js integration", url: "/site-madrador/assets/js/search.js", expects: ["/search.json"] },
-  { name: "details js integration", url: "/site-madrador/assets/js/details.js", expects: ["/details.json", "Madrador.playerUrl"] },
+  { name: "details js integration", url: "/site-madrador/assets/js/details.js", expects: ["/details.json", "/stream/", "playSource"] },
   { name: "player js integration", url: "/site-madrador/assets/js/player.js", expects: ["/stream/", "Hls"] },
   { name: "providers js integration", url: "/site-madrador/assets/js/providers.js", expects: ["/providers.json", "/providers/status.json", "/diagnostics.json"] },
   { name: "admin js integration", url: "/site-madrador/assets/js/admin.js", expects: ["/health", "/providers.json", "x-admin-token"] },

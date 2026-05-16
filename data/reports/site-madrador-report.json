@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-16T09:59:47.012Z",
+  "generatedAt": "2026-05-16T10:14:51.792Z",
   "results": [
     {
       "name": "home page",
@@ -8,7 +8,7 @@
       "status": 200,
       "type": "text/html; charset=utf-8",
       "missing": [],
-      "timeMs": 3
+      "timeMs": 4
     },
     {
       "name": "site-madrador direct",
@@ -17,7 +17,7 @@
       "status": 200,
       "type": "text/html; charset=utf-8",
       "missing": [],
-      "timeMs": 2
+      "timeMs": 1
     },
     {
       "name": "catalog page",
@@ -62,7 +62,7 @@
       "status": 200,
       "type": "text/html; charset=utf-8",
       "missing": [],
-      "timeMs": 1
+      "timeMs": 2
     },
     {
       "name": "legal page",
@@ -71,7 +71,7 @@
       "status": 200,
       "type": "text/html; charset=utf-8",
       "missing": [],
-      "timeMs": 0
+      "timeMs": 1
     },
     {
       "name": "dmca page",
@@ -89,7 +89,7 @@
       "status": 200,
       "type": "text/html; charset=utf-8",
       "missing": [],
-      "timeMs": 1
+      "timeMs": 0
     },
     {
       "name": "css asset",
@@ -116,7 +116,7 @@
       "status": 200,
       "type": "application/javascript; charset=utf-8",
       "missing": [],
-      "timeMs": 0
+      "timeMs": 1
     },
     {
       "name": "search js integration",
@@ -125,7 +125,7 @@
       "status": 200,
       "type": "application/javascript; charset=utf-8",
       "missing": [],
-      "timeMs": 1
+      "timeMs": 0
     },
     {
       "name": "details js integration",
@@ -143,7 +143,7 @@
       "status": 200,
       "type": "application/javascript; charset=utf-8",
       "missing": [],
-      "timeMs": 0
+      "timeMs": 1
     },
     {
       "name": "providers js integration",
@@ -152,7 +152,7 @@
       "status": 200,
       "type": "application/javascript; charset=utf-8",
       "missing": [],
-      "timeMs": 1
+      "timeMs": 0
     },
     {
       "name": "admin js integration",
@@ -161,7 +161,7 @@
       "status": 200,
       "type": "application/javascript; charset=utf-8",
       "missing": [],
-      "timeMs": 0
+      "timeMs": 1
     },
     {
       "name": "catalog api",
@@ -169,7 +169,7 @@
       "ok": true,
       "status": 200,
       "type": "application/json; charset=utf-8",
-      "timeMs": 2
+      "timeMs": 1
     },
     {
       "name": "search api",
@@ -177,7 +177,7 @@
       "ok": true,
       "status": 200,
       "type": "application/json; charset=utf-8",
-      "timeMs": 1
+      "timeMs": 0
     },
     {
       "name": "details api",
@@ -209,7 +209,7 @@
       "ok": true,
       "status": 200,
       "type": "application/json; charset=utf-8",
-      "timeMs": 0
+      "timeMs": 1
     }
   ]
 }
