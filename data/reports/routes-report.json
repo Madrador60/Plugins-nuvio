@@ -1,11 +1,11 @@
 {
-  "generatedAt": "2026-05-16T14:14:42.028Z",
+  "generatedAt": "2026-05-16T14:50:34.660Z",
   "results": [
     {
       "route": "/health",
       "ok": true,
       "status": 200,
-      "timeMs": 1
+      "timeMs": 2
     },
     {
       "route": "/health.json",
@@ -23,7 +23,7 @@
       "route": "/",
       "ok": true,
       "status": 200,
-      "timeMs": 11
+      "timeMs": 2
     },
     {
       "route": "/site-madrador",
@@ -35,13 +35,13 @@
       "route": "/site-madrador/",
       "ok": true,
       "status": 200,
-      "timeMs": 0
+      "timeMs": 1
     },
     {
       "route": "/catalog",
       "ok": true,
       "status": 200,
-      "timeMs": 9
+      "timeMs": 0
     },
     {
       "route": "/details?type=movie&id=157336",
@@ -53,7 +53,7 @@
       "route": "/player?type=movie&id=157336&title=Interstellar",
       "ok": true,
       "status": 200,
-      "timeMs": 9
+      "timeMs": 1
     },
     {
       "route": "/providers",
@@ -71,13 +71,13 @@
       "route": "/providers/status.json",
       "ok": true,
       "status": 200,
-      "timeMs": 1
+      "timeMs": 0
     },
     {
       "route": "/catalog.json",
       "ok": true,
       "status": 200,
-      "timeMs": 0
+      "timeMs": 2
     },
     {
       "route": "/search.json?type=movie&q=Interstellar",
@@ -86,7 +86,25 @@
       "timeMs": 1
     },
     {
+      "route": "/search.json?type=all&q=Keanu",
+      "ok": true,
+      "status": 200,
+      "timeMs": 0
+    },
+    {
       "route": "/details.json?type=movie&id=157336",
+      "ok": true,
+      "status": 200,
+      "timeMs": 1
+    },
+    {
+      "route": "/episodes.json?id=1396&season=1",
+      "ok": true,
+      "status": 200,
+      "timeMs": 0
+    },
+    {
+      "route": "/recommendations.json?type=movie&id=157336",
       "ok": true,
       "status": 200,
       "timeMs": 1
@@ -101,13 +119,13 @@
       "route": "/dmca",
       "ok": true,
       "status": 200,
-      "timeMs": 0
+      "timeMs": 1
     },
     {
       "route": "/security",
       "ok": true,
       "status": 200,
-      "timeMs": 1
+      "timeMs": 0
     },
     {
       "route": "/site-madrador/assets/css/style.css",
@@ -119,7 +137,7 @@
       "route": "/site-madrador/assets/js/app.js",
       "ok": true,
       "status": 200,
-      "timeMs": 22
+      "timeMs": 0
     }
   ]
 }

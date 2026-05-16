@@ -15,6 +15,10 @@
     metrics.innerHTML = [
       metric("Serveur", health.ok ? "OK" : "Erreur"),
       metric("Version", health.version || "?"),
+      metric("Commit", health.deploy && health.deploy.commit || "local"),
+      metric("Node", health.deploy && health.deploy.node || "?"),
+      metric("TMDB", health.deploy && health.deploy.hasTmdb ? "Configure" : "Manquant"),
+      metric("Cache", health.cacheEntries || 0),
       metric("Uptime", `${Math.round(health.uptime || 0)}s`),
       metric("Providers", providers.all.length),
       metric("OK", values.filter((item) => item.status === "OK").length),

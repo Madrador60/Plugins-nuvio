@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-16T09:28:44.884Z",
+  "generatedAt": "2026-05-16T14:51:05.850Z",
   "timeoutMs": 45000,
   "results": [
     {
@@ -7,15 +7,7 @@
       "name": "Movix",
       "case": "Interstellar",
       "streams": 0,
-      "ms": 12160,
-      "error": ""
-    },
-    {
-      "id": "frenchstream",
-      "name": "Frenchstream",
-      "case": "Interstellar",
-      "streams": 0,
-      "ms": 1242,
+      "ms": 12165,
       "error": ""
     },
     {
@@ -23,7 +15,15 @@
       "name": "Nakios",
       "case": "Interstellar",
       "streams": 0,
-      "ms": 195,
+      "ms": 203,
+      "error": ""
+    },
+    {
+      "id": "videasy",
+      "name": "VIDEASY",
+      "case": "Interstellar",
+      "streams": 5,
+      "ms": 1068,
       "error": ""
     }
   ]

@@ -9,6 +9,7 @@ const domainService = require("../services/domain.service");
 
 const ROOT = path.resolve(__dirname, "..", "..");
 const SITE_MADRADOR_DIR = path.join(ROOT, "site-madrador");
+const REPORTS_DIR = path.join(ROOT, "data", "reports");
 const nuvioManifest = require(path.join(ROOT, "manifest.json"));
 const domains = require(path.join(ROOT, "domains.json"));
 
@@ -63,6 +64,17 @@ function fallbackItem(item) {
   });
 }
 
+function tmdbImage(pathname, size) {
+  return pathname ? "https://image.tmdb.org/t/p/" + (size || "w342") + pathname : null;
+}
+
+function normalizeText(value) {
+  return String(value || "")
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+}
+
 const fallbackCast = {
   "157336": [
     { id: "10297", name: "Matthew McConaughey", character: "Cooper" },
@@ -101,6 +113,20 @@ const fallbackSeasons = {
   ]
 };
 
+function fallbackEpisodes(tvId, seasonNumber) {
+  const season = (fallbackSeasons[String(tvId)] || []).find((item) => Number(item.seasonNumber) === Number(seasonNumber));
+  const count = season ? Number(season.episodeCount || 0) : 0;
+  return Array.from({ length: Math.min(count, 60) }, (_, index) => ({
+    seasonNumber: Number(seasonNumber || 1),
+    episodeNumber: index + 1,
+    title: "Episode " + (index + 1),
+    overview: "Resume complet disponible quand TMDB_API_KEY est configuree.",
+    still: null,
+    runtime: null,
+    airDate: ""
+  }));
+}
+
 const fallbackItems = [
   fallbackItem({ id: "157336", imdbId: "tt0816692", type: "movie", title: "Interstellar", year: "2014", rating: 8.4 }),
   fallbackItem({ id: "155", imdbId: "tt0468569", type: "movie", title: "The Dark Knight", year: "2008", rating: 8.5 }),
@@ -129,7 +155,7 @@ const fallbackItems = [
 function corsHeaders(extra) {
   return Object.assign({
     "access-control-allow-origin": "*",
-    "access-control-allow-methods": "GET,HEAD,OPTIONS",
+    "access-control-allow-methods": "GET,POST,HEAD,OPTIONS",
     "access-control-allow-headers": "*",
     "access-control-expose-headers": "Content-Length,Content-Range,Accept-Ranges,Content-Type",
     "cross-origin-resource-policy": "cross-origin",
@@ -633,6 +659,39 @@ function isAdminAuthorized(req, url) {
   return token === ADMIN_TOKEN;
 }
 
+function readRequestJson(req, limitBytes) {
+  return new Promise((resolve) => {
+    let body = "";
+    req.on("data", (chunk) => {
+      body += chunk;
+      if (body.length > (limitBytes || 20_000)) req.destroy();
+    });
+    req.on("end", () => {
+      try {
+        resolve(body ? JSON.parse(body) : {});
+      } catch (_) {
+        resolve({});
+      }
+    });
+    req.on("error", () => resolve({}));
+  });
+}
+
+function appendReport(filename, payload) {
+  fs.mkdirSync(REPORTS_DIR, { recursive: true });
+  const filePath = path.join(REPORTS_DIR, filename);
+  let rows = [];
+  try {
+    rows = JSON.parse(fs.readFileSync(filePath, "utf8"));
+    if (!Array.isArray(rows)) rows = [];
+  } catch (_) {
+    rows = [];
+  }
+  rows.unshift(Object.assign({ createdAt: new Date().toISOString() }, payload || {}));
+  fs.writeFileSync(filePath, JSON.stringify(rows.slice(0, 200), null, 2));
+  return rows[0];
+}
+
 function renderLegalPage(kind) {
   const title = kind === "security" ? "Securite" : kind === "dmca" ? "DMCA" : "Legal";
   return `<!doctype html>
@@ -680,14 +739,19 @@ const out=document.getElementById('out');document.querySelectorAll('button[data-
 </script></main></body></html>`;
 }
 async function searchTmdb(query, mediaType) {
+  if (mediaType === "person" || mediaType === "actor") {
+    return searchPeople(query);
+  }
+
   if (mediaType === "all") {
-    const [movies, series] = await Promise.all([
+    const [movies, series, people] = await Promise.all([
       searchTmdb(query, "movie"),
-      searchTmdb(query, "series")
+      searchTmdb(query, "series"),
+      searchPeople(query)
     ]);
     const seen = new Set();
-    return movies.concat(series).filter((item) => {
-      const key = item.type + ":" + item.id;
+    return movies.concat(series, people).filter((item) => {
+      const key = (item.kind || item.type) + ":" + item.id;
       if (seen.has(key)) return false;
       seen.add(key);
       return true;
@@ -703,7 +767,7 @@ async function searchTmdb(query, mediaType) {
     .trim();
   if (!TMDB_API_KEY) {
     const wantedType = type === "tv" ? "series" : "movie";
-    const haystack = (item) => (item.title || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    const haystack = (item) => normalizeText(item.title);
     const matches = fallbackItems
       .filter((item) => item.type === wantedType)
       .filter((item) => haystack(item).includes(normalizedQuery) || haystack(item).includes(looseQuery) || looseQuery.includes(haystack(item)))
@@ -725,6 +789,45 @@ async function searchTmdb(query, mediaType) {
       title: item.title || item.name || "Sans titre",
       year: String(item.release_date || item.first_air_date || "").slice(0, 4),
       poster: item.poster_path ? "https://image.tmdb.org/t/p/w185" + item.poster_path : null
+    }));
+  }, SEARCH_CACHE_TTL_MS);
+}
+
+async function searchPeople(query) {
+  const normalizedQuery = normalizeText(query).trim();
+  if (!TMDB_API_KEY) {
+    const people = Object.values(fallbackCast)
+      .flat()
+      .filter((person, index, list) => list.findIndex((item) => item.id === person.id) === index)
+      .filter((person) => normalizeText(person.name).includes(normalizedQuery))
+      .slice(0, 10);
+    return people.map((person) => ({
+      id: String(person.id),
+      type: "person",
+      kind: "person",
+      title: person.name,
+      year: "Acteur",
+      poster: person.profile || null,
+      profile: person.profile || null
+    }));
+  }
+
+  return cachedJson("people:" + normalizedQuery, async () => {
+    const endpoint = "https://api.themoviedb.org/3/search/person" +
+      "?api_key=" + encodeURIComponent(TMDB_API_KEY) +
+      "&language=fr-FR&query=" + encodeURIComponent(query);
+    const response = await fetch(endpoint);
+    if (!response.ok) throw new Error("TMDB people failed: HTTP " + response.status);
+    const data = await response.json();
+    return (data.results || []).slice(0, 10).map((person) => ({
+      id: String(person.id),
+      type: "person",
+      kind: "person",
+      title: person.name || "Acteur",
+      year: "Acteur",
+      poster: tmdbImage(person.profile_path, "w185"),
+      profile: tmdbImage(person.profile_path, "w185"),
+      knownFor: Array.isArray(person.known_for) ? person.known_for.map((item) => item.title || item.name).filter(Boolean).slice(0, 3) : []
     }));
   }, SEARCH_CACHE_TTL_MS);
 }
@@ -758,7 +861,7 @@ async function getTmdbDetails(tmdbId, mediaType) {
   return cachedJson("details:" + type + ":" + tmdbId, async () => {
     const endpoint = "https://api.themoviedb.org/3/" + type + "/" + encodeURIComponent(tmdbId) +
       "?api_key=" + encodeURIComponent(TMDB_API_KEY) +
-      "&language=fr-FR&append_to_response=credits,external_ids";
+      "&language=fr-FR&append_to_response=credits,external_ids,videos";
     const response = await fetch(endpoint);
     if (!response.ok) throw new Error("TMDB details failed: HTTP " + response.status);
     const data = await response.json();
@@ -770,6 +873,9 @@ async function getTmdbDetails(tmdbId, mediaType) {
       overview: data.overview || "",
       poster: data.poster_path ? "https://image.tmdb.org/t/p/w342" + data.poster_path : null,
       backdrop: data.backdrop_path ? "https://image.tmdb.org/t/p/original" + data.backdrop_path : null,
+      trailer: data.videos && Array.isArray(data.videos.results)
+        ? data.videos.results.find((video) => video.site === "YouTube" && /Trailer|Teaser|Bande-annonce/i.test(video.type || video.name || ""))
+        : null,
       rating: data.vote_average || 0,
       genres: Array.isArray(data.genres) ? data.genres.map((genre) => genre.name).filter(Boolean) : [],
       cast: data.credits && Array.isArray(data.credits.cast) ? data.credits.cast.slice(0, 14).map((person) => ({
@@ -787,6 +893,70 @@ async function getTmdbDetails(tmdbId, mediaType) {
           poster: season.poster_path ? "https://image.tmdb.org/t/p/w185" + season.poster_path : null
         })) : [],
       imdbId: data.external_ids && data.external_ids.imdb_id || null
+    };
+  }, 24 * 60 * 60 * 1000);
+}
+
+async function getSeasonEpisodes(tmdbId, seasonNumber) {
+  const season = Number(seasonNumber || 1);
+  if (!TMDB_API_KEY) {
+    return {
+      id: String(tmdbId),
+      seasonNumber: season,
+      episodes: fallbackEpisodes(tmdbId, season)
+    };
+  }
+
+  return cachedJson("episodes:" + tmdbId + ":" + season, async () => {
+    const endpoint = "https://api.themoviedb.org/3/tv/" + encodeURIComponent(tmdbId) +
+      "/season/" + encodeURIComponent(season) +
+      "?api_key=" + encodeURIComponent(TMDB_API_KEY) +
+      "&language=fr-FR";
+    const response = await fetch(endpoint);
+    if (!response.ok) throw new Error("TMDB episodes failed: HTTP " + response.status);
+    const data = await response.json();
+    return {
+      id: String(tmdbId),
+      seasonNumber: season,
+      name: data.name || "Saison " + season,
+      overview: data.overview || "",
+      poster: tmdbImage(data.poster_path, "w342"),
+      episodes: (data.episodes || []).map((episode) => ({
+        seasonNumber: season,
+        episodeNumber: episode.episode_number,
+        title: episode.name || "Episode " + episode.episode_number,
+        overview: episode.overview || "",
+        still: tmdbImage(episode.still_path, "w300"),
+        runtime: episode.runtime || null,
+        airDate: episode.air_date || "",
+        rating: episode.vote_average || 0
+      }))
+    };
+  }, 24 * 60 * 60 * 1000);
+}
+
+async function getRecommendations(tmdbId, mediaType) {
+  const type = mediaType === "series" || mediaType === "tv" ? "tv" : "movie";
+  if (!TMDB_API_KEY) {
+    const fallback = fallbackItems.find((item) => item.id === String(tmdbId));
+    return {
+      id: String(tmdbId),
+      results: fallbackItems
+        .filter((item) => item.id !== String(tmdbId) && (!fallback || item.type === fallback.type))
+        .slice(0, 18)
+    };
+  }
+
+  return cachedJson("recommendations:" + type + ":" + tmdbId, async () => {
+    const endpoint = "https://api.themoviedb.org/3/" + type + "/" + encodeURIComponent(tmdbId) +
+      "/recommendations?api_key=" + encodeURIComponent(TMDB_API_KEY) +
+      "&language=fr-FR&page=1";
+    const response = await fetch(endpoint);
+    if (!response.ok) throw new Error("TMDB recommendations failed: HTTP " + response.status);
+    const data = await response.json();
+    return {
+      id: String(tmdbId),
+      results: (data.results || []).filter((item) => item.poster_path).slice(0, 18).map((item) => normalizeTmdbItem(item, type))
     };
   }, 24 * 60 * 60 * 1000);
 }
@@ -1026,6 +1196,25 @@ function getConfig(req) {
       catalogMs: CATALOG_CACHE_TTL_MS,
       entries: memoryCache.size
     }
+  };
+}
+
+function getDeployInfo() {
+  let commit = process.env.RENDER_GIT_COMMIT || process.env.GIT_COMMIT || "";
+  if (!commit) {
+    try {
+      commit = fs.readFileSync(path.join(ROOT, ".git", "refs", "heads", "main"), "utf8").trim();
+    } catch (_) {
+      commit = "";
+    }
+  }
+  return {
+    version: SITE_VERSION,
+    commit: commit ? commit.slice(0, 12) : "local",
+    node: process.version,
+    renderService: process.env.RENDER_SERVICE_NAME || "",
+    hasTmdb: Boolean(TMDB_API_KEY),
+    adminEnabled: Boolean(ADMIN_TOKEN)
   };
 }
 
@@ -1304,6 +1493,7 @@ async function resolveTmdb(imdbId, mediaType) {
 function toSiteStream(stream, provider, req) {
   if (!stream || !stream.url || typeof stream.url !== "string") return null;
 
+  const status = providerStatusService.getProviderStatuses()[provider.id] || {};
   const proxied = shouldProxyStream(stream);
   const extension = getProxyExtension(stream.url);
   const quality = stream.quality || "HD";
@@ -1319,6 +1509,9 @@ function toSiteStream(stream, provider, req) {
     url: proxied ? getProxyUrl(req, stream) : stream.url,
     originalUrl: stream.url,
     providerId: provider.id,
+    providerStatus: status.status || getProviderState(provider),
+    score: typeof status.score === "number" ? status.score : 0,
+    responseTime: status.responseTime || 0,
     format: getStreamFormat(stream),
     language: getStreamLanguage(stream),
     quality: quality,
@@ -1457,7 +1650,9 @@ const server = http.createServer(async (req, res) => {
         ok: true,
         name: SITE_NAME,
         version: SITE_VERSION,
+        deploy: getDeployInfo(),
         uptime: process.uptime(),
+        cacheEntries: memoryCache.size,
         providers: getEnabledProviders("tv").length
       });
       return;
@@ -1469,6 +1664,7 @@ const server = http.createServer(async (req, res) => {
         ok: true,
         name: SITE_NAME,
         version: SITE_VERSION,
+        deploy: getDeployInfo(),
         providers: getEnabledProviders("tv").length
       });
       return;
@@ -1492,6 +1688,28 @@ const server = http.createServer(async (req, res) => {
         return;
       }
       sendJson(res, 200, await getTmdbDetails(tmdbId, mediaType));
+      return;
+    }
+
+    if (url.pathname === "/episodes.json") {
+      const tmdbId = url.searchParams.get("id") || "";
+      const season = url.searchParams.get("season") || "1";
+      if (!tmdbId.trim()) {
+        sendJson(res, 400, { error: "Missing id" });
+        return;
+      }
+      sendJson(res, 200, await getSeasonEpisodes(tmdbId, season));
+      return;
+    }
+
+    if (url.pathname === "/recommendations.json") {
+      const tmdbId = url.searchParams.get("id") || "";
+      const mediaType = url.searchParams.get("type") || "movie";
+      if (!tmdbId.trim()) {
+        sendJson(res, 400, { error: "Missing id" });
+        return;
+      }
+      sendJson(res, 200, await getRecommendations(tmdbId, mediaType));
       return;
     }
 
@@ -1519,6 +1737,7 @@ const server = http.createServer(async (req, res) => {
     }
 
     if (url.pathname === "/providers.json") {
+      const statuses = providerStatusService.getProviderStatuses();
       sendJson(res, 200, {
         success: true,
         movie: getProviderSummary("movie"),
@@ -1527,11 +1746,28 @@ const server = http.createServer(async (req, res) => {
           id: provider.id,
           name: provider.name,
           state: getProviderState(provider),
+          enabled: provider.enabled !== false,
           languages: provider.contentLanguage || [],
           formats: provider.formats || [],
-          domains: getProviderDomains(provider.id)
+          domains: getProviderDomains(provider.id),
+          activeDomain: getProviderDomains(provider.id)[0] || "",
+          status: statuses[provider.id] || null,
+          type: animeProviders.has(provider.id) ? "anime" : "movie"
         }))
       });
+      return;
+    }
+
+    if (req.method === "POST" && url.pathname === "/report/source") {
+      const payload = await readRequestJson(req, 30_000);
+      const saved = appendReport("dead-sources.json", {
+        provider: String(payload.provider || "").slice(0, 80),
+        sourceName: String(payload.sourceName || "").slice(0, 160),
+        mediaType: String(payload.mediaType || "").slice(0, 30),
+        mediaId: String(payload.mediaId || "").slice(0, 80),
+        reason: String(payload.reason || "source_morte").slice(0, 200)
+      });
+      sendJson(res, 200, { success: true, report: saved });
       return;
     }
 

@@ -90,6 +90,7 @@ button, input, select {
   border-radius: 12px;
   padding: 10px 12px;
 }
+.bottom-bar { display: none; }
 
 .container {
   width: min(1220px, calc(100% - 32px));
@@ -252,6 +253,121 @@ button, input, select {
   display: block;
   margin-top: 8px;
   color: var(--muted);
+}
+
+.detail-page-hero {
+  min-height: min(72vh, 700px);
+  display: grid;
+  grid-template-columns: minmax(190px, 280px) minmax(0, 1fr);
+  gap: 28px;
+  align-items: end;
+  padding: clamp(20px, 4vw, 44px);
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background-size: cover;
+  background-position: center;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+.detail-poster-wrap img {
+  width: 100%;
+  border-radius: 16px;
+  border: 1px solid var(--line);
+  box-shadow: 0 30px 90px rgba(0,0,0,.55);
+}
+.detail-copy h1 {
+  margin: 18px 0 14px;
+  max-width: 860px;
+  font-size: clamp(42px, 7vw, 84px);
+  line-height: .95;
+}
+.detail-copy p {
+  max-width: 860px;
+  color: #dbeafe;
+  line-height: 1.75;
+  font-size: 17px;
+}
+.cast-rail {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 145px;
+  gap: 12px;
+  overflow-x: auto;
+  padding: 4px 0 14px;
+}
+.cast-card {
+  border: 1px solid var(--line);
+  background: rgba(18,25,54,.9);
+  border-radius: 14px;
+  overflow: hidden;
+}
+.cast-card img {
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  object-fit: cover;
+  background: var(--surface-2);
+}
+.cast-card strong,
+.cast-card small {
+  display: block;
+  padding: 0 10px;
+}
+.cast-card strong { padding-top: 10px; }
+.cast-card small { color: var(--muted); padding-bottom: 12px; }
+.episode-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 12px;
+}
+.episode-card {
+  display: grid;
+  grid-template-columns: 118px 1fr;
+  gap: 12px;
+  min-height: 118px;
+  border: 1px solid var(--line);
+  background: rgba(18,25,54,.86);
+  color: #fff;
+  border-radius: 14px;
+  padding: 10px;
+  text-align: left;
+  cursor: pointer;
+}
+.episode-card.active {
+  border-color: rgba(56,189,248,.75);
+  box-shadow: 0 0 0 3px rgba(56,189,248,.12);
+}
+.episode-card.watched {
+  border-color: rgba(52,211,153,.42);
+}
+.episode-card img {
+  width: 118px;
+  height: 78px;
+  object-fit: cover;
+  border-radius: 10px;
+  background: var(--surface-2);
+}
+.episode-card strong,
+.episode-card small,
+.episode-card em {
+  display: block;
+}
+.episode-card small {
+  margin: 5px 0;
+  color: var(--muted);
+}
+.episode-card em {
+  color: var(--soft);
+  font-style: normal;
+  font-size: 12px;
+  line-height: 1.4;
+  max-height: 50px;
+  overflow: hidden;
+}
+.source-toolbar {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin: 0 0 14px;
 }
 
 .panel {

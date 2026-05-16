@@ -17,6 +17,9 @@
   }
 
   function detailsUrl(item) {
+    if ((item.kind || item.type) === "person") {
+      return `/catalog?person=${encodeURIComponent(item.id)}&name=${encodeURIComponent(item.title || item.name || "Acteur")}`;
+    }
     return `/details?type=${encodeURIComponent(typeForUrl(item.type))}&id=${encodeURIComponent(item.id)}&title=${encodeURIComponent(item.title || "")}`;
   }
 
@@ -61,6 +64,10 @@
   function card(item) {
     const title = item.title || "Sans titre";
     const poster = item.poster || placeholder;
+    if ((item.kind || item.type) === "person") {
+      const known = Array.isArray(item.knownFor) && item.knownFor.length ? item.knownFor.join(", ") : "Filmographie";
+      return `<a class="poster-card" href="${detailsUrl(item)}"><img src="${esc(poster)}" alt=""><span class="body"><strong>${esc(title)}</strong><small>${esc(known)}</small><span class="badge info" style="margin-top:10px">Voir acteur</span></span></a>`;
+    }
     const meta = [item.year, typeForUrl(item.type) === "series" ? "Serie" : "Film"].filter(Boolean).join(" · ");
     return `<a class="poster-card" href="${detailsUrl(item)}"><img src="${esc(poster)}" alt=""><span class="body"><strong>${esc(title)}</strong><small>${esc(meta || "Madrador Film")}</small><span class="badge info" style="margin-top:10px">Voir les flux</span></span></a>`;
   }
@@ -79,7 +86,7 @@
     const host = document.querySelector("[data-nav]");
     if (!host) return;
     const current = location.pathname;
-    host.innerHTML = `<nav class="nav"><a class="brand" href="/"><img src="/site-madrador/assets/img/logo.svg" alt="Madrador Film"></a><button class="mobile-toggle" id="navToggle">Menu</button><div class="nav-links" id="navLinks">${navItems.map(([href, label]) => `<a class="${current === href || (href !== "/" && current.startsWith(href)) ? "active" : ""}" href="${href}">${label}</a>`).join("")}</div></nav>`;
+    host.innerHTML = `<nav class="nav"><a class="brand" href="/"><img src="/site-madrador/assets/img/logo.svg" alt="Madrador Film"></a><button class="mobile-toggle" id="navToggle">Menu</button><div class="nav-links" id="navLinks">${navItems.map(([href, label]) => `<a class="${current === href || (href !== "/" && current.startsWith(href)) ? "active" : ""}" href="${href}">${label}</a>`).join("")}</div></nav><nav class="bottom-bar"><a href="/">Accueil</a><a href="/catalog">Recherche</a><a href="/catalog#favoris">Favoris</a><a href="/providers">Providers</a></nav>`;
     const toggle = document.getElementById("navToggle");
     const links = document.getElementById("navLinks");
     if (toggle && links) toggle.addEventListener("click", () => links.classList.toggle("open"));

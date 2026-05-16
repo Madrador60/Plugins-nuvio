@@ -143,6 +143,15 @@ Variables recommandees :
 
 Sans `TMDB_API_KEY`, le site garde un catalogue de secours avec affiches, mais il ne peut pas afficher automatiquement toutes les nouveautes TMDB.
 
+## Nouveautes V3
+
+- Fiche detail plus proche d'une plateforme streaming : grand fond, casting, trailer, recommandations.
+- Series : saisons, episodes, miniatures, resume, episode precedent/suivant, episodes vus.
+- Lecteur : source suivante/prececente, filtres MP4/HLS/VF/MULTI/VOSTFR, reprise automatique.
+- Sources : tri MP4 puis VF/MULTI, score provider affiche, bouton signaler une source morte.
+- Catalogue : recherche universelle films/series/acteurs, filtres annee/genre/type, tri populaire/recent/note/A-Z.
+- Providers : domaine actif, score, succes/erreurs, dernier test et page plus lisible.
+
 ## Documentation
 
 Lis aussi :

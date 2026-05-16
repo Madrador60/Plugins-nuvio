@@ -1,12 +1,12 @@
 {
   "movix": {
     "status": "ZERO_RESULT",
-    "score": 65,
-    "lastTested": "2026-05-16T09:28:43.358Z",
-    "responseTime": 12160,
+    "score": 60,
+    "lastTested": "2026-05-16T14:51:04.491Z",
+    "responseTime": 12165,
     "lastError": null,
     "successCount": 0,
-    "failCount": 1
+    "failCount": 2
   },
   "frenchstream": {
     "status": "ZERO_RESULT",
@@ -20,10 +20,19 @@
   "nakios": {
     "status": "ZERO_RESULT",
     "score": 70,
-    "lastTested": "2026-05-16T09:28:44.883Z",
-    "responseTime": 195,
+    "lastTested": "2026-05-16T14:51:04.738Z",
+    "responseTime": 203,
     "lastError": null,
     "successCount": 0,
-    "failCount": 1
+    "failCount": 2
+  },
+  "videasy": {
+    "status": "OK",
+    "score": 88,
+    "lastTested": "2026-05-16T14:51:05.849Z",
+    "responseTime": 1068,
+    "lastError": null,
+    "successCount": 1,
+    "failCount": 0
   }
 }

@@ -8,12 +8,15 @@
   const refreshButton = document.getElementById("refreshCatalog");
   const suggestions = document.getElementById("suggestions");
   const localRows = document.getElementById("localRows");
+  const yearFilter = document.getElementById("yearFilter");
+  const genreFilter = document.getElementById("genreFilter");
+  const sortFilter = document.getElementById("sortFilter");
   let catalogRows = [];
   let activeFilter = "all";
   let suggestionTimer = 0;
 
   function renderRow(row, mode) {
-    const items = row.items || [];
+    const items = sortItems(filterItems(row.items || [], row));
     const body = items.length ? `<div class="${mode === "grid" ? "grid" : "rail"}">${items.map(Madrador.card).join("")}</div>` : `<div class="empty">Aucun titre dans cette section.</div>`;
     return `<section class="section" data-group="${Madrador.esc(row.group || "movie")}" data-title="${Madrador.esc(row.title || "")}"><div class="section-head"><h2>${Madrador.esc(row.title)}</h2><span class="badge info">${items.length} titres</span></div>${body}</section>`;
   }
@@ -29,12 +32,39 @@
     });
   }
 
+  function filterItems(items, row) {
+    const year = yearFilter && yearFilter.value;
+    const genre = genreFilter && genreFilter.value ? genreFilter.value.toLowerCase() : "";
+    return items.filter((item) => {
+      if (year && String(item.year || "") !== String(year)) return false;
+      if (genre) {
+        const haystack = [row.title, item.title, item.genres && item.genres.join(" ")].join(" ").toLowerCase();
+        if (!haystack.includes(genre)) return false;
+      }
+      return true;
+    });
+  }
+
+  function sortItems(items) {
+    const sort = sortFilter && sortFilter.value || "popular";
+    const list = items.slice();
+    if (sort === "recent") return list.sort((a, b) => Number(b.year || 0) - Number(a.year || 0));
+    if (sort === "rating") return list.sort((a, b) => Number(b.rating || 0) - Number(a.rating || 0));
+    if (sort === "az") return list.sort((a, b) => String(a.title || "").localeCompare(String(b.title || ""), "fr"));
+    return list;
+  }
+
+  function rerenderCatalog() {
+    if (!rowsHost) return;
+    rowsHost.innerHTML = catalogRows.map((row) => renderRow(row, "rail")).join("") || `<div class="empty">Catalogue indisponible.</div>`;
+    applyFilter();
+  }
+
   async function loadCatalog(force) {
     const data = await Madrador.getJson(`/catalog.json${force ? "?refresh=1" : ""}`, { rows: [] });
     catalogRows = data.rows || [];
     if (rowsHost) {
-      rowsHost.innerHTML = catalogRows.map((row) => renderRow(row, "rail")).join("") || `<div class="empty">Catalogue indisponible.</div>`;
-      applyFilter();
+      rerenderCatalog();
     }
     if (homeRows.length) {
       homeRows.forEach((target) => {
@@ -109,6 +139,9 @@
   if (searchInput) searchInput.addEventListener("input", updateSuggestions);
   if (searchType) searchType.addEventListener("change", updateSuggestions);
   if (refreshButton) refreshButton.addEventListener("click", () => loadCatalog(true));
+  if (yearFilter) yearFilter.addEventListener("change", rerenderCatalog);
+  if (genreFilter) genreFilter.addEventListener("change", rerenderCatalog);
+  if (sortFilter) sortFilter.addEventListener("change", rerenderCatalog);
   const params = new URLSearchParams(location.search);
   if (params.get("person")) {
     loadPersonCredits(params.get("person"), params.get("name"));
@@ -118,8 +151,7 @@
     doSearch();
   }
   for (let year = new Date().getFullYear(); year >= 1980; year -= 1) {
-    const select = document.getElementById("yearFilter");
-    if (select) select.insertAdjacentHTML("beforeend", `<option>${year}</option>`);
+    if (yearFilter) yearFilter.insertAdjacentHTML("beforeend", `<option>${year}</option>`);
   }
   renderLocalRows();
   loadCatalog(false);

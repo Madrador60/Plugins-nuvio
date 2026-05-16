@@ -57,3 +57,13 @@ Les routes historiques restent actives :
 - `/test-player`
 
 Les routes V2 ajoutent l'admin, la sante, le legal et les rapports providers.
+
+## Routes V3 utiles
+
+- `/episodes.json?id=TV_ID&season=1` : episodes d'une saison, avec miniatures et resumes quand TMDB est configure.
+- `/recommendations.json?type=movie&id=TMDB_ID` : titres similaires.
+- `/search.json?type=all&q=...` : recherche films, series et acteurs.
+- `/search.json?type=person&q=...` : recherche acteurs.
+- `POST /report/source` : signale une source morte dans `data/reports/dead-sources.json`.
+
+Le front `site-madrador/` consomme ces routes directement pour la fiche detail, le lecteur, le catalogue et la page providers.

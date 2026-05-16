@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-16T14:14:42.707Z",
+  "generatedAt": "2026-05-16T14:50:34.671Z",
   "results": [
     {
       "name": "home page",
@@ -8,7 +8,7 @@
       "status": 200,
       "type": "text/html; charset=utf-8",
       "missing": [],
-      "timeMs": 3
+      "timeMs": 4
     },
     {
       "name": "site-madrador direct",
@@ -26,7 +26,7 @@
       "status": 200,
       "type": "text/html; charset=utf-8",
       "missing": [],
-      "timeMs": 1
+      "timeMs": 2
     },
     {
       "name": "details page",
@@ -98,7 +98,7 @@
       "status": 200,
       "type": "text/css; charset=utf-8",
       "missing": [],
-      "timeMs": 0
+      "timeMs": 1
     },
     {
       "name": "app js asset",
@@ -107,7 +107,7 @@
       "status": 200,
       "type": "application/javascript; charset=utf-8",
       "missing": [],
-      "timeMs": 1
+      "timeMs": 0
     },
     {
       "name": "catalog js integration",
@@ -116,7 +116,7 @@
       "status": 200,
       "type": "application/javascript; charset=utf-8",
       "missing": [],
-      "timeMs": 20
+      "timeMs": 1
     },
     {
       "name": "search js integration",
@@ -134,7 +134,7 @@
       "status": 200,
       "type": "application/javascript; charset=utf-8",
       "missing": [],
-      "timeMs": 15
+      "timeMs": 1
     },
     {
       "name": "player js integration",
@@ -143,7 +143,7 @@
       "status": 200,
       "type": "application/javascript; charset=utf-8",
       "missing": [],
-      "timeMs": 15
+      "timeMs": 1
     },
     {
       "name": "providers js integration",
@@ -188,6 +188,14 @@
       "timeMs": 0
     },
     {
+      "name": "actor search api",
+      "url": "/search.json?type=person&q=keanu",
+      "ok": true,
+      "status": 200,
+      "type": "application/json; charset=utf-8",
+      "timeMs": 1
+    },
+    {
       "name": "details api",
       "url": "/details.json?type=movie&id=157336",
       "ok": true,
@@ -212,12 +220,28 @@
       "timeMs": 1
     },
     {
+      "name": "episodes api",
+      "url": "/episodes.json?id=1396&season=1",
+      "ok": true,
+      "status": 200,
+      "type": "application/json; charset=utf-8",
+      "timeMs": 0
+    },
+    {
+      "name": "recommendations api",
+      "url": "/recommendations.json?type=movie&id=157336",
+      "ok": true,
+      "status": 200,
+      "type": "application/json; charset=utf-8",
+      "timeMs": 1
+    },
+    {
       "name": "person credits api",
       "url": "/person.json?id=10297",
       "ok": true,
       "status": 200,
       "type": "application/json; charset=utf-8",
-      "timeMs": 1
+      "timeMs": 0
     },
     {
       "name": "providers api",
@@ -225,7 +249,7 @@
       "ok": true,
       "status": 200,
       "type": "application/json; charset=utf-8",
-      "timeMs": 0
+      "timeMs": 1
     },
     {
       "name": "provider status api",
@@ -241,7 +265,7 @@
       "ok": true,
       "status": 200,
       "type": "application/json; charset=utf-8",
-      "timeMs": 0
+      "timeMs": 1
     }
   ]
 }
