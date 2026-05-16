@@ -1,0 +1,206 @@
+{
+  "generatedAt": "2026-05-16T09:48:23.122Z",
+  "results": [
+    {
+      "name": "home page",
+      "url": "/",
+      "ok": true,
+      "status": 200,
+      "type": "text/html; charset=utf-8",
+      "missing": [],
+      "timeMs": 4
+    },
+    {
+      "name": "catalog page",
+      "url": "/catalog",
+      "ok": true,
+      "status": 200,
+      "type": "text/html; charset=utf-8",
+      "missing": [],
+      "timeMs": 1
+    },
+    {
+      "name": "details page",
+      "url": "/details?type=movie&id=157336",
+      "ok": true,
+      "status": 200,
+      "type": "text/html; charset=utf-8",
+      "missing": [],
+      "timeMs": 1
+    },
+    {
+      "name": "player page",
+      "url": "/player?type=movie&id=157336&title=Interstellar",
+      "ok": true,
+      "status": 200,
+      "type": "text/html; charset=utf-8",
+      "missing": [],
+      "timeMs": 1
+    },
+    {
+      "name": "providers page",
+      "url": "/providers",
+      "ok": true,
+      "status": 200,
+      "type": "text/html; charset=utf-8",
+      "missing": [],
+      "timeMs": 1
+    },
+    {
+      "name": "admin page",
+      "url": "/admin",
+      "ok": true,
+      "status": 200,
+      "type": "text/html; charset=utf-8",
+      "missing": [],
+      "timeMs": 1
+    },
+    {
+      "name": "legal page",
+      "url": "/legal",
+      "ok": true,
+      "status": 200,
+      "type": "text/html; charset=utf-8",
+      "missing": [],
+      "timeMs": 1
+    },
+    {
+      "name": "dmca page",
+      "url": "/dmca",
+      "ok": true,
+      "status": 200,
+      "type": "text/html; charset=utf-8",
+      "missing": [],
+      "timeMs": 1
+    },
+    {
+      "name": "security page",
+      "url": "/security",
+      "ok": true,
+      "status": 200,
+      "type": "text/html; charset=utf-8",
+      "missing": [],
+      "timeMs": 1
+    },
+    {
+      "name": "css asset",
+      "url": "/site-madrador/assets/css/style.css",
+      "ok": true,
+      "status": 200,
+      "type": "text/css; charset=utf-8",
+      "missing": [],
+      "timeMs": 1
+    },
+    {
+      "name": "app js asset",
+      "url": "/site-madrador/assets/js/app.js",
+      "ok": true,
+      "status": 200,
+      "type": "application/javascript; charset=utf-8",
+      "missing": [],
+      "timeMs": 0
+    },
+    {
+      "name": "catalog js integration",
+      "url": "/site-madrador/assets/js/catalog.js",
+      "ok": true,
+      "status": 200,
+      "type": "application/javascript; charset=utf-8",
+      "missing": [],
+      "timeMs": 1
+    },
+    {
+      "name": "search js integration",
+      "url": "/site-madrador/assets/js/search.js",
+      "ok": true,
+      "status": 200,
+      "type": "application/javascript; charset=utf-8",
+      "missing": [],
+      "timeMs": 1
+    },
+    {
+      "name": "details js integration",
+      "url": "/site-madrador/assets/js/details.js",
+      "ok": true,
+      "status": 200,
+      "type": "application/javascript; charset=utf-8",
+      "missing": [],
+      "timeMs": 16
+    },
+    {
+      "name": "player js integration",
+      "url": "/site-madrador/assets/js/player.js",
+      "ok": true,
+      "status": 200,
+      "type": "application/javascript; charset=utf-8",
+      "missing": [],
+      "timeMs": 1
+    },
+    {
+      "name": "providers js integration",
+      "url": "/site-madrador/assets/js/providers.js",
+      "ok": true,
+      "status": 200,
+      "type": "application/javascript; charset=utf-8",
+      "missing": [],
+      "timeMs": 1
+    },
+    {
+      "name": "admin js integration",
+      "url": "/site-madrador/assets/js/admin.js",
+      "ok": true,
+      "status": 200,
+      "type": "application/javascript; charset=utf-8",
+      "missing": [],
+      "timeMs": 0
+    },
+    {
+      "name": "catalog api",
+      "url": "/catalog.json",
+      "ok": true,
+      "status": 200,
+      "type": "application/json; charset=utf-8",
+      "timeMs": 2
+    },
+    {
+      "name": "search api",
+      "url": "/search.json?type=movie&q=Interstellar",
+      "ok": true,
+      "status": 200,
+      "type": "application/json; charset=utf-8",
+      "timeMs": 0
+    },
+    {
+      "name": "details api",
+      "url": "/details.json?type=movie&id=157336",
+      "ok": true,
+      "status": 200,
+      "type": "application/json; charset=utf-8",
+      "timeMs": 1
+    },
+    {
+      "name": "providers api",
+      "url": "/providers.json",
+      "ok": true,
+      "status": 200,
+      "type": "application/json; charset=utf-8",
+      "timeMs": 1
+    },
+    {
+      "name": "provider status api",
+      "url": "/providers/status.json",
+      "ok": true,
+      "status": 200,
+      "type": "application/json; charset=utf-8",
+      "timeMs": 0
+    },
+    {
+      "name": "health api",
+      "url": "/health",
+      "ok": true,
+      "status": 200,
+      "type": "application/json; charset=utf-8",
+      "timeMs": 1
+    }
+  ]
+}

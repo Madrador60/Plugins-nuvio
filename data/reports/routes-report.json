@@ -1,11 +1,11 @@
 {
-  "generatedAt": "2026-05-16T09:42:05.855Z",
+  "generatedAt": "2026-05-16T09:48:35.725Z",
   "results": [
     {
       "route": "/health",
       "ok": true,
       "status": 200,
-      "timeMs": 1
+      "timeMs": 2
     },
     {
       "route": "/health.json",
@@ -17,7 +17,7 @@
       "route": "/config.json",
       "ok": true,
       "status": 200,
-      "timeMs": 1
+      "timeMs": 0
     },
     {
       "route": "/",
@@ -59,7 +59,7 @@
       "route": "/providers/status.json",
       "ok": true,
       "status": 200,
-      "timeMs": 1
+      "timeMs": 0
     },
     {
       "route": "/catalog.json",
@@ -71,7 +71,7 @@
       "route": "/search.json?type=movie&q=Interstellar",
       "ok": true,
       "status": 200,
-      "timeMs": 0
+      "timeMs": 1
     },
     {
       "route": "/details.json?type=movie&id=157336",
@@ -83,31 +83,31 @@
       "route": "/legal",
       "ok": true,
       "status": 200,
-      "timeMs": 1
+      "timeMs": 0
     },
     {
       "route": "/dmca",
       "ok": true,
       "status": 200,
-      "timeMs": 0
+      "timeMs": 1
     },
     {
       "route": "/security",
       "ok": true,
       "status": 200,
-      "timeMs": 1
+      "timeMs": 0
     },
     {
       "route": "/site-madrador/assets/css/style.css",
       "ok": true,
       "status": 200,
-      "timeMs": 0
+      "timeMs": 1
     },
     {
       "route": "/site-madrador/assets/js/app.js",
       "ok": true,
       "status": 200,
-      "timeMs": 1
+      "timeMs": 0
     }
   ]
 }

@@ -5,6 +5,7 @@ Commandes principales :
 ```powershell
 npm run check
 npm run test:routes
+npm run test:site
 npm run test:quick
 npm run test:domains
 npm run test:all

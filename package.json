@@ -15,8 +15,9 @@
     "test:films": "node scripts/test-providers.js --only=frenchstream,movix,nakios,purstream,toflix --timeout=60000",
     "test:anime": "node scripts/test-providers.js --only=anime-sama,voiranime,vostfree,french-anime,animevostfr --timeout=60000",
     "test:routes": "node scripts/test-routes.js",
+    "test:site": "node scripts/test-site-madrador.js",
     "test:domains": "node scripts/check-domains.js",
-    "test:all": "npm run check && npm run test:routes && npm run test:quick",
+    "test:all": "npm run check && npm run test:routes && npm run test:site && npm run test:quick",
     "domains:check": "node scripts/check-domains.js",
     "report:providers": "node scripts/generate-provider-report.js"
   },

@@ -28,6 +28,7 @@ Puis ouvre `http://127.0.0.1:7000/`.
 ```powershell
 npm run check
 npm run test:routes
+npm run test:site
 npm run test:quick
 npm run test:films
 npm run test:anime
