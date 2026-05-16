@@ -30,6 +30,9 @@ const checks = [
   { name: "catalog api", url: "/catalog.json", json: true, validate: (data) => Array.isArray(data.rows) && data.rows.length > 0 },
   { name: "search api", url: "/search.json?type=movie&q=Interstellar", json: true, validate: (data) => Array.isArray(data.results) },
   { name: "details api", url: "/details.json?type=movie&id=157336", json: true, validate: (data) => Boolean(data.id && data.title) },
+  { name: "details cast api", url: "/details.json?type=movie&id=157336", json: true, validate: (data) => Array.isArray(data.cast) },
+  { name: "series seasons api", url: "/details.json?type=series&id=1396", json: true, validate: (data) => Array.isArray(data.seasons) },
+  { name: "person credits api", url: "/person.json?id=10297", json: true, validate: (data) => Array.isArray(data.results) && data.results.length > 0 },
   { name: "providers api", url: "/providers.json", json: true, validate: (data) => Array.isArray(data.all) && data.all.length > 0 },
   { name: "provider status api", url: "/providers/status.json", json: true, validate: (data) => data.success === true && typeof data.statuses === "object" },
   { name: "health api", url: "/health", json: true, validate: (data) => data.ok === true }

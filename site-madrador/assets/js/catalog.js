@@ -51,6 +51,16 @@
     searchHost.innerHTML = `<div class="section-head"><h2>Recherche</h2><span class="badge info">${results.length} resultats</span></div>${results.length ? `<div class="grid">${results.map(Madrador.card).join("")}</div>` : `<div class="empty">Aucun resultat pour cette recherche.</div>`}`;
   }
 
+  async function loadPersonCredits(personId, name) {
+    if (!searchHost || !personId) return;
+    searchHost.classList.remove("hidden");
+    searchHost.innerHTML = `<div class="skeleton"></div>`;
+    const data = await Madrador.getJson(`/person.json?id=${encodeURIComponent(personId)}`, { results: [] });
+    const results = data.results || [];
+    searchHost.innerHTML = `<div class="section-head"><h2>${Madrador.esc(name || "Filmographie")}</h2><span class="badge info">${results.length} titre(s)</span></div>${results.length ? `<div class="grid">${results.map(Madrador.card).join("")}</div>` : `<div class="empty">Aucun film relie pour cet acteur.</div>`}`;
+    if (rowsHost) rowsHost.classList.add("hidden");
+  }
+
   document.querySelectorAll("[data-filter]").forEach((button) => {
     button.addEventListener("click", () => {
       activeFilter = button.dataset.filter;
@@ -63,7 +73,9 @@
   if (searchInput) searchInput.addEventListener("keydown", (event) => { if (event.key === "Enter") doSearch(); });
   if (refreshButton) refreshButton.addEventListener("click", () => loadCatalog(true));
   const params = new URLSearchParams(location.search);
-  if (searchInput && params.get("q")) {
+  if (params.get("person")) {
+    loadPersonCredits(params.get("person"), params.get("name"));
+  } else if (searchInput && params.get("q")) {
     searchInput.value = params.get("q");
     if (searchType && params.get("type")) searchType.value = params.get("type");
     doSearch();

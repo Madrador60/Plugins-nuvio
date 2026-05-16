@@ -63,6 +63,44 @@ function fallbackItem(item) {
   });
 }
 
+const fallbackCast = {
+  "157336": [
+    { id: "10297", name: "Matthew McConaughey", character: "Cooper" },
+    { id: "1813", name: "Anne Hathaway", character: "Brand" },
+    { id: "1892", name: "Jessica Chastain", character: "Murph" },
+    { id: "3895", name: "Michael Caine", character: "Professor Brand" }
+  ],
+  "603": [
+    { id: "6384", name: "Keanu Reeves", character: "Neo" },
+    { id: "530", name: "Laurence Fishburne", character: "Morpheus" },
+    { id: "2975", name: "Carrie-Anne Moss", character: "Trinity" }
+  ],
+  "1396": [
+    { id: "17419", name: "Bryan Cranston", character: "Walter White" },
+    { id: "84497", name: "Aaron Paul", character: "Jesse Pinkman" }
+  ],
+  "37854": [
+    { id: "124191", name: "Mayumi Tanaka", character: "Monkey D. Luffy" },
+    { id: "97016", name: "Kazuya Nakai", character: "Roronoa Zoro" }
+  ]
+};
+
+const fallbackSeasons = {
+  "1396": [
+    { seasonNumber: 1, episodeCount: 7, name: "Saison 1" },
+    { seasonNumber: 2, episodeCount: 13, name: "Saison 2" },
+    { seasonNumber: 3, episodeCount: 13, name: "Saison 3" },
+    { seasonNumber: 4, episodeCount: 13, name: "Saison 4" },
+    { seasonNumber: 5, episodeCount: 16, name: "Saison 5" }
+  ],
+  "37854": [
+    { seasonNumber: 1, episodeCount: 61, name: "Saison 1" }
+  ],
+  "46260": [
+    { seasonNumber: 1, episodeCount: 57, name: "Saison 1" }
+  ]
+};
+
 const fallbackItems = [
   fallbackItem({ id: "157336", imdbId: "tt0816692", type: "movie", title: "Interstellar", year: "2014", rating: 8.4 }),
   fallbackItem({ id: "155", imdbId: "tt0468569", type: "movie", title: "The Dark Knight", year: "2008", rating: 8.5 }),
@@ -644,13 +682,21 @@ const out=document.getElementById('out');document.querySelectorAll('button[data-
 async function searchTmdb(query, mediaType) {
   const type = mediaType === "series" || mediaType === "tv" ? "tv" : "movie";
   const normalizedQuery = query.trim().toLowerCase();
+  const looseQuery = normalizedQuery
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/\b(film|serie|series|anime|vf|vostfr|multi|episode|saison|horreur|action|comedie|comedy)\b/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
   if (!TMDB_API_KEY) {
+    const wantedType = type === "tv" ? "series" : "movie";
+    const haystack = (item) => (item.title || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
     const matches = fallbackItems
-      .filter((item) => item.type === (type === "tv" ? "series" : "movie"))
-      .filter((item) => item.title.toLowerCase().includes(normalizedQuery))
+      .filter((item) => item.type === wantedType)
+      .filter((item) => haystack(item).includes(normalizedQuery) || haystack(item).includes(looseQuery) || looseQuery.includes(haystack(item)))
       .slice(0, 10);
     return matches.length ? matches : fallbackItems
-      .filter((item) => item.type === (type === "tv" ? "series" : "movie"))
+      .filter((item) => item.type === wantedType)
       .slice(0, 10);
   }
   return cachedJson("search:" + type + ":" + normalizedQuery, async () => {
@@ -673,7 +719,16 @@ async function searchTmdb(query, mediaType) {
 async function getTmdbDetails(tmdbId, mediaType) {
   const type = mediaType === "series" || mediaType === "tv" ? "tv" : "movie";
   if (!TMDB_API_KEY) {
-    return fallbackItems.find((item) => item.id === String(tmdbId)) || {
+    const fallback = fallbackItems.find((item) => item.id === String(tmdbId));
+    if (fallback) {
+      return Object.assign({}, fallback, {
+        overview: "Details complets disponibles avec TMDB_API_KEY. Les flux restent charges depuis les providers actifs.",
+        genres: [],
+        cast: fallbackCast[String(tmdbId)] || [],
+        seasons: fallbackSeasons[String(tmdbId)] || []
+      });
+    }
+    return {
       id: String(tmdbId),
       type: type === "tv" ? "series" : "movie",
       title: "Titre indisponible",
@@ -682,13 +737,15 @@ async function getTmdbDetails(tmdbId, mediaType) {
       poster: null,
       backdrop: null,
       rating: 0,
-      genres: []
+      genres: [],
+      cast: [],
+      seasons: []
     };
   }
   return cachedJson("details:" + type + ":" + tmdbId, async () => {
     const endpoint = "https://api.themoviedb.org/3/" + type + "/" + encodeURIComponent(tmdbId) +
       "?api_key=" + encodeURIComponent(TMDB_API_KEY) +
-      "&language=fr-FR";
+      "&language=fr-FR&append_to_response=credits,external_ids";
     const response = await fetch(endpoint);
     if (!response.ok) throw new Error("TMDB details failed: HTTP " + response.status);
     const data = await response.json();
@@ -701,8 +758,62 @@ async function getTmdbDetails(tmdbId, mediaType) {
       poster: data.poster_path ? "https://image.tmdb.org/t/p/w342" + data.poster_path : null,
       backdrop: data.backdrop_path ? "https://image.tmdb.org/t/p/original" + data.backdrop_path : null,
       rating: data.vote_average || 0,
-      genres: Array.isArray(data.genres) ? data.genres.map((genre) => genre.name).filter(Boolean) : []
+      genres: Array.isArray(data.genres) ? data.genres.map((genre) => genre.name).filter(Boolean) : [],
+      cast: data.credits && Array.isArray(data.credits.cast) ? data.credits.cast.slice(0, 14).map((person) => ({
+        id: String(person.id),
+        name: person.name || "",
+        character: person.character || "",
+        profile: person.profile_path ? "https://image.tmdb.org/t/p/w185" + person.profile_path : null
+      })).filter((person) => person.id && person.name) : [],
+      seasons: Array.isArray(data.seasons) ? data.seasons
+        .filter((season) => season.season_number > 0 && season.episode_count > 0)
+        .map((season) => ({
+          seasonNumber: season.season_number,
+          episodeCount: season.episode_count,
+          name: season.name || ("Saison " + season.season_number),
+          poster: season.poster_path ? "https://image.tmdb.org/t/p/w185" + season.poster_path : null
+        })) : [],
+      imdbId: data.external_ids && data.external_ids.imdb_id || null
     };
+  }, 24 * 60 * 60 * 1000);
+}
+
+async function getPersonCredits(personId) {
+  if (!TMDB_API_KEY) {
+    return {
+      id: String(personId),
+      name: "Acteur",
+      results: fallbackItems.slice(0, 12)
+    };
+  }
+  return cachedJson("person:" + personId, async () => {
+    const endpoint = "https://api.themoviedb.org/3/person/" + encodeURIComponent(personId) +
+      "/combined_credits?api_key=" + encodeURIComponent(TMDB_API_KEY) +
+      "&language=fr-FR";
+    const response = await fetch(endpoint);
+    if (!response.ok) throw new Error("TMDB person failed: HTTP " + response.status);
+    const data = await response.json();
+    const seen = new Set();
+    const results = (data.cast || [])
+      .filter((item) => ["movie", "tv"].includes(item.media_type))
+      .filter((item) => item.poster_path)
+      .sort((a, b) => Number(b.popularity || 0) - Number(a.popularity || 0))
+      .map((item) => ({
+        id: String(item.id),
+        type: item.media_type === "tv" ? "series" : "movie",
+        title: item.title || item.name || "Sans titre",
+        year: String(item.release_date || item.first_air_date || "").slice(0, 4),
+        poster: item.poster_path ? "https://image.tmdb.org/t/p/w342" + item.poster_path : null,
+        character: item.character || ""
+      }))
+      .filter((item) => {
+        const key = item.type + ":" + item.id;
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      })
+      .slice(0, 48);
+    return { id: String(personId), results };
   }, 24 * 60 * 60 * 1000);
 }
 
@@ -1368,6 +1479,16 @@ const server = http.createServer(async (req, res) => {
         return;
       }
       sendJson(res, 200, await getTmdbDetails(tmdbId, mediaType));
+      return;
+    }
+
+    if (url.pathname === "/person.json") {
+      const personId = url.searchParams.get("id") || "";
+      if (!personId.trim()) {
+        sendJson(res, 400, { error: "Missing id" });
+        return;
+      }
+      sendJson(res, 200, await getPersonCredits(personId));
       return;
     }
 
