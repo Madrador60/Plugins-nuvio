@@ -11,7 +11,7 @@ const BASE = `http://127.0.0.1:${PORT}`;
 const checks = [
   { name: "home page", url: "/", expects: ["Madrador Film", "/catalog", "/manifest.json", "/site-madrador/assets/js/catalog.js"] },
   { name: "site-madrador direct", url: "/site-madrador/", expects: ["Madrador Film", "/catalog", "/site-madrador/assets/css/style.css"] },
-  { name: "catalog page", url: "/catalog", expects: ["Catalogue", "catalogSearch", "suggestions", "localRows", "/site-madrador/assets/js/catalog.js", "/site-madrador/assets/js/search.js"] },
+  { name: "catalog page", url: "/catalog", expects: ["Catalogue", "catalogSearch", "suggestions", "localRows", "/site-madrador/assets/js/catalog.js", "/site-madrador/assets/js/search.js", "/site-madrador/assets/js/search-ui.js"] },
   { name: "details page", url: "/details?type=movie&id=157336", expects: ["detailsRoot", "/site-madrador/assets/js/details.js"] },
   { name: "player page", url: "/player?type=movie&id=157336&title=Interstellar", expects: ["sourceList", "nextSource", "/site-madrador/assets/js/player.js"] },
   { name: "providers page", url: "/providers", expects: ["providersGrid", "/site-madrador/assets/js/providers.js", "Tester tous"] },
@@ -23,6 +23,7 @@ const checks = [
   { name: "app js asset", url: "/site-madrador/assets/js/app.js", expects: ["window.Madrador", "getJson"] },
   { name: "catalog js integration", url: "/site-madrador/assets/js/catalog.js", expects: ["/catalog.json", "MadradorSearch.runSearch", "updateSuggestions", "madrador:history"] },
   { name: "search js integration", url: "/site-madrador/assets/js/search.js", expects: ["/search.json"] },
+  { name: "search ui integration", url: "/site-madrador/assets/js/search-ui.js", expects: ["/search.json", "homeSearch", "catalogSearch", "renderCatalogSearch"] },
   { name: "details js integration", url: "/site-madrador/assets/js/details.js", expects: ["/details.json", "/episodes.json", "/recommendations.json", "/report/source", "playSource"] },
   { name: "player js integration", url: "/site-madrador/assets/js/player.js", expects: ["/stream/", "/report/source", "prevSource", "lastSource"] },
   { name: "providers js integration", url: "/site-madrador/assets/js/providers.js", expects: ["/providers.json", "/providers/status.json", "/diagnostics.json"] },

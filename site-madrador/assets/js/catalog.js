@@ -146,8 +146,8 @@
     });
   });
 
-  if (searchButton) searchButton.addEventListener("click", doSearch);
-  if (searchInput) searchInput.addEventListener("keydown", (event) => { if (event.key === "Enter") doSearch(); });
+  if (searchButton) searchButton.addEventListener("click", (event) => { event.preventDefault(); doSearch(); });
+  if (searchInput) searchInput.addEventListener("keydown", (event) => { if (event.key === "Enter") { event.preventDefault(); doSearch(); } });
   if (searchInput) searchInput.addEventListener("input", updateSuggestions);
   if (searchType) searchType.addEventListener("change", updateSuggestions);
   if (refreshButton) refreshButton.addEventListener("click", () => loadCatalog(true));

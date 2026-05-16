@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-16T20:20:46.293Z",
+  "generatedAt": "2026-05-16T20:30:03.816Z",
   "results": [
     {
       "name": "home page",
@@ -17,7 +17,7 @@
       "status": 200,
       "type": "text/html; charset=utf-8",
       "missing": [],
-      "timeMs": 1
+      "timeMs": 2
     },
     {
       "name": "catalog page",
@@ -26,7 +26,7 @@
       "status": 200,
       "type": "text/html; charset=utf-8",
       "missing": [],
-      "timeMs": 13
+      "timeMs": 1
     },
     {
       "name": "details page",
@@ -35,7 +35,7 @@
       "status": 200,
       "type": "text/html; charset=utf-8",
       "missing": [],
-      "timeMs": 8
+      "timeMs": 1
     },
     {
       "name": "player page",
@@ -71,7 +71,7 @@
       "status": 200,
       "type": "text/html; charset=utf-8",
       "missing": [],
-      "timeMs": 1
+      "timeMs": 2
     },
     {
       "name": "dmca page",
@@ -128,6 +128,15 @@
       "timeMs": 0
     },
     {
+      "name": "search ui integration",
+      "url": "/site-madrador/assets/js/search-ui.js",
+      "ok": true,
+      "status": 200,
+      "type": "application/javascript; charset=utf-8",
+      "missing": [],
+      "timeMs": 27
+    },
+    {
       "name": "details js integration",
       "url": "/site-madrador/assets/js/details.js",
       "ok": true,
@@ -143,7 +152,7 @@
       "status": 200,
       "type": "application/javascript; charset=utf-8",
       "missing": [],
-      "timeMs": 0
+      "timeMs": 1
     },
     {
       "name": "providers js integration",
@@ -169,7 +178,7 @@
       "ok": true,
       "status": 200,
       "type": "application/json; charset=utf-8",
-      "timeMs": 1
+      "timeMs": 2
     },
     {
       "name": "search api",
@@ -177,7 +186,7 @@
       "ok": true,
       "status": 200,
       "type": "application/json; charset=utf-8",
-      "timeMs": 0
+      "timeMs": 1
     },
     {
       "name": "global search api",
@@ -185,7 +194,7 @@
       "ok": true,
       "status": 200,
       "type": "application/json; charset=utf-8",
-      "timeMs": 1
+      "timeMs": 0
     },
     {
       "name": "actor search api",
@@ -193,7 +202,7 @@
       "ok": true,
       "status": 200,
       "type": "application/json; charset=utf-8",
-      "timeMs": 0
+      "timeMs": 2
     },
     {
       "name": "details api",
@@ -201,7 +210,7 @@
       "ok": true,
       "status": 200,
       "type": "application/json; charset=utf-8",
-      "timeMs": 1
+      "timeMs": 0
     },
     {
       "name": "details cast api",
@@ -233,7 +242,7 @@
       "ok": true,
       "status": 200,
       "type": "application/json; charset=utf-8",
-      "timeMs": 0
+      "timeMs": 1
     },
     {
       "name": "person credits api",

@@ -103,7 +103,8 @@
     const input = document.getElementById("homeSearch");
     const type = document.getElementById("homeType");
     if (!go || !input || !type) return;
-    const run = () => {
+    const run = (event) => {
+      if (event) event.preventDefault();
       const q = input.value.trim();
       if (!q) return location.assign("/catalog");
       location.assign(`/catalog?q=${encodeURIComponent(q)}&type=${encodeURIComponent(type.value)}`);

@@ -4,8 +4,8 @@
   <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Catalogue - Madrador Film</title>
   <link rel="icon" href="/site-madrador/assets/img/favicon.svg">
-  <link rel="stylesheet" href="/site-madrador/assets/css/style.css?v=3.1.0">
-  <link rel="stylesheet" href="/site-madrador/assets/css/responsive.css?v=3.1.0">
+  <link rel="stylesheet" href="/site-madrador/assets/css/style.css?v=3.2.0">
+  <link rel="stylesheet" href="/site-madrador/assets/css/responsive.css?v=3.2.0">
 </head>
 <body>
   <div class="app-shell">
@@ -15,11 +15,11 @@
         <section class="section">
           <div class="section-head"><div><h1 class="page-title">Catalogue</h1><p>Recherche, filtres et catalogue auto depuis le backend.</p></div><button class="btn ghost" id="refreshCatalog">Rafraichir</button></div>
           <div class="panel">
-            <div class="search-panel">
-              <input class="input" id="catalogSearch" placeholder="Interstellar, Naruto, film horreur 2024..." autocomplete="off">
-              <select class="select" id="catalogType"><option value="all">Tout</option><option value="movie">Films</option><option value="series">Series</option></select>
-              <button class="btn" id="catalogGo">Rechercher</button>
-            </div>
+            <form class="search-panel" action="/catalog" method="get">
+              <input class="input" id="catalogSearch" name="q" placeholder="Interstellar, Naruto, film horreur 2024..." autocomplete="off">
+              <select class="select" id="catalogType" name="type"><option value="all">Tout</option><option value="movie">Films</option><option value="series">Series</option></select>
+              <button class="btn" id="catalogGo" type="submit">Rechercher</button>
+            </form>
             <div id="suggestions" class="panel hidden" style="margin-top:10px;padding:10px"></div>
             <div class="filters" style="margin-top:14px">
               <button class="btn secondary" data-filter="all">Tout</button>
@@ -39,8 +39,9 @@
     </main>
     <footer class="footer" data-footer></footer>
   </div>
-  <script src="/site-madrador/assets/js/app.js?v=3.1.0"></script>
-  <script src="/site-madrador/assets/js/search.js?v=3.1.0"></script>
-  <script src="/site-madrador/assets/js/catalog.js?v=3.1.0"></script>
+  <script src="/site-madrador/assets/js/app.js?v=3.2.0"></script>
+  <script src="/site-madrador/assets/js/search.js?v=3.2.0"></script>
+  <script src="/site-madrador/assets/js/catalog.js?v=3.2.0"></script>
+  <script src="/site-madrador/assets/js/search-ui.js?v=3.2.0"></script>
 </body>
 </html>
