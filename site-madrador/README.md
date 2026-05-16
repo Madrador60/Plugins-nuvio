@@ -31,3 +31,11 @@ http://127.0.0.1:7000/
 ```
 
 Garde la fenetre noire ouverte pendant que tu utilises le site.
+
+Le lanceur cherche Node.js dans cet ordre :
+
+1. `node` installe normalement sur Windows
+2. le runtime Node integre de Codex
+3. `C:\Program Files\nodejs\node.exe`
+
+Si aucun n'est trouve, utilise l'adresse Render en ligne.

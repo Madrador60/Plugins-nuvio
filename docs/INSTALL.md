@@ -16,6 +16,8 @@ ouvrir-site.bat
 
 Garde la fenetre ouverte pendant que tu utilises le site.
 
+Le lanceur cherche aussi le Node integre de Codex. Si le message indique que Node est introuvable, installe Node.js 18+ ou utilise l'adresse Render en ligne.
+
 Methode terminal :
 
 ```powershell
