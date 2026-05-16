@@ -1,0 +1,30 @@
+{
+  "generatedAt": "2026-05-16T09:28:44.884Z",
+  "timeoutMs": 45000,
+  "results": [
+    {
+      "id": "movix",
+      "name": "Movix",
+      "case": "Interstellar",
+      "streams": 0,
+      "ms": 12160,
+      "error": ""
+    },
+    {
+      "id": "frenchstream",
+      "name": "Frenchstream",
+      "case": "Interstellar",
+      "streams": 0,
+      "ms": 1242,
+      "error": ""
+    },
+    {
+      "id": "nakios",
+      "name": "Nakios",
+      "case": "Interstellar",
+      "streams": 0,
+      "ms": 195,
+      "error": ""
+    }
+  ]
+}

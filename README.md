@@ -1,109 +1,139 @@
 # Madrador Film - Plugins Nuvio FR
 
-![Madrador Film](assets/banner.svg)
+Madrador Film est un catalogue web sombre et responsive pour explorer des films, series et animes, tester des providers Nuvio francais, suivre leur etat, et deployer facilement sur Render.
 
-Depot de providers francais pour **Nuvio** avec un site public **Madrador Film**.
-
-L'objectif est simple : installer facilement les sources FR dans Nuvio, ou utiliser le site web avec catalogue, fiches, favoris et lecteur integre.
-
-## Installer dans Nuvio
-
-Dans **Nuvio > Settings > Plugins** ou **Local Scrapers**, ajoute cette URL :
-
-```text
-https://raw.githubusercontent.com/Madrador60/Plugins-nuvio/refs/heads/main/
-```
-
-Ensuite, rafraichis la liste des providers et active ceux que tu veux.
+Le projet ne stocke aucune video, ne contourne aucun DRM, ne contourne aucun paywall et ne doit pas utiliser de cookies prives ou d'acces caches.
 
 ## Ouvrir le site
 
 | Page | Lien |
-| --- | --- |
-| Catalogue | [Ouvrir](https://madrador60-stremio-addon.onrender.com/) |
-| Lecteur | [Ouvrir](https://madrador60-stremio-addon.onrender.com/test-player) |
-| Providers | [Ouvrir](https://madrador60-stremio-addon.onrender.com/providers) |
+|---|---|
+| Catalogue | [https://madrador60-stremio-addon.onrender.com/](https://madrador60-stremio-addon.onrender.com/) |
+| Lecteur de test | [https://madrador60-stremio-addon.onrender.com/test-player](https://madrador60-stremio-addon.onrender.com/test-player) |
+| Fournisseurs | [https://madrador60-stremio-addon.onrender.com/providers](https://madrador60-stremio-addon.onrender.com/providers) |
+| Admin | [https://madrador60-stremio-addon.onrender.com/admin](https://madrador60-stremio-addon.onrender.com/admin) |
 
-Le service Render gratuit peut dormir. Si la page met du temps au premier chargement, attends 30 a 60 secondes puis recharge. L'adresse technique Render peut garder son ancien nom meme si le site s'appelle Madrador Film.
+## Installation locale
 
-## Ce qu'il y a dedans
-
-| Partie | Role |
-| --- | --- |
-| `manifest.json` | Liste publique des providers pour Nuvio |
-| `providers/` | Providers JavaScript actifs |
-| `domains.json` | Domaines connus et fallbacks |
-| `site/server.js` | Serveur web Madrador Film |
-| `assets/banner.svg` | Banniere GitHub Madrador Film |
-| `assets/brand.svg` | Logo public du site |
-| `docs/provider-sources/fr/` | Sources Kotlin FR a porter en JavaScript |
-
-## Catalogue automatique
-
-Le catalogue du site est genere depuis TMDB avec un cache court. Il affiche plusieurs rails : tendances du jour, tendances de la semaine, sorties cinema France, bientot au cinema, films populaires, genres, series, animes et contenus francais.
-
-Quand TMDB ajoute un nouveau film ou met a jour une sortie, le site le recupere automatiquement a la prochaine regeneration du cache. Par defaut, la verification se fait toutes les 30 minutes. Le bouton **Actualiser maintenant** sur le catalogue force une regeneration immediate.
-
-## Providers actifs
-
-Films et series :
-
-```text
-Frenchstream, Movix, Nakios, Purstream, ToFlix, VIDEASY, CinemaCity
+```powershell
+npm install
+copy .env.example .env
+npm start
 ```
 
-Animes :
+Puis ouvre `http://127.0.0.1:7000/`.
 
-```text
-Anime-Sama, VoirAnime, Vostfree, French-Anime, AnimeVOSTFR, AnimesUltra,
-JetAnimes, Mugiwara-no-Streaming, AnimoFlix, Sekai, AnimeSite
+## Scripts utiles
+
+```powershell
+npm run check
+npm run test:routes
+npm run test:quick
+npm run test:films
+npm run test:anime
+npm run test:domains
+npm run test:all
+npm run manifest:update
 ```
 
-Sources FR ajoutees en reference, a porter en JavaScript :
+Les rapports JSON sont generes dans `data/reports/`.
 
-```text
-AfterDark, FrenchManga, Frembed, Kidraz, Otakufr, 1Jour1Film, Wiflix
+## Architecture V2
+
+- `site/server.js` : compatibilite Render, importe `src/server/app.js`.
+- `src/server/app.js` : serveur HTTP principal et routes compatibles.
+- `src/services/` : domaines, score providers, cache futur, services metier.
+- `src/utils/` : logger, reponses JSON, sanitization, fetch avec timeout.
+- `providers/anime/`, `providers/movies/`, `providers/disabled/` : providers classes proprement.
+- `data/` : cache, rapports et etats persistants.
+- `docs/` : documentation projet.
+- `archive/` : anciens fichiers conserves avec explication.
+
+## Providers
+
+Les providers actifs sont declares dans `manifest.json`. Chaque provider doit retourner des streams dans un format coherent :
+
+```js
+{
+  provider: "frenchstream",
+  title: "...",
+  url: "...",
+  quality: "1080p",
+  language: "VF",
+  type: "mp4",
+  external: false,
+  score: 0
+}
 ```
 
-Voir le detail : [docs/FRENCH_SOURCES.md](docs/FRENCH_SOURCES.md)
+Les providers non portes ou instables restent dans `providers/disabled/` ou avec `enabled: false`.
+
+## Score providers
+
+Les tests mettent a jour `data/provider-status.json` :
+
+- `OK`
+- `LENT`
+- `INSTABLE`
+- `TIMEOUT`
+- `ZERO_RESULT`
+- `DISABLED`
+- `ERROR`
+
+Le score monte quand une source est trouvee rapidement, baisse lors des erreurs, timeouts ou resultats vides.
+
+## Domaines
+
+`domains.json` accepte l'ancien format et le nouveau :
+
+```json
+{
+  "frenchstream": {
+    "domains": ["https://fstream.info", "https://fs03.lol"],
+    "lastChecked": null,
+    "status": "unknown"
+  }
+}
+```
+
+Teste les domaines avec :
+
+```powershell
+npm run domains:check
+```
+
+## Admin
+
+La page `/admin` affiche l'etat du serveur. Les actions sensibles exigent `ADMIN_TOKEN`.
+
+Variables utiles :
+
+```env
+ENABLE_ADMIN=true
+ADMIN_TOKEN=change-moi
+```
+
+## Render
+
+Le deploiement Render utilise `render.yaml` et `node site/server.js`.
+
+Variables recommandees :
+
+- `NODE_ENV=production`
+- `TMDB_API_KEY`
+- `ADMIN_TOKEN`
+- `PROVIDER_TIMEOUT_MS=45000`
+- `CATALOG_CACHE_TTL_MS=1800000`
 
 ## Documentation
 
-| Document | Contenu |
-| --- | --- |
-| [docs/INSTALL.md](docs/INSTALL.md) | Installation Nuvio, site public, lancement local |
-| [docs/PROVIDERS.md](docs/PROVIDERS.md) | Etat des providers actifs |
-| [docs/FRENCH_SOURCES.md](docs/FRENCH_SOURCES.md) | Sources francaises actives et sources a porter |
-| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Structure technique |
-| [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) | Problemes courants |
-| [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md) | Ajouter ou maintenir un provider |
-| [docs/SECURITY.md](docs/SECURITY.md) | Securite et limites |
-| [TESTING.md](TESTING.md) | Derniers tests manuels |
+Lis aussi :
 
-## Lancer en local
-
-```powershell
-node site\server.js
-```
-
-Puis ouvre :
-
-```text
-http://127.0.0.1:7000/
-```
-
-## Tester
-
-```powershell
-node --check site\server.js
-node --check scripts\test-providers.js
-node scripts\test-providers.js --only=frenchstream,movix,nakios,toflix --timeout=60000
-```
-
-## Notes
-
-- Le depot ne contient aucune video.
-- Les providers cherchent des liens depuis des sources externes.
-- Certains domaines changent souvent.
-- Les sources Kotlin ajoutees en reference ne sont pas activees tant qu'elles ne sont pas portees en JavaScript.
-- Chaque utilisateur reste responsable de son utilisation et du respect des lois applicables.
+- [Installation](docs/INSTALL.md)
+- [Architecture](docs/ARCHITECTURE.md)
+- [Providers](docs/PROVIDERS.md)
+- [Tests](docs/TESTING.md)
+- [Securite](docs/SECURITY.md)
+- [Legal](docs/LEGAL.md)
+- [Depannage](docs/TROUBLESHOOTING.md)
+- [Changelog](docs/CHANGELOG.md)

@@ -1,40 +1,88 @@
 {
-  "frenchstream": [
-    "https://fstream.info",
-    "https://fs03.lol",
-    "https://french-stream.one"
-  ],
-  "movix": [
-    "https://movix.cash"
-  ],
-  "purstream": [
-    "https://purstream.art"
-  ],
-  "toflix": [
-    "https://toflix.sbs"
-  ],
-  "cinemacity": [
-    "https://cinemacity.cc"
-  ],
-  "afterdark": [
-    "https://afterdark.best"
-  ],
-  "frenchmanga": [
-    "https://w16.french-manga.net"
-  ],
-  "frembed": [
-    "https://frembed.one"
-  ],
-  "kidraz": [
-    "https://www.kidraz.com/saby1jy/home/kidraz"
-  ],
-  "otakufr": [
-    "https://otakufr.cc"
-  ],
-  "unjourunfilm": [
-    "https://1jour1film0126b.site"
-  ],
-  "wiflix": [
-    "http://flemmix.best"
-  ]
+  "frenchstream": {
+    "domains": [
+      "https://fstream.info",
+      "https://fs03.lol",
+      "https://french-stream.one"
+    ],
+    "lastChecked": null,
+    "status": "unknown"
+  },
+  "movix": {
+    "domains": [
+      "https://movix.cash"
+    ],
+    "lastChecked": null,
+    "status": "unknown"
+  },
+  "purstream": {
+    "domains": [
+      "https://purstream.art"
+    ],
+    "lastChecked": null,
+    "status": "unknown"
+  },
+  "toflix": {
+    "domains": [
+      "https://toflix.sbs"
+    ],
+    "lastChecked": null,
+    "status": "unknown"
+  },
+  "cinemacity": {
+    "domains": [
+      "https://cinemacity.cc"
+    ],
+    "lastChecked": null,
+    "status": "unknown"
+  },
+  "afterdark": {
+    "domains": [
+      "https://afterdark.best"
+    ],
+    "lastChecked": null,
+    "status": "unknown"
+  },
+  "frenchmanga": {
+    "domains": [
+      "https://w16.french-manga.net"
+    ],
+    "lastChecked": null,
+    "status": "unknown"
+  },
+  "frembed": {
+    "domains": [
+      "https://frembed.one"
+    ],
+    "lastChecked": null,
+    "status": "unknown"
+  },
+  "kidraz": {
+    "domains": [
+      "https://www.kidraz.com/saby1jy/home/kidraz"
+    ],
+    "lastChecked": null,
+    "status": "unknown"
+  },
+  "otakufr": {
+    "domains": [
+      "https://otakufr.cc"
+    ],
+    "lastChecked": null,
+    "status": "unknown"
+  },
+  "unjourunfilm": {
+    "domains": [
+      "https://1jour1film0126b.site"
+    ],
+    "lastChecked": null,
+    "status": "unknown"
+  },
+  "wiflix": {
+    "domains": [
+      "http://flemmix.best"
+    ],
+    "lastChecked": null,
+    "status": "unknown"
+  }
 }

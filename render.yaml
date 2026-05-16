@@ -5,9 +5,20 @@ services:
     plan: free
     buildCommand: ""
     startCommand: node site/server.js
+    healthCheckPath: /health
     envVars:
+      - key: NODE_ENV
+        value: production
       - key: HOST
         value: 0.0.0.0
+      - key: TMDB_API_KEY
+        sync: false
+      - key: ADMIN_TOKEN
+        sync: false
+      - key: ENABLE_ADMIN
+        value: false
+      - key: CACHE_TTL_MINUTES
+        value: 30
       - key: PROVIDER_TIMEOUT_MS
         value: 45000
       - key: VIDEASY_SERVER_TIMEOUT_MS

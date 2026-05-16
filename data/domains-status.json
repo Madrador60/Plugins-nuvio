@@ -1,0 +1,184 @@
+{
+  "frenchstream": {
+    "status": "working",
+    "activeDomain": "https://fs03.lol/",
+    "lastChecked": "2026-05-16T09:28:53.972Z",
+    "domains": [
+      {
+        "url": "https://fstream.info/",
+        "ok": true,
+        "statusCode": 200,
+        "responseTime": 147,
+        "error": null
+      },
+      {
+        "url": "https://fs03.lol/",
+        "ok": true,
+        "statusCode": 200,
+        "responseTime": 130,
+        "error": null
+      },
+      {
+        "url": "https://french-stream.one/",
+        "ok": false,
+        "statusCode": 0,
+        "responseTime": 13,
+        "error": "fetch failed"
+      }
+    ]
+  },
+  "movix": {
+    "status": "down",
+    "activeDomain": null,
+    "lastChecked": "2026-05-16T09:28:53.985Z",
+    "domains": [
+      {
+        "url": "https://movix.cash/",
+        "ok": false,
+        "statusCode": 0,
+        "responseTime": 12,
+        "error": "fetch failed"
+      }
+    ]
+  },
+  "purstream": {
+    "status": "down",
+    "activeDomain": null,
+    "lastChecked": "2026-05-16T09:28:53.996Z",
+    "domains": [
+      {
+        "url": "https://purstream.art/",
+        "ok": false,
+        "statusCode": 0,
+        "responseTime": 11,
+        "error": "fetch failed"
+      }
+    ]
+  },
+  "toflix": {
+    "status": "down",
+    "activeDomain": null,
+    "lastChecked": "2026-05-16T09:28:54.007Z",
+    "domains": [
+      {
+        "url": "https://toflix.sbs/",
+        "ok": false,
+        "statusCode": 0,
+        "responseTime": 11,
+        "error": "fetch failed"
+      }
+    ]
+  },
+  "cinemacity": {
+    "status": "working",
+    "activeDomain": "https://cinemacity.cc/",
+    "lastChecked": "2026-05-16T09:28:54.147Z",
+    "domains": [
+      {
+        "url": "https://cinemacity.cc/",
+        "ok": true,
+        "statusCode": 200,
+        "responseTime": 140,
+        "error": null
+      }
+    ]
+  },
+  "afterdark": {
+    "status": "down",
+    "activeDomain": null,
+    "lastChecked": "2026-05-16T09:28:54.159Z",
+    "domains": [
+      {
+        "url": "https://afterdark.best/",
+        "ok": false,
+        "statusCode": 0,
+        "responseTime": 12,
+        "error": "fetch failed"
+      }
+    ]
+  },
+  "frenchmanga": {
+    "status": "working",
+    "activeDomain": "https://w16.french-manga.net/",
+    "lastChecked": "2026-05-16T09:28:54.309Z",
+    "domains": [
+      {
+        "url": "https://w16.french-manga.net/",
+        "ok": true,
+        "statusCode": 200,
+        "responseTime": 150,
+        "error": null
+      }
+    ]
+  },
+  "frembed": {
+    "status": "working",
+    "activeDomain": "https://frembed.one/",
+    "lastChecked": "2026-05-16T09:28:54.399Z",
+    "domains": [
+      {
+        "url": "https://frembed.one/",
+        "ok": true,
+        "statusCode": 200,
+        "responseTime": 90,
+        "error": null
+      }
+    ]
+  },
+  "kidraz": {
+    "status": "down",
+    "activeDomain": null,
+    "lastChecked": "2026-05-16T09:29:02.402Z",
+    "domains": [
+      {
+        "url": "https://www.kidraz.com/saby1jy/home/kidraz",
+        "ok": false,
+        "statusCode": 0,
+        "responseTime": 8003,
+        "error": "This operation was aborted"
+      }
+    ]
+  },
+  "otakufr": {
+    "status": "down",
+    "activeDomain": null,
+    "lastChecked": "2026-05-16T09:29:10.410Z",
+    "domains": [
+      {
+        "url": "https://otakufr.cc/",
+        "ok": false,
+        "statusCode": 0,
+        "responseTime": 8008,
+        "error": "This operation was aborted"
+      }
+    ]
+  },
+  "unjourunfilm": {
+    "status": "working",
+    "activeDomain": "https://1jour1film0126b.site/",
+    "lastChecked": "2026-05-16T09:29:10.528Z",
+    "domains": [
+      {
+        "url": "https://1jour1film0126b.site/",
+        "ok": true,
+        "statusCode": 403,
+        "responseTime": 117,
+        "error": null
+      }
+    ]
+  },
+  "wiflix": {
+    "status": "down",
+    "activeDomain": null,
+    "lastChecked": "2026-05-16T09:29:10.539Z",
+    "domains": [
+      {
+        "url": "http://flemmix.best/",
+        "ok": false,
+        "statusCode": 0,
+        "responseTime": 11,
+        "error": "fetch failed"
+      }
+    ]
+  }
+}

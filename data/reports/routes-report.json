@@ -1,0 +1,71 @@
+{
+  "generatedAt": "2026-05-16T09:30:24.212Z",
+  "results": [
+    {
+      "route": "/health",
+      "ok": true,
+      "status": 200,
+      "timeMs": 1
+    },
+    {
+      "route": "/health.json",
+      "ok": true,
+      "status": 200,
+      "timeMs": 1
+    },
+    {
+      "route": "/config.json",
+      "ok": true,
+      "status": 200,
+      "timeMs": 1
+    },
+    {
+      "route": "/providers",
+      "ok": true,
+      "status": 200,
+      "timeMs": 8
+    },
+    {
+      "route": "/providers.json",
+      "ok": true,
+      "status": 200,
+      "timeMs": 1
+    },
+    {
+      "route": "/providers/status.json",
+      "ok": true,
+      "status": 200,
+      "timeMs": 2
+    },
+    {
+      "route": "/catalog.json",
+      "ok": true,
+      "status": 200,
+      "timeMs": 1
+    },
+    {
+      "route": "/search.json?type=movie&q=Interstellar",
+      "ok": true,
+      "status": 200,
+      "timeMs": 1
+    },
+    {
+      "route": "/details.json?type=movie&id=157336",
+      "ok": true,
+      "status": 200,
+      "timeMs": 1
+    },
+    {
+      "route": "/legal",
+      "ok": true,
+      "status": 200,
+      "timeMs": 0
+    },
+    {
+      "route": "/security",
+      "ok": true,
+      "status": 200,
+      "timeMs": 1
+    }
+  ]
+}

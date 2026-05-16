@@ -4,6 +4,8 @@ const { spawn } = require("node:child_process");
 
 const ROOT = path.resolve(__dirname, "..");
 const manifest = JSON.parse(fs.readFileSync(path.join(ROOT, "manifest.json"), "utf8"));
+const providerStatusService = require("../src/services/provider-status.service");
+const REPORT_FILE = path.join(ROOT, "data", "reports", "providers-report.json");
 
 const TIMEOUT_ARG = Number((process.argv.find((arg) => arg.startsWith("--timeout=")) || "").slice("--timeout=".length) || 0);
 const DEFAULT_TIMEOUT_MS = TIMEOUT_ARG || Number(process.env.PROVIDER_TIMEOUT_MS || 30000);
@@ -63,7 +65,7 @@ function streamCount(value) {
 
 function statusFromResult(result) {
   if (result.error) return "ERROR";
-  return result.streams > 0 ? "OK" : "ZERO";
+  return result.streams > 0 ? "OK" : "ZERO_RESULT";
 }
 
 function formatError(error) {
@@ -230,18 +232,33 @@ async function main() {
   for (const provider of providers) {
     process.stdout.write("Testing " + provider.id + "... ");
     const result = await runWorker(provider);
+    const status = statusFromResult(result);
+    providerStatusService.updateProviderStatus(provider.id, {
+      status,
+      streams: result.streams,
+      timeMs: result.ms,
+      error: result.error || ""
+    });
     results.push(result);
-    console.log(statusFromResult(result) + " (" + result.streams + " stream(s), " + result.ms + "ms)");
+    console.log(status + " (" + result.streams + " stream(s), " + result.ms + "ms)");
   }
 
   console.log("");
   printTable(results);
 
+  fs.mkdirSync(path.dirname(REPORT_FILE), { recursive: true });
+  fs.writeFileSync(REPORT_FILE, `${JSON.stringify({
+    generatedAt: new Date().toISOString(),
+    timeoutMs: DEFAULT_TIMEOUT_MS,
+    results
+  }, null, 2)}\n`);
+
   const ok = results.filter((result) => statusFromResult(result) === "OK").length;
-  const zero = results.filter((result) => statusFromResult(result) === "ZERO").length;
+  const zero = results.filter((result) => statusFromResult(result) === "ZERO_RESULT").length;
   const errors = results.filter((result) => statusFromResult(result) === "ERROR").length;
   console.log("");
-  console.log("Summary: OK=" + ok + " ZERO=" + zero + " ERROR=" + errors);
+  console.log("Summary: OK=" + ok + " ZERO_RESULT=" + zero + " ERROR=" + errors);
+  console.log("Report: data/reports/providers-report.json");
 
   if (errors > 0) process.exitCode = 1;
 }

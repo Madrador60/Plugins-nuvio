@@ -1,31 +1,18 @@
-# Securite et limites
+# Securite
 
-## Ce que le depot contient
+Mesures V2 :
 
-- du code JavaScript de providers ;
-- un serveur local/hebergeable pour le site Madrador Film ;
-- un proxy technique pour rendre certains liens lisibles par les lecteurs.
+- timeouts sur les appels externes ;
+- headers HTTP simples (`nosniff`, `referrer-policy`, permissions policy) ;
+- actions admin protegees par `ADMIN_TOKEN` ;
+- pas de secrets en dur dans `.env.example` ;
+- erreurs JSON propres ;
+- validation minimale des providers et domaines ;
+- fichiers obsoletes archives plutot que conserves au hasard.
 
-## Ce que le depot ne contient pas
+Ne jamais commiter :
 
-- aucune video ;
-- aucun fichier media ;
-- aucun contenu heberge ;
-- aucun cookie prive volontairement versionne.
-
-## Bonnes pratiques
-
-- Ne jamais commit de cookie personnel.
-- Ne jamais commit de cle API privee.
-- Utiliser `.env` en local pour les secrets.
-- Garder `.env.example` public et sans secret.
-
-## Signalement
-
-Pour un bug ou un provider casse, ouvre une issue avec :
-
-- le provider concerne ;
-- le titre teste ;
-- le type : film, serie ou anime ;
-- l'erreur observee ;
-- si possible, le resultat de `/diagnostics.json`.
+- cles API privees ;
+- cookies ;
+- tokens personnels ;
+- URLs cachees reservees a un compte.

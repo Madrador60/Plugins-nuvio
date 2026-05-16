@@ -2,28 +2,28 @@
 
 ## Le site ne charge pas
 
-1. Ouvre [health.json](https://madrador60-stremio-addon.onrender.com/health.json).
-2. Si Render etait en veille, attends le premier reveil puis recharge la page.
-3. Teste aussi [catalog.json](https://madrador60-stremio-addon.onrender.com/catalog.json).
-
-## Aucune source trouvee
-
-Certains films recents ou rares ne sont pas disponibles chez les providers actifs.
-
-1. Essaie un autre titre connu.
-2. Clique sur `Relancer` dans la fiche.
-3. Verifie `/providers` pour voir les providers actifs ou instables.
-
-## La video ne se lance pas
-
-1. Essaie une source `MP4` en priorite.
-2. Essaie une source `HLS` si MP4 ne marche pas.
-3. Ouvre le meme titre dans `/test-player` pour voir les erreurs du lecteur.
-
-## Tests rapides
+Teste :
 
 ```powershell
-node --check site\server.js
-node --check scripts\test-providers.js
-node site\server.js
+npm run check
+npm start
 ```
+
+Puis ouvre `/health`.
+
+## Le catalogue est vide
+
+- Verifie `TMDB_API_KEY`.
+- Force un refresh avec `/catalog.json?refresh=1`.
+- Regarde les logs Render.
+
+## Un provider ne retourne rien
+
+Lance :
+
+```powershell
+npm run test:quick
+npm run test:domains
+```
+
+Un domaine mort ou un timeout externe n'est pas forcement bloquant pour tout le site.

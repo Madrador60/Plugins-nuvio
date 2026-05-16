@@ -1,16 +1,24 @@
 {
   "name": "plugins-nuvio",
-  "version": "1.1.1",
-  "description": "Providers francais pour Nuvio et site Madrador Film hebergeable.",
+  "version": "2.0.0",
+  "description": "Catalogue Madrador Film et providers francais pour Nuvio, avec interface web, diagnostics et deploiement Render.",
   "private": true,
   "type": "commonjs",
   "scripts": {
     "start": "node site/server.js",
+    "dev": "node site/server.js",
     "start:web": "node site/server.js",
     "manifest:update": "node scripts/update-manifest.js",
-    "check": "node --check site/server.js && node --check scripts/test-providers.js",
+    "check": "node scripts/check-syntax.js",
     "test:providers": "node scripts/test-providers.js",
-    "test:quick": "node scripts/test-providers.js --only=frenchstream,movix,nakios --timeout=45000"
+    "test:quick": "node scripts/test-providers.js --only=frenchstream,movix,nakios --timeout=45000",
+    "test:films": "node scripts/test-providers.js --only=frenchstream,movix,nakios,purstream,toflix --timeout=60000",
+    "test:anime": "node scripts/test-providers.js --only=anime-sama,voiranime,vostfree,french-anime,animevostfr --timeout=60000",
+    "test:routes": "node scripts/test-routes.js",
+    "test:domains": "node scripts/check-domains.js",
+    "test:all": "npm run check && npm run test:routes && npm run test:quick",
+    "domains:check": "node scripts/check-domains.js",
+    "report:providers": "node scripts/generate-provider-report.js"
   },
   "engines": {
     "node": ">=18"

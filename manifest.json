@@ -1,6 +1,6 @@
 {
   "name": "Madrador60 Repo",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "scrapers": [
     {
       "id": "anime-sama",
@@ -12,7 +12,7 @@
         "movie",
         "tv"
       ],
-      "filename": "providers/anime-sama.js",
+      "filename": "providers/anime/anime-sama.js",
       "enabled": true,
       "logo": "https://raw.githubusercontent.com/Anime-Sama/IMG/img/autres/logo.png",
       "contentLanguage": [
@@ -36,7 +36,7 @@
         "movie",
         "tv"
       ],
-      "filename": "providers/voiranime.js",
+      "filename": "providers/anime/voiranime.js",
       "enabled": true,
       "logo": "https://lh3.googleusercontent.com/728eE_dzDC7HWN9Cs2eGkQg4Vlk1CqCJj3T8aAQs50srttRUl6pVmmD0O4t1Zxn4fdiVpPzcoPAzNS2EuUre29Dulw=s60",
       "contentLanguage": [
@@ -61,7 +61,7 @@
         "movie",
         "tv"
       ],
-      "filename": "providers/vostfree.js",
+      "filename": "providers/anime/vostfree.js",
       "enabled": true,
       "logo": "https://vostfree.ws/templates/Animix/images/logo.png",
       "contentLanguage": [
@@ -85,7 +85,7 @@
         "movie",
         "tv"
       ],
-      "filename": "providers/animoflix.js",
+      "filename": "providers/anime/animoflix.js",
       "enabled": true,
       "logo": "https://animoflix.to/img/logo.png",
       "contentLanguage": [
@@ -110,7 +110,7 @@
         "movie",
         "tv"
       ],
-      "filename": "providers/french-anime.js",
+      "filename": "providers/anime/french-anime.js",
       "enabled": true,
       "logo": "https://french-anime.com/templates/franime/images/favicon3.png",
       "contentLanguage": [
@@ -134,7 +134,7 @@
         "movie",
         "tv"
       ],
-      "filename": "providers/animevostfr.js",
+      "filename": "providers/anime/animevostfr.js",
       "enabled": true,
       "logo": "https://animevostfr.org/wp-content/uploads/luffy-icon.jpg",
       "contentLanguage": [
@@ -158,7 +158,7 @@
         "movie",
         "tv"
       ],
-      "filename": "providers/animesultra.js",
+      "filename": "providers/anime/animesultra.js",
       "enabled": true,
       "logo": "https://animesultra.org/templates/animeultra/images/favicon.ico",
       "contentLanguage": [
@@ -182,7 +182,7 @@
         "movie",
         "tv"
       ],
-      "filename": "providers/jetanimes.js",
+      "filename": "providers/anime/jetanimes.js",
       "enabled": true,
       "logo": "https://vww.jetanimes.com/wp-content/uploads/2018/12/android-chrome-192x192.png",
       "contentLanguage": [
@@ -206,7 +206,7 @@
         "movie",
         "tv"
       ],
-      "filename": "providers/sekai.js",
+      "filename": "providers/anime/sekai.js",
       "enabled": true,
       "logo": "https://sekai.one/favicon.ico",
       "contentLanguage": [
@@ -231,7 +231,7 @@
         "movie",
         "tv"
       ],
-      "filename": "providers/movix.js",
+      "filename": "providers/movies/movix.js",
       "enabled": true,
       "logo": "https://movix.cash/movix.png",
       "contentLanguage": [
@@ -256,7 +256,7 @@
         "movie",
         "tv"
       ],
-      "filename": "providers/mugiwarastream.js",
+      "filename": "providers/anime/mugiwarastream.js",
       "enabled": true,
       "logo": "https://raw.githubusercontent.com/NOUSSS/mugiwara-no-streaming-images/main/Logo.png",
       "contentLanguage": [
@@ -281,7 +281,7 @@
         "movie",
         "tv"
       ],
-      "filename": "providers/animesite.js",
+      "filename": "providers/anime/animesite.js",
       "enabled": true,
       "logo": "https://animesite.fr/anime-site-og.png",
       "contentLanguage": [
@@ -306,7 +306,7 @@
         "movie",
         "tv"
       ],
-      "filename": "providers/frenchstream.js",
+      "filename": "providers/movies/frenchstream.js",
       "enabled": true,
       "logo": "https://fs03.lol/favicon.ico",
       "contentLanguage": [
@@ -331,7 +331,7 @@
         "movie",
         "tv"
       ],
-      "filename": "providers/nakios.js",
+      "filename": "providers/movies/nakios.js",
       "enabled": true,
       "formats": [
         "mp4",
@@ -353,7 +353,7 @@
         "movie",
         "tv"
       ],
-      "filename": "providers/purstream.js",
+      "filename": "providers/movies/purstream.js",
       "enabled": true,
       "formats": [
         "mp4",
@@ -375,7 +375,7 @@
         "movie",
         "tv"
       ],
-      "filename": "providers/toflix.js",
+      "filename": "providers/movies/toflix.js",
       "enabled": true,
       "formats": [
         "mp4",
@@ -397,7 +397,7 @@
         "movie",
         "tv"
       ],
-      "filename": "providers/videasy.js",
+      "filename": "providers/movies/videasy.js",
       "enabled": true,
       "limited": true,
       "formats": [
@@ -427,7 +427,7 @@
         "movie",
         "tv"
       ],
-      "filename": "providers/cinemacity.js",
+      "filename": "providers/movies/cinemacity.js",
       "enabled": true,
       "formats": [
         "mp4",
@@ -457,7 +457,7 @@
         "movie",
         "tv"
       ],
-      "filename": "providers/afterdark.js",
+      "filename": "providers/disabled/afterdark.js",
       "enabled": false,
       "logo": "https://afterdark.best/favicon.ico",
       "contentLanguage": [
@@ -483,7 +483,7 @@
         "movie",
         "tv"
       ],
-      "filename": "providers/frenchmanga.js",
+      "filename": "providers/disabled/frenchmanga.js",
       "enabled": false,
       "logo": "https://w16.french-manga.net/logo.png",
       "contentLanguage": [
@@ -509,7 +509,7 @@
         "movie",
         "tv"
       ],
-      "filename": "providers/frembed.js",
+      "filename": "providers/disabled/frembed.js",
       "enabled": false,
       "logo": "https://frembed.one/favicon.ico",
       "contentLanguage": [
@@ -535,7 +535,7 @@
         "movie",
         "tv"
       ],
-      "filename": "providers/kidraz.js",
+      "filename": "providers/disabled/kidraz.js",
       "enabled": false,
       "logo": "https://www.kidraz.com/favicon.ico",
       "contentLanguage": [
@@ -560,7 +560,7 @@
       "supportedTypes": [
         "tv"
       ],
-      "filename": "providers/otakufr.js",
+      "filename": "providers/disabled/otakufr.js",
       "enabled": false,
       "logo": "https://i.ibb.co/GndKBbF/otakufr-logo.webp",
       "contentLanguage": [
@@ -585,7 +585,7 @@
       "supportedTypes": [
         "movie"
       ],
-      "filename": "providers/unjourunfilm.js",
+      "filename": "providers/disabled/unjourunfilm.js",
       "enabled": false,
       "logo": "https://1jour1film0126b.site/favicon.ico",
       "contentLanguage": [
@@ -611,7 +611,7 @@
         "movie",
         "tv"
       ],
-      "filename": "providers/wiflix.js",
+      "filename": "providers/disabled/wiflix.js",
       "enabled": false,
       "logo": "http://flemmix.best/favicon.ico",
       "contentLanguage": [
