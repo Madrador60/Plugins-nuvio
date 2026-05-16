@@ -204,7 +204,7 @@
 
   function infoBlock(trailerUrl) {
     const castNames = (details.cast || []).slice(0, 8).map((person) => person.name).join(", ");
-    return `<section class="cinema-info" style="background-image:linear-gradient(90deg,rgba(18,18,18,.98),rgba(18,18,18,.82),rgba(18,18,18,.94)),url('${Madrador.esc(details.backdrop || details.poster || Madrador.placeholder)}')">
+    return `<section class="cinema-info" style="background-image:linear-gradient(90deg,rgba(5,7,20,.98),rgba(17,24,58,.82),rgba(5,7,20,.96)),url('${Madrador.esc(details.backdrop || details.poster || Madrador.placeholder)}')">
       <aside class="cinema-poster">
         <img src="${Madrador.esc(details.poster || Madrador.placeholder)}" alt="">
         ${trailerUrl ? `<a class="orange-outline" target="_blank" rel="noreferrer" href="${trailerUrl}"><span class="play-dot"></span>Bande annonce</a>` : ""}
