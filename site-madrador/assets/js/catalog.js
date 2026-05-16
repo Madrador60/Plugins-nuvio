@@ -165,7 +165,7 @@
   } else if (searchInput && params.get("q")) {
     searchInput.value = params.get("q");
     if (searchType && params.get("type")) searchType.value = params.get("type");
-    doSearch();
+    if (!document.querySelector('script[src*="search-ui.js"]')) doSearch();
   }
   for (let year = new Date().getFullYear(); year >= 1980; year -= 1) {
     if (yearFilter) yearFilter.insertAdjacentHTML("beforeend", `<option>${year}</option>`);
