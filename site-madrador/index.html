@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Madrador Film</title>
+  <link rel="icon" href="/site-madrador/assets/img/favicon.svg">
+  <link rel="stylesheet" href="/site-madrador/assets/css/style.css">
+  <link rel="stylesheet" href="/site-madrador/assets/css/responsive.css">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="site-header" data-nav></header>
+    <section class="hero">
+      <div class="container">
+        <span class="eyebrow">Catalogue responsable pour providers FR</span>
+        <h1>Madrador Film</h1>
+        <p>Explore films, series et animes avec une interface propre. Le site ne stocke aucune video et utilise seulement les routes de ton serveur.</p>
+        <div class="search-panel">
+          <input class="input" id="homeSearch" placeholder="Rechercher un film, une serie, un anime..." autocomplete="off">
+          <select class="select" id="homeType"><option value="movie">Films</option><option value="series">Series</option></select>
+          <button class="btn" id="homeGo">Rechercher</button>
+        </div>
+        <div class="actions" style="margin-top:18px">
+          <a class="btn" href="/catalog">Ouvrir le catalogue</a>
+          <a class="btn secondary" href="/manifest.json">Installer dans Nuvio</a>
+        </div>
+      </div>
+    </section>
+    <main class="main">
+      <div class="container">
+        <div class="notice">Madrador Film ne stocke aucun contenu video. Les sources dependent des providers configures et peuvent etre indisponibles, lentes ou desactivees.</div>
+        <section class="section"><div class="section-head"><h2>Tendances</h2><a class="btn ghost" href="/catalog">Tout voir</a></div><div class="rail" data-row="trending-day"><div class="skeleton"></div></div></section>
+        <section class="section"><div class="section-head"><h2>Films populaires</h2></div><div class="rail" data-row="popular-movies"><div class="skeleton"></div></div></section>
+        <section class="section"><div class="section-head"><h2>Series</h2></div><div class="rail" data-row="popular-series"><div class="skeleton"></div></div></section>
+        <section class="section"><div class="section-head"><h2>Animes</h2></div><div class="rail" data-row="anime"><div class="skeleton"></div></div></section>
+      </div>
+    </main>
+    <footer class="footer" data-footer></footer>
+  </div>
+  <script src="/site-madrador/assets/js/app.js"></script>
+  <script src="/site-madrador/assets/js/catalog.js"></script>
+</body>
+</html>

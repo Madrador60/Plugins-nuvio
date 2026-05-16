@@ -6,6 +6,7 @@ Le projet garde une compatibilite simple avec Render :
 
 ```text
 site/server.js -> src/server/app.js
+src/server/app.js -> site-madrador/*.html
 ```
 
 `site/server.js` est volontairement petit. Toute la logique vit dans `src/`.
@@ -37,6 +38,7 @@ data/
   reports/
 
 archive/
+site-madrador/
 ```
 
 ## Compatibilite
@@ -45,6 +47,8 @@ Les routes historiques restent actives :
 
 - `/`
 - `/catalog`
+- `/details`
+- `/player`
 - `/catalog.json`
 - `/details.json`
 - `/search.json`

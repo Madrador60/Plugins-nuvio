@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Catalogue - Madrador Film</title>
+  <link rel="icon" href="/site-madrador/assets/img/favicon.svg">
+  <link rel="stylesheet" href="/site-madrador/assets/css/style.css">
+  <link rel="stylesheet" href="/site-madrador/assets/css/responsive.css">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="site-header" data-nav></header>
+    <main class="main">
+      <div class="container">
+        <section class="section">
+          <div class="section-head"><div><h1 class="page-title">Catalogue</h1><p>Recherche, filtres et catalogue auto depuis le backend.</p></div><button class="btn ghost" id="refreshCatalog">Rafraichir</button></div>
+          <div class="panel">
+            <div class="search-panel">
+              <input class="input" id="catalogSearch" placeholder="Interstellar, Naruto, film horreur 2024..." autocomplete="off">
+              <select class="select" id="catalogType"><option value="movie">Films</option><option value="series">Series</option></select>
+              <button class="btn" id="catalogGo">Rechercher</button>
+            </div>
+            <div class="filters" style="margin-top:14px">
+              <button class="btn secondary" data-filter="all">Tout</button>
+              <button class="btn ghost" data-filter="movie">Films</button>
+              <button class="btn ghost" data-filter="series">Series</button>
+              <button class="btn ghost" data-filter="anime">Animes</button>
+              <select class="select" id="yearFilter" style="max-width:160px"><option value="">Annee</option></select>
+              <select class="select" id="genreFilter" style="max-width:180px"><option value="">Genre</option><option>Action</option><option>Horreur</option><option>Comedie</option><option>Anime</option></select>
+            </div>
+          </div>
+        </section>
+        <section id="searchResults" class="section hidden"></section>
+        <section id="catalogRows" class="section"><div class="skeleton"></div></section>
+      </div>
+    </main>
+    <footer class="footer" data-footer></footer>
+  </div>
+  <script src="/site-madrador/assets/js/app.js"></script>
+  <script src="/site-madrador/assets/js/search.js"></script>
+  <script src="/site-madrador/assets/js/catalog.js"></script>
+</body>
+</html>

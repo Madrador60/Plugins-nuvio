@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Admin - Madrador Film</title>
+  <link rel="icon" href="/site-madrador/assets/img/favicon.svg">
+  <link rel="stylesheet" href="/site-madrador/assets/css/style.css">
+  <link rel="stylesheet" href="/site-madrador/assets/css/responsive.css">
+  <link rel="stylesheet" href="/site-madrador/assets/css/admin.css">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="site-header" data-nav></header>
+    <main class="main"><div class="container">
+      <div class="section-head"><div><h1 class="page-title">Admin</h1><p>Actions protegees par ADMIN_TOKEN. Le token n'est jamais affiche.</p></div></div>
+      <section class="admin-grid" id="adminMetrics"></section>
+      <section class="section panel">
+        <input class="input" id="adminToken" type="password" placeholder="ADMIN_TOKEN" autocomplete="off" style="max-width:420px">
+        <div class="admin-actions" style="margin-top:14px">
+          <button class="btn" data-admin-action="/admin/cache/clear">Vider cache</button>
+          <button class="btn" data-admin-action="/admin/catalog/refresh">Refresh catalogue</button>
+          <button class="btn" data-admin-action="/admin/providers/test">Tester providers</button>
+          <button class="btn" data-admin-action="/admin/domains/check">Tester domaines</button>
+        </div>
+        <pre class="log-box" id="adminOutput">Pret.</pre>
+      </section>
+    </div></main>
+    <footer class="footer" data-footer></footer>
+  </div>
+  <script src="/site-madrador/assets/js/app.js"></script>
+  <script src="/site-madrador/assets/js/admin.js"></script>
+</body>
+</html>

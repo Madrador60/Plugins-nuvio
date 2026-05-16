@@ -12,6 +12,10 @@ const routes = [
   "/health",
   "/health.json",
   "/config.json",
+  "/",
+  "/catalog",
+  "/details?type=movie&id=157336",
+  "/player?type=movie&id=157336&title=Interstellar",
   "/providers",
   "/providers.json",
   "/providers/status.json",
@@ -19,7 +23,10 @@ const routes = [
   "/search.json?type=movie&q=Interstellar",
   "/details.json?type=movie&id=157336",
   "/legal",
-  "/security"
+  "/dmca",
+  "/security",
+  "/site-madrador/assets/css/style.css",
+  "/site-madrador/assets/js/app.js"
 ];
 
 function wait(ms) {

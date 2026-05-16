@@ -1,0 +1,32 @@
+.admin-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 14px;
+}
+.metric {
+  border: 1px solid var(--line);
+  background: rgba(18,25,54,.82);
+  border-radius: 16px;
+  padding: 16px;
+}
+.metric strong {
+  display: block;
+  font-size: 30px;
+  margin-top: 8px;
+  color: var(--cyan);
+}
+.admin-actions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 10px;
+}
+.log-box {
+  white-space: pre-wrap;
+  max-height: 360px;
+  overflow: auto;
+  background: #050714;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 14px;
+  color: #dbeafe;
+}

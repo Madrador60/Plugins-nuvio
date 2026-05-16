@@ -42,6 +42,7 @@ Les rapports JSON sont generes dans `data/reports/`.
 
 - `site/server.js` : compatibilite Render, importe `src/server/app.js`.
 - `src/server/app.js` : serveur HTTP principal et routes compatibles.
+- `site-madrador/` : vrai front-end HTML/CSS/JS servi par `/`, `/catalog`, `/details`, `/player`, `/providers`, `/admin`.
 - `src/services/` : domaines, score providers, cache futur, services metier.
 - `src/utils/` : logger, reponses JSON, sanitization, fetch avec timeout.
 - `providers/anime/`, `providers/movies/`, `providers/disabled/` : providers classes proprement.

@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 342 513">
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop stop-color="#111936"/>
+      <stop offset="1" stop-color="#351b78"/>
+    </linearGradient>
+  </defs>
+  <rect width="342" height="513" fill="url(#bg)"/>
+  <circle cx="171" cy="220" r="56" fill="none" stroke="#38bdf8" stroke-width="8" opacity=".7"/>
+  <path d="M153 190l58 30-58 30z" fill="#fff" opacity=".86"/>
+  <text x="171" y="330" text-anchor="middle" fill="#dbeafe" font-family="Inter,Segoe UI,sans-serif" font-size="24" font-weight="800">Madrador Film</text>
+</svg>

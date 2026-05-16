@@ -2,6 +2,8 @@
 
 ## 2.0.0
 
+- Ajout du front-end complet `site-madrador/` avec pages HTML/CSS/JS separees.
+- Routes propres connectees au front : `/`, `/catalog`, `/details`, `/player`, `/providers`, `/admin`.
 - Migration du serveur vers `src/server/app.js`.
 - Conservation de `site/server.js` pour Render et les anciennes commandes.
 - Providers ranges par type dans `providers/anime`, `providers/movies` et `providers/disabled`.

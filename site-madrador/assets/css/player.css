@@ -1,0 +1,43 @@
+.player-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(320px, .6fr);
+  gap: 18px;
+  align-items: start;
+}
+.video-shell {
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  overflow: hidden;
+  background: #000;
+  box-shadow: var(--shadow);
+}
+video {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  display: block;
+  background: #000;
+}
+.source-list {
+  display: grid;
+  gap: 10px;
+  max-height: 620px;
+  overflow: auto;
+}
+.source-card {
+  border: 1px solid var(--line);
+  background: rgba(18,25,54,.9);
+  border-radius: 14px;
+  padding: 13px;
+  color: #fff;
+  text-align: left;
+  cursor: pointer;
+}
+.source-card.active {
+  border-color: rgba(56,189,248,.75);
+  box-shadow: 0 0 0 3px rgba(56,189,248,.12);
+}
+.source-card strong { display: block; margin-bottom: 6px; }
+.source-card small { color: var(--muted); display: block; line-height: 1.4; }
+@media (max-width: 920px) {
+  .player-layout { grid-template-columns: 1fr; }
+}

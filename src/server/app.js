@@ -8,6 +8,7 @@ const providerStatusService = require("../services/provider-status.service");
 const domainService = require("../services/domain.service");
 
 const ROOT = path.resolve(__dirname, "..", "..");
+const SITE_MADRADOR_DIR = path.join(ROOT, "site-madrador");
 const nuvioManifest = require(path.join(ROOT, "manifest.json"));
 const domains = require(path.join(ROOT, "domains.json"));
 
@@ -107,6 +108,49 @@ function sendFile(res, status, filePath, contentType) {
     }));
     res.end(data);
   });
+}
+
+function contentTypeFor(filePath) {
+  const ext = path.extname(filePath).toLowerCase();
+  return {
+    ".html": "text/html; charset=utf-8",
+    ".css": "text/css; charset=utf-8",
+    ".js": "application/javascript; charset=utf-8",
+    ".svg": "image/svg+xml",
+    ".png": "image/png",
+    ".jpg": "image/jpeg",
+    ".jpeg": "image/jpeg",
+    ".webp": "image/webp",
+    ".ico": "image/x-icon"
+  }[ext] || "application/octet-stream";
+}
+
+function sendSiteFile(res, relativePath, status) {
+  const safeRelative = String(relativePath || "").replace(/^\/+/, "");
+  const filePath = path.resolve(SITE_MADRADOR_DIR, safeRelative);
+  if (!filePath.startsWith(SITE_MADRADOR_DIR)) {
+    sendJson(res, 403, fail("FORBIDDEN", "Chemin refuse."));
+    return true;
+  }
+  sendFile(res, status || 200, filePath, contentTypeFor(filePath));
+  return true;
+}
+
+function routeSitePage(res, pathname) {
+  const pageMap = {
+    "/": "index.html",
+    "/catalog": "catalog.html",
+    "/details": "details.html",
+    "/player": "player.html",
+    "/test-player": "player.html",
+    "/providers": "providers.html",
+    "/admin": "admin.html",
+    "/legal": "legal.html",
+    "/dmca": "dmca.html",
+    "/security": "security.html"
+  };
+  if (!pageMap[pathname]) return false;
+  return sendSiteFile(res, pageMap[pathname], 200);
 }
 
 function getPublicBaseUrl(req) {
@@ -1197,13 +1241,13 @@ const server = http.createServer(async (req, res) => {
       return;
     }
 
-    if (url.pathname === "/") {
-      sendHtml(res, 200, renderCatalogPage());
+    if (url.pathname.startsWith("/site-madrador/")) {
+      sendSiteFile(res, url.pathname.slice("/site-madrador/".length), 200);
       return;
     }
 
     if (url.pathname === "/favicon.ico" || url.pathname === "/logo.png") {
-      sendFile(res, 200, path.join(ROOT, "assets", "Logo-2.png"), "image/png");
+      sendFile(res, 200, path.join(SITE_MADRADOR_DIR, "assets", "img", "favicon.svg"), "image/svg+xml");
       return;
     }
 
@@ -1217,28 +1261,7 @@ const server = http.createServer(async (req, res) => {
       return;
     }
 
-    if (url.pathname === "/test-player") {
-      sendHtml(res, 200, renderTestPlayerPage());
-      return;
-    }
-
-    if (url.pathname === "/catalog") {
-      sendHtml(res, 200, renderCatalogPage());
-      return;
-    }
-
-    if (url.pathname === "/providers") {
-      sendHtml(res, 200, renderProvidersPage());
-      return;
-    }
-
-    if (url.pathname === "/admin") {
-      sendHtml(res, 200, renderAdminPage());
-      return;
-    }
-
-    if (["/legal", "/dmca", "/security"].includes(url.pathname)) {
-      sendHtml(res, 200, renderLegalPage(url.pathname.slice(1)));
+    if (routeSitePage(res, url.pathname)) {
       return;
     }
 
@@ -1367,9 +1390,17 @@ const server = http.createServer(async (req, res) => {
       return;
     }
 
+    if ((req.headers.accept || "").includes("text/html")) {
+      sendSiteFile(res, "404.html", 404);
+      return;
+    }
     sendJson(res, 404, fail("NOT_FOUND", "Route introuvable."));
   } catch (error) {
     logger.error(error && error.stack ? error.stack : error);
+    if ((req.headers.accept || "").includes("text/html")) {
+      sendSiteFile(res, "500.html", 500);
+      return;
+    }
     sendJson(res, 500, fail("INTERNAL_ERROR", "Erreur interne du serveur."));
   }
 });
