@@ -86,6 +86,11 @@
     if (!searchInput || !searchHost) return;
     const q = searchInput.value.trim();
     if (!q) return;
+    if (window.MadradorSearchUI && typeof window.MadradorSearchUI.renderCatalogSearch === "function") {
+      window.MadradorSearchUI.renderCatalogSearch(q, searchType ? searchType.value : "all");
+      if (suggestions) suggestions.classList.add("hidden");
+      return;
+    }
     searchHost.classList.remove("hidden");
     searchHost.innerHTML = `<div class="skeleton"></div>`;
     try {

@@ -44,11 +44,18 @@
   .bottom-bar a:hover { background: rgba(56,189,248,.12); }
   .hero { min-height: 520px; }
   .search-panel { grid-template-columns: 1fr; }
+  .quick-searches { overflow-x: auto; flex-wrap: nowrap; padding-bottom: 4px; }
+  .quick-chip { flex: 0 0 auto; }
   .section-head { align-items: start; flex-direction: column; }
   .rail { grid-auto-columns: 138px; }
   .grid { grid-template-columns: repeat(auto-fill, minmax(136px, 1fr)); gap: 12px; }
   .poster-card .body { padding: 10px; }
   .poster-card strong { min-height: 34px; font-size: 14px; }
+  .search-results-head { grid-template-columns: 1fr; align-items: start; }
+  .result-stat { width: 100%; display: flex; align-items: center; justify-content: space-between; text-align: left; }
+  .result-stat strong { font-size: 28px; }
+  .result-tabs, .result-tools { overflow-x: auto; flex-wrap: nowrap; padding-bottom: 4px; }
+  .result-tab, .sort-pill { flex: 0 0 auto; }
 }
 
 @media (max-width: 520px) {
