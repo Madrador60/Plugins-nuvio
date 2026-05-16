@@ -33,7 +33,7 @@ Ouvre `http://127.0.0.1:7000/`.
 1. Connecte le repo GitHub.
 2. Garde `render.yaml`.
 3. Configure les variables utiles :
-   - `TMDB_API_KEY`
+   - `TMDB_API_KEY` pour les affiches, nouveautes et tendances TMDB
    - `ADMIN_TOKEN`
    - `PROVIDER_TIMEOUT_MS`
 4. Deploie.

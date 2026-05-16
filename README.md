@@ -136,10 +136,12 @@ Le deploiement Render utilise `render.yaml` et `node site/server.js`.
 Variables recommandees :
 
 - `NODE_ENV=production`
-- `TMDB_API_KEY`
+- `TMDB_API_KEY` pour avoir le catalogue complet TMDB avec affiches, nouveautes et tendances
 - `ADMIN_TOKEN`
 - `PROVIDER_TIMEOUT_MS=45000`
 - `CATALOG_CACHE_TTL_MS=1800000`
+
+Sans `TMDB_API_KEY`, le site garde un catalogue de secours avec affiches, mais il ne peut pas afficher automatiquement toutes les nouveautes TMDB.
 
 ## Documentation
 

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-16T10:14:51.792Z",
+  "generatedAt": "2026-05-16T10:24:00.235Z",
   "results": [
     {
       "name": "home page",
@@ -62,7 +62,7 @@
       "status": 200,
       "type": "text/html; charset=utf-8",
       "missing": [],
-      "timeMs": 2
+      "timeMs": 1
     },
     {
       "name": "legal page",
@@ -116,7 +116,7 @@
       "status": 200,
       "type": "application/javascript; charset=utf-8",
       "missing": [],
-      "timeMs": 1
+      "timeMs": 0
     },
     {
       "name": "search js integration",
@@ -125,7 +125,7 @@
       "status": 200,
       "type": "application/javascript; charset=utf-8",
       "missing": [],
-      "timeMs": 0
+      "timeMs": 1
     },
     {
       "name": "details js integration",
@@ -177,7 +177,7 @@
       "ok": true,
       "status": 200,
       "type": "application/json; charset=utf-8",
-      "timeMs": 0
+      "timeMs": 1
     },
     {
       "name": "details api",
@@ -185,7 +185,7 @@
       "ok": true,
       "status": 200,
       "type": "application/json; charset=utf-8",
-      "timeMs": 1
+      "timeMs": 0
     },
     {
       "name": "providers api",

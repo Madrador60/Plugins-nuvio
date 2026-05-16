@@ -48,29 +48,44 @@ const animeProviders = new Set([
 
 const unstableProviders = new Set(["animoflix", "animesite", "cinemacity", "sekai", "videasy"]);
 
+function metahubPoster(imdbId) {
+  return imdbId ? "https://images.metahub.space/poster/medium/" + imdbId + "/img" : null;
+}
+
+function metahubBackground(imdbId) {
+  return imdbId ? "https://images.metahub.space/background/medium/" + imdbId + "/img" : null;
+}
+
+function fallbackItem(item) {
+  return Object.assign({}, item, {
+    poster: item.poster || metahubPoster(item.imdbId),
+    backdrop: item.backdrop || metahubBackground(item.imdbId)
+  });
+}
+
 const fallbackItems = [
-  { id: "157336", type: "movie", title: "Interstellar", year: "2014", poster: null, backdrop: null, rating: 8.4 },
-  { id: "155", type: "movie", title: "The Dark Knight", year: "2008", poster: null, backdrop: null, rating: 8.5 },
-  { id: "603", type: "movie", title: "Matrix", year: "1999", poster: null, backdrop: null, rating: 8.2 },
-  { id: "550", type: "movie", title: "Fight Club", year: "1999", poster: null, backdrop: null, rating: 8.4 },
-  { id: "27205", type: "movie", title: "Inception", year: "2010", poster: null, backdrop: null, rating: 8.4 },
-  { id: "680", type: "movie", title: "Pulp Fiction", year: "1994", poster: null, backdrop: null, rating: 8.5 },
-  { id: "13", type: "movie", title: "Forrest Gump", year: "1994", poster: null, backdrop: null, rating: 8.5 },
-  { id: "238", type: "movie", title: "Le Parrain", year: "1972", poster: null, backdrop: null, rating: 8.7 },
-  { id: "278", type: "movie", title: "Les Evades", year: "1994", poster: null, backdrop: null, rating: 8.7 },
-  { id: "496243", type: "movie", title: "Parasite", year: "2019", poster: null, backdrop: null, rating: 8.5 },
-  { id: "324857", type: "movie", title: "Spider-Man: New Generation", year: "2018", poster: null, backdrop: null, rating: 8.4 },
-  { id: "429", type: "movie", title: "Le Bon, la Brute et le Truand", year: "1966", poster: null, backdrop: null, rating: 8.5 },
-  { id: "1399", type: "series", title: "Game of Thrones", year: "2011", poster: null, backdrop: null, rating: 8.4 },
-  { id: "1396", type: "series", title: "Breaking Bad", year: "2008", poster: null, backdrop: null, rating: 8.9 },
-  { id: "66732", type: "series", title: "Stranger Things", year: "2016", poster: null, backdrop: null, rating: 8.6 },
-  { id: "60574", type: "series", title: "Peaky Blinders", year: "2013", poster: null, backdrop: null, rating: 8.5 },
-  { id: "37854", type: "series", title: "One Piece", year: "1999", poster: null, backdrop: null, rating: 8.7 },
-  { id: "31911", type: "series", title: "Fullmetal Alchemist: Brotherhood", year: "2009", poster: null, backdrop: null, rating: 8.7 },
-  { id: "46260", type: "series", title: "Naruto", year: "2002", poster: null, backdrop: null, rating: 8.4 },
-  { id: "85937", type: "series", title: "Demon Slayer", year: "2019", poster: null, backdrop: null, rating: 8.7 },
-  { id: "1429", type: "series", title: "L'Attaque des Titans", year: "2013", poster: null, backdrop: null, rating: 8.7 },
-  { id: "95479", type: "series", title: "Jujutsu Kaisen", year: "2020", poster: null, backdrop: null, rating: 8.5 }
+  fallbackItem({ id: "157336", imdbId: "tt0816692", type: "movie", title: "Interstellar", year: "2014", rating: 8.4 }),
+  fallbackItem({ id: "155", imdbId: "tt0468569", type: "movie", title: "The Dark Knight", year: "2008", rating: 8.5 }),
+  fallbackItem({ id: "603", imdbId: "tt0133093", type: "movie", title: "Matrix", year: "1999", rating: 8.2 }),
+  fallbackItem({ id: "550", imdbId: "tt0137523", type: "movie", title: "Fight Club", year: "1999", rating: 8.4 }),
+  fallbackItem({ id: "27205", imdbId: "tt1375666", type: "movie", title: "Inception", year: "2010", rating: 8.4 }),
+  fallbackItem({ id: "680", imdbId: "tt0110912", type: "movie", title: "Pulp Fiction", year: "1994", rating: 8.5 }),
+  fallbackItem({ id: "13", imdbId: "tt0109830", type: "movie", title: "Forrest Gump", year: "1994", rating: 8.5 }),
+  fallbackItem({ id: "238", imdbId: "tt0068646", type: "movie", title: "Le Parrain", year: "1972", rating: 8.7 }),
+  fallbackItem({ id: "278", imdbId: "tt0111161", type: "movie", title: "Les Evades", year: "1994", rating: 8.7 }),
+  fallbackItem({ id: "496243", imdbId: "tt6751668", type: "movie", title: "Parasite", year: "2019", rating: 8.5 }),
+  fallbackItem({ id: "324857", imdbId: "tt4633694", type: "movie", title: "Spider-Man: New Generation", year: "2018", rating: 8.4 }),
+  fallbackItem({ id: "429", imdbId: "tt0060196", type: "movie", title: "Le Bon, la Brute et le Truand", year: "1966", rating: 8.5 }),
+  fallbackItem({ id: "1399", imdbId: "tt0944947", type: "series", title: "Game of Thrones", year: "2011", rating: 8.4 }),
+  fallbackItem({ id: "1396", imdbId: "tt0903747", type: "series", title: "Breaking Bad", year: "2008", rating: 8.9 }),
+  fallbackItem({ id: "66732", imdbId: "tt4574334", type: "series", title: "Stranger Things", year: "2016", rating: 8.6 }),
+  fallbackItem({ id: "60574", imdbId: "tt2442560", type: "series", title: "Peaky Blinders", year: "2013", rating: 8.5 }),
+  fallbackItem({ id: "37854", imdbId: "tt0388629", type: "series", title: "One Piece", year: "1999", rating: 8.7 }),
+  fallbackItem({ id: "31911", imdbId: "tt1355642", type: "series", title: "Fullmetal Alchemist: Brotherhood", year: "2009", rating: 8.7 }),
+  fallbackItem({ id: "46260", imdbId: "tt0409591", type: "series", title: "Naruto", year: "2002", rating: 8.4 }),
+  fallbackItem({ id: "85937", imdbId: "tt9335498", type: "series", title: "Demon Slayer", year: "2019", rating: 8.7 }),
+  fallbackItem({ id: "1429", imdbId: "tt2560140", type: "series", title: "L'Attaque des Titans", year: "2013", rating: 8.7 }),
+  fallbackItem({ id: "95479", imdbId: "tt12343534", type: "series", title: "Jujutsu Kaisen", year: "2020", rating: 8.5 })
 ];
 
 function corsHeaders(extra) {
