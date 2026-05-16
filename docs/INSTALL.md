@@ -2,6 +2,22 @@
 
 ## Local
 
+Methode simple sur Windows :
+
+```text
+ouvrir-madrador.bat
+```
+
+ou depuis `site-madrador/` :
+
+```text
+ouvrir-site.bat
+```
+
+Garde la fenetre ouverte pendant que tu utilises le site.
+
+Methode terminal :
+
 ```powershell
 npm install
 copy .env.example .env

@@ -1241,8 +1241,14 @@ const server = http.createServer(async (req, res) => {
       return;
     }
 
+    if (url.pathname === "/site-madrador" || url.pathname === "/site-madrador/") {
+      sendSiteFile(res, "index.html", 200);
+      return;
+    }
+
     if (url.pathname.startsWith("/site-madrador/")) {
-      sendSiteFile(res, url.pathname.slice("/site-madrador/".length), 200);
+      const relativeSitePath = url.pathname.slice("/site-madrador/".length) || "index.html";
+      sendSiteFile(res, relativeSitePath, 200);
       return;
     }
 

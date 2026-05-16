@@ -13,6 +13,8 @@ const routes = [
   "/health.json",
   "/config.json",
   "/",
+  "/site-madrador",
+  "/site-madrador/",
   "/catalog",
   "/details?type=movie&id=157336",
   "/player?type=movie&id=157336&title=Interstellar",

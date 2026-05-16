@@ -10,6 +10,7 @@ const BASE = `http://127.0.0.1:${PORT}`;
 
 const checks = [
   { name: "home page", url: "/", expects: ["Madrador Film", "/catalog", "/manifest.json", "/site-madrador/assets/js/catalog.js"] },
+  { name: "site-madrador direct", url: "/site-madrador/", expects: ["Madrador Film", "/catalog", "/site-madrador/assets/css/style.css"] },
   { name: "catalog page", url: "/catalog", expects: ["Catalogue", "catalogSearch", "/site-madrador/assets/js/catalog.js", "/site-madrador/assets/js/search.js"] },
   { name: "details page", url: "/details?type=movie&id=157336", expects: ["detailsRoot", "/site-madrador/assets/js/details.js"] },
   { name: "player page", url: "/player?type=movie&id=157336&title=Interstellar", expects: ["sourceList", "/site-madrador/assets/js/player.js"] },

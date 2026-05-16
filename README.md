@@ -15,6 +15,20 @@ Le projet ne stocke aucune video, ne contourne aucun DRM, ne contourne aucun pay
 
 ## Installation locale
 
+Le plus simple sur Windows :
+
+```text
+ouvrir-madrador.bat
+```
+
+Ou depuis `site-madrador/` :
+
+```text
+ouvrir-site.bat
+```
+
+Ne double-clique pas directement sur `index.html`, car le site a besoin du serveur pour les API.
+
 ```powershell
 npm install
 copy .env.example .env
