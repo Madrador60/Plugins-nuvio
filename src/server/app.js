@@ -198,9 +198,10 @@ function sendFile(res, status, filePath, contentType) {
       sendJson(res, 404, { error: "Not found" });
       return;
     }
+    const isSiteAsset = filePath.includes(SITE_MADRADOR_DIR) || filePath.includes(path.join(ROOT, "assets"));
     res.writeHead(status, corsHeaders({
       "content-type": contentType,
-      "cache-control": "public, max-age=86400"
+      "cache-control": isSiteAsset ? "no-cache, max-age=0, must-revalidate" : "public, max-age=300"
     }));
     res.end(data);
   });
