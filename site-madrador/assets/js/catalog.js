@@ -15,6 +15,14 @@
   let activeFilter = "all";
   let suggestionTimer = 0;
 
+  async function runSearch(query, type) {
+    if (window.MadradorSearch && typeof window.MadradorSearch.runSearch === "function") {
+      return window.MadradorSearch.runSearch(query, type);
+    }
+    const data = await Madrador.getJson(`/search.json?type=${encodeURIComponent(type || "all")}&q=${encodeURIComponent(query)}`, { results: [] });
+    return data.results || [];
+  }
+
   function renderRow(row, mode) {
     const items = sortItems(filterItems(row.items || [], row));
     const body = items.length ? `<div class="${mode === "grid" ? "grid" : "rail"}">${items.map(Madrador.card).join("")}</div>` : `<div class="empty">Aucun titre dans cette section.</div>`;
@@ -80,8 +88,12 @@
     if (!q) return;
     searchHost.classList.remove("hidden");
     searchHost.innerHTML = `<div class="skeleton"></div>`;
-    const results = await window.MadradorSearch.runSearch(q, searchType ? searchType.value : "movie");
-    searchHost.innerHTML = `<div class="section-head"><h2>Recherche</h2><span class="badge info">${results.length} resultats</span></div>${results.length ? `<div class="grid">${results.map(Madrador.card).join("")}</div>` : `<div class="empty">Aucun resultat pour cette recherche.</div>`}`;
+    try {
+      const results = await runSearch(q, searchType ? searchType.value : "all");
+      searchHost.innerHTML = `<div class="section-head"><h2>Recherche</h2><span class="badge info">${results.length} resultats</span></div>${results.length ? `<div class="grid">${results.map(Madrador.card).join("")}</div>` : `<div class="empty">Aucun resultat pour cette recherche.</div>`}`;
+    } catch (error) {
+      searchHost.innerHTML = `<div class="empty">Recherche indisponible pour le moment. Recharge la page et reessaie.</div>`;
+    }
     if (suggestions) suggestions.classList.add("hidden");
   }
 
@@ -95,7 +107,7 @@
       return;
     }
     suggestionTimer = setTimeout(async () => {
-      const results = await window.MadradorSearch.runSearch(q, searchType ? searchType.value : "all");
+      const results = await runSearch(q, searchType ? searchType.value : "all");
       const items = results.slice(0, 6);
       suggestions.classList.toggle("hidden", !items.length);
       suggestions.innerHTML = items.map((item) => `<a class="badge info" style="margin:4px" href="${Madrador.detailsUrl(item)}">${Madrador.esc(item.title)} ${item.year ? "(" + Madrador.esc(item.year) + ")" : ""}</a>`).join("");

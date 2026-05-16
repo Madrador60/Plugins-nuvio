@@ -96,4 +96,63 @@
   .cast-rail {
     grid-auto-columns: 118px;
   }
+  .cinema-controls,
+  .series-top {
+    grid-template-columns: 1fr 1fr;
+  }
+  .cinema-state {
+    grid-column: 1 / -1;
+    white-space: normal;
+  }
+  .provider-tabs {
+    grid-auto-columns: minmax(105px, 1fr);
+  }
+  .cinema-source-list,
+  .cinema-filters {
+    grid-template-columns: 1fr;
+  }
+  .cinema-info {
+    grid-template-columns: 112px 1fr;
+    gap: 12px;
+    padding: 10px;
+  }
+  .cinema-rating {
+    grid-column: 1 / -1;
+    grid-template-columns: repeat(3, auto);
+    justify-content: start;
+    align-items: center;
+  }
+  .like-ring,
+  .cinema-rating strong {
+    width: 58px;
+    height: 58px;
+    font-size: 22px;
+  }
+  .cinema-title-line h1 {
+    font-size: 28px;
+  }
+  .cinema-title-line span {
+    font-size: 21px;
+  }
+  .cinema-overview {
+    max-height: 112px;
+    overflow: auto;
+    font-size: 15px;
+  }
+  .cinema-facts {
+    grid-template-columns: 1fr;
+    font-size: 12px;
+  }
+  .problem-btn {
+    margin-top: 12px;
+  }
+  .episode-lanes {
+    grid-template-columns: 1fr;
+  }
+  .episode-row {
+    grid-template-columns: 30px 1fr 28px;
+  }
+  .episode-row small {
+    display: none;
+  }
 }
