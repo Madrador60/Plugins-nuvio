@@ -91,6 +91,18 @@ function mapCinemetaMeta(meta, fallbackType) {
   };
 }
 
+function uniqueMediaItems(items, limit) {
+  const seen = new Set();
+  return (items || []).filter((item) => {
+    const key = (item.imdbId || item.id || item.title) + ":" + item.type;
+    const titleKey = normalizeText(item.title) + ":" + (item.year || "") + ":" + item.type;
+    if (seen.has(key) || seen.has(titleKey)) return false;
+    seen.add(key);
+    seen.add(titleKey);
+    return true;
+  }).slice(0, limit || 80);
+}
+
 const fallbackCast = {
   "157336": [
     { id: "10297", name: "Matthew McConaughey", character: "Cooper" },
@@ -802,6 +814,20 @@ async function searchTmdb(query, mediaType) {
     science: ["science-fiction", "science fiction", "sci fi"],
     sf: ["science-fiction", "science fiction", "sci fi"]
   };
+  const cinemetaGenre = {
+    horreur: "Horror",
+    horror: "Horror",
+    action: "Action",
+    comedie: "Comedy",
+    comedy: "Comedy",
+    romance: "Romance",
+    famille: "Family",
+    animation: "Animation",
+    anime: "Animation",
+    thriller: "Thriller",
+    science: "Sci-Fi",
+    sf: "Sci-Fi"
+  };
   const detectedGenre = Object.keys(genreAliases).find((genre) => normalizedQuery.includes(genre));
   const looseQuery = normalizedQuery
     .replace(/\b(film|films|movie|movies|serie|series|vf|vostfr|multi|episode|saison)\b/g, "")
@@ -813,6 +839,13 @@ async function searchTmdb(query, mediaType) {
     const wantedType = type === "tv" ? "series" : "movie";
     const haystack = (item) => normalizeText(item.title);
     const terms = looseQuery.split(/\s+/).filter((term) => term.length > 1);
+    const matchTerms = (item) => {
+      const text = haystack(item);
+      if (detectedGenre || yearFilter) return !terms.length || terms.some((term) => text.includes(term));
+      return text.includes(normalizedQuery) ||
+        (looseQuery && text.includes(looseQuery)) ||
+        terms.some((term) => text.includes(term));
+    };
     const localMatches = fallbackItems
       .filter((item) => item.type === wantedType)
       .filter((item) => !yearFilter || String(item.year || "") === yearFilter)
@@ -821,23 +854,19 @@ async function searchTmdb(query, mediaType) {
         const genres = (item.genres || []).map(normalizeText).join(" ");
         return genreAliases[detectedGenre].some((genre) => genres.includes(normalizeText(genre)));
       })
-      .filter((item) => {
-        const text = haystack(item);
-        if (detectedGenre || yearFilter) return !terms.length || terms.some((term) => text.includes(term));
-        return text.includes(normalizedQuery) ||
-          (looseQuery && text.includes(looseQuery)) ||
-          terms.some((term) => text.includes(term));
-      })
-      .slice(0, 10);
+      .filter(matchTerms);
+    if (detectedGenre || yearFilter) {
+      const externalCatalog = await searchCinemetaCatalog(wantedType, {
+        genre: detectedGenre ? cinemetaGenre[detectedGenre] : "",
+        year: yearFilter
+      }).catch(() => []);
+      const filteredExternal = externalCatalog.filter(matchTerms);
+      const merged = uniqueMediaItems(localMatches.concat(filteredExternal), 120);
+      if (merged.length) return merged;
+    }
     if (!detectedGenre && !yearFilter && (looseQuery || normalizedQuery).length >= 2) {
       const externalMatches = await searchCinemeta(looseQuery || normalizedQuery, wantedType).catch(() => []);
-      const seen = new Set();
-      const merged = localMatches.concat(externalMatches).filter((item) => {
-        const key = (item.imdbId || item.id || item.title) + ":" + item.type;
-        if (seen.has(key)) return false;
-        seen.add(key);
-        return true;
-      }).slice(0, 20);
+      const merged = uniqueMediaItems(localMatches.concat(externalMatches), 80);
       if (merged.length) return merged;
     }
     if (localMatches.length || normalizedQuery || looseQuery) return localMatches;
@@ -875,6 +904,27 @@ async function searchCinemeta(query, mediaType) {
       .map((meta) => mapCinemetaMeta(meta, type))
       .filter((item) => item.id && item.title)
       .slice(0, 18);
+  }, SEARCH_CACHE_TTL_MS);
+}
+
+async function searchCinemetaCatalog(mediaType, options) {
+  const type = mediaType === "series" || mediaType === "tv" ? "series" : "movie";
+  const genre = options && options.genre ? String(options.genre) : "";
+  const year = options && options.year ? String(options.year) : "";
+  if (!genre && !year) return [];
+  return cachedJson("cinemeta-catalog:" + type + ":" + genre + ":" + year, async () => {
+    const baseFilter = genre ? "genre=" + encodeURIComponent(genre) : "year=" + encodeURIComponent(year);
+    const skips = Array.from({ length: 18 }, (_, index) => index * 20);
+    const pages = await Promise.all(skips.map(async (skip) => {
+      const suffix = skip ? "&skip=" + skip : "";
+      const endpoint = "https://v3-cinemeta.strem.io/catalog/" + type + "/top/" + baseFilter + suffix + ".json";
+      const response = await fetch(endpoint);
+      if (!response.ok) return [];
+      const data = await response.json();
+      return (data.metas || []).map((meta) => mapCinemetaMeta(meta, type));
+    }));
+    return uniqueMediaItems(pages.flat()
+      .filter((item) => !year || String(item.year || "") === year), 120);
   }, SEARCH_CACHE_TTL_MS);
 }
 
