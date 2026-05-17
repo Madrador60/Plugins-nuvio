@@ -858,10 +858,12 @@ async function searchTmdb(query, mediaType) {
     if (detectedGenre || yearFilter) {
       const externalCatalog = await searchCinemetaCatalog(wantedType, {
         genre: detectedGenre ? cinemetaGenre[detectedGenre] : "",
-        year: yearFilter
+        year: yearFilter,
+        pages: 30,
+        limit: 220
       }).catch(() => []);
       const filteredExternal = externalCatalog.filter(matchTerms);
-      const merged = uniqueMediaItems(localMatches.concat(filteredExternal), 120);
+      const merged = uniqueMediaItems(localMatches.concat(filteredExternal), 220);
       if (merged.length) return merged;
     }
     if (!detectedGenre && !yearFilter && (looseQuery || normalizedQuery).length >= 2) {
@@ -911,20 +913,23 @@ async function searchCinemetaCatalog(mediaType, options) {
   const type = mediaType === "series" || mediaType === "tv" ? "series" : "movie";
   const genre = options && options.genre ? String(options.genre) : "";
   const year = options && options.year ? String(options.year) : "";
-  if (!genre && !year) return [];
-  return cachedJson("cinemeta-catalog:" + type + ":" + genre + ":" + year, async () => {
-    const baseFilter = genre ? "genre=" + encodeURIComponent(genre) : "year=" + encodeURIComponent(year);
-    const skips = Array.from({ length: 18 }, (_, index) => index * 20);
+  const pageCount = Math.max(1, Math.min(Number(options && options.pages || 18), 36));
+  const limit = Math.max(12, Math.min(Number(options && options.limit || 120), 240));
+  return cachedJson("cinemeta-catalog:" + type + ":" + genre + ":" + year + ":" + pageCount + ":" + limit, async () => {
+    const baseFilter = genre ? "genre=" + encodeURIComponent(genre) : year ? "year=" + encodeURIComponent(year) : "";
+    const skips = Array.from({ length: pageCount }, (_, index) => index * 20);
     const pages = await Promise.all(skips.map(async (skip) => {
-      const suffix = skip ? "&skip=" + skip : "";
-      const endpoint = "https://v3-cinemeta.strem.io/catalog/" + type + "/top/" + baseFilter + suffix + ".json";
+      let endpoint = "https://v3-cinemeta.strem.io/catalog/" + type + "/top";
+      if (baseFilter) endpoint += "/" + baseFilter + (skip ? "&skip=" + skip : "");
+      else if (skip) endpoint += "/skip=" + skip;
+      endpoint += ".json";
       const response = await fetch(endpoint);
       if (!response.ok) return [];
       const data = await response.json();
       return (data.metas || []).map((meta) => mapCinemetaMeta(meta, type));
     }));
     return uniqueMediaItems(pages.flat()
-      .filter((item) => !year || String(item.year || "") === year), 120);
+      .filter((item) => !year || String(item.year || "") === year), limit);
   }, SEARCH_CACHE_TTL_MS);
 }
 
@@ -1188,7 +1193,7 @@ async function tmdbList(pathname, params, type) {
   const data = await response.json();
   return (data.results || [])
     .filter((item) => item.poster_path)
-    .slice(0, 18)
+    .slice(0, 20)
     .map((item) => normalizeTmdbItem(item, type));
 }
 
@@ -1209,60 +1214,82 @@ async function catalogRow(id, group, title, pathname, params, type) {
       seen.add(key);
       return true;
     })
-    .slice(0, 36);
+    .slice(0, 72);
+  return { id, group, title, items };
+}
+
+async function cinemetaCatalogRow(id, group, title, mediaType, options) {
+  const items = await searchCinemetaCatalog(mediaType, Object.assign({ pages: 6, limit: 72 }, options || {})).catch(() => []);
   return { id, group, title, items };
 }
 
 async function getCatalogRows(forceRefresh) {
-  const cacheKey = "catalog:v4";
+  const cacheKey = "catalog:v5-big";
   if (forceRefresh) memoryCache.delete(cacheKey);
   return cachedJson(cacheKey, async () => {
     if (!TMDB_API_KEY) {
-      const movies = fallbackItems.filter((item) => item.type === "movie");
-      const series = fallbackItems.filter((item) => item.type === "series");
-      const anime = series.filter((item) => /one piece|naruto|demon|attack|attaque|jujutsu|fullmetal/i.test(item.title));
-      const rows = [
-        { id: "trending-day", group: "movie", title: "Tendances du jour", items: movies.slice(0, 12) },
-        { id: "popular-movies", group: "movie", title: "Films populaires", items: movies },
-        { id: "popular-series", group: "series", title: "Series populaires", items: series },
-        { id: "anime", group: "series", title: "Animes", items: anime.length ? anime : series },
-        { id: "french-movies", group: "movie", title: "Films francais", items: movies.slice().reverse() },
-        { id: "new-movies", group: "movie", title: "Nouveautes", items: movies.slice(0, 8) }
-      ];
+      const currentYear = new Date().getFullYear();
+      const previousYear = currentYear - 1;
+      const localMovies = fallbackItems.filter((item) => item.type === "movie");
+      const localSeries = fallbackItems.filter((item) => item.type === "series");
+      const rows = (await Promise.all([
+        cinemetaCatalogRow("popular-movies", "movie", "Films populaires", "movie", { pages: 14, limit: 160 }),
+        cinemetaCatalogRow("new-movies", "movie", "Films " + currentYear, "movie", { year: currentYear, pages: 14, limit: 140 }),
+        cinemetaCatalogRow("recent-movies", "movie", "Films " + previousYear, "movie", { year: previousYear, pages: 14, limit: 140 }),
+        cinemetaCatalogRow("movies-2024", "movie", "Films 2024", "movie", { year: 2024, pages: 22, limit: 180 }),
+        cinemetaCatalogRow("movies-2023", "movie", "Films 2023", "movie", { year: 2023, pages: 22, limit: 180 }),
+        cinemetaCatalogRow("horror", "movie", "Horreur", "movie", { genre: "Horror", pages: 12, limit: 140 }),
+        cinemetaCatalogRow("action", "movie", "Action", "movie", { genre: "Action", pages: 12, limit: 140 }),
+        cinemetaCatalogRow("thriller", "movie", "Thriller", "movie", { genre: "Thriller", pages: 12, limit: 140 }),
+        cinemetaCatalogRow("comedy", "movie", "Comedie", "movie", { genre: "Comedy", pages: 12, limit: 140 }),
+        cinemetaCatalogRow("romance", "movie", "Romance", "movie", { genre: "Romance", pages: 10, limit: 120 }),
+        cinemetaCatalogRow("sci-fi", "movie", "Science-fiction", "movie", { genre: "Sci-Fi", pages: 10, limit: 120 }),
+        cinemetaCatalogRow("family", "movie", "Famille", "movie", { genre: "Family", pages: 10, limit: 120 }),
+        cinemetaCatalogRow("animated-movies", "anime", "Films animation", "movie", { genre: "Animation", pages: 10, limit: 120 }),
+        cinemetaCatalogRow("popular-series", "series", "Series populaires", "series", { pages: 14, limit: 160 }),
+        cinemetaCatalogRow("series-drama", "series", "Series drama", "series", { genre: "Drama", pages: 12, limit: 140 }),
+        cinemetaCatalogRow("series-crime", "series", "Crime et enquete", "series", { genre: "Crime", pages: 10, limit: 120 }),
+        cinemetaCatalogRow("series-comedy", "series", "Series comedie", "series", { genre: "Comedy", pages: 10, limit: 120 }),
+        cinemetaCatalogRow("anime", "anime", "Animation et anime", "series", { genre: "Animation", pages: 12, limit: 140 })
+      ])).map((row) => {
+        const local = row.group === "series" || row.group === "anime" ? localSeries : localMovies;
+        return Object.assign({}, row, { items: uniqueMediaItems([...(row.items || []), ...local], row.items && row.items.length ? 180 : 48) });
+      }).filter((row) => row.items.length);
       return {
         rows,
         generatedAt: new Date().toISOString(),
         nextRefreshAt: new Date(Date.now() + CATALOG_CACHE_TTL_MS).toISOString(),
         cacheTtlMs: CATALOG_CACHE_TTL_MS,
         fallback: true,
-        warning: "TMDB_API_KEY absent: catalogue local de secours."
+        autoUpdate: "Sans TMDB_API_KEY, le catalogue est reconstruit automatiquement depuis le catalogue public Cinemeta et les titres locaux.",
+        warning: "TMDB_API_KEY absent: catalogue public elargi, moins complet que TMDB."
       };
     }
     const rows = await Promise.all([
-      catalogRow("trending-day", "movie", "Tendances du jour", "/trending/movie/day", { pages: 2 }, "movie"),
-      catalogRow("trending-week", "movie", "Tendances de la semaine", "/trending/movie/week", { pages: 2 }, "movie"),
-      catalogRow("new-movies", "movie", "Sorties cinema France", "/movie/now_playing", { pages: 2 }, "movie"),
-      catalogRow("upcoming-movies", "movie", "Bientot au cinema", "/movie/upcoming", { pages: 2 }, "movie"),
-      catalogRow("popular-movies", "movie", "Films populaires", "/movie/popular", { pages: 2 }, "movie"),
-      catalogRow("top-movies", "movie", "Films les mieux notes", "/movie/top_rated", { pages: 2 }, "movie"),
-      catalogRow("action", "movie", "Action", "/discover/movie", { sort_by: "popularity.desc", with_genres: "28", pages: 2 }, "movie"),
-      catalogRow("thriller", "movie", "Thriller", "/discover/movie", { sort_by: "popularity.desc", with_genres: "53", pages: 2 }, "movie"),
-      catalogRow("horror", "movie", "Horreur", "/discover/movie", { sort_by: "popularity.desc", with_genres: "27", pages: 2 }, "movie"),
-      catalogRow("comedy", "movie", "Comedies", "/discover/movie", { sort_by: "popularity.desc", with_genres: "35", pages: 2 }, "movie"),
-      catalogRow("romance", "movie", "Romance", "/discover/movie", { sort_by: "popularity.desc", with_genres: "10749", pages: 2 }, "movie"),
-      catalogRow("sci-fi", "movie", "Science-fiction", "/discover/movie", { sort_by: "popularity.desc", with_genres: "878", pages: 2 }, "movie"),
-      catalogRow("family", "movie", "Famille", "/discover/movie", { sort_by: "popularity.desc", with_genres: "10751", pages: 2 }, "movie"),
-      catalogRow("french-movies", "movie", "Films francais", "/discover/movie", { sort_by: "popularity.desc", with_original_language: "fr", pages: 2 }, "movie"),
-      catalogRow("popular-series", "series", "Series populaires", "/tv/popular", { pages: 2 }, "tv"),
-      catalogRow("airing-series", "series", "Episodes en diffusion", "/tv/on_the_air", { pages: 2 }, "tv"),
-      catalogRow("top-series", "series", "Series les mieux notees", "/tv/top_rated", { pages: 2 }, "tv"),
-      catalogRow("drama-series", "series", "Series drama", "/discover/tv", { sort_by: "popularity.desc", with_genres: "18", pages: 2 }, "tv"),
-      catalogRow("crime-series", "series", "Crime et enquete", "/discover/tv", { sort_by: "popularity.desc", with_genres: "80", pages: 2 }, "tv"),
-      catalogRow("comedy-series", "series", "Series comedie", "/discover/tv", { sort_by: "popularity.desc", with_genres: "35", pages: 2 }, "tv"),
-      catalogRow("french-series", "series", "Series francaises", "/discover/tv", { sort_by: "popularity.desc", with_original_language: "fr", pages: 2 }, "tv"),
-      catalogRow("anime", "anime", "Animation et anime", "/discover/tv", { sort_by: "popularity.desc", with_genres: "16", pages: 2 }, "tv"),
-      catalogRow("anime-jp", "anime", "Animes japonais", "/discover/tv", { sort_by: "popularity.desc", with_original_language: "ja", pages: 2 }, "tv"),
-      catalogRow("animated-movies", "anime", "Films animation", "/discover/movie", { sort_by: "popularity.desc", with_genres: "16", pages: 2 }, "movie")
+      catalogRow("trending-day", "movie", "Tendances du jour", "/trending/movie/day", { pages: 3 }, "movie"),
+      catalogRow("trending-week", "movie", "Tendances de la semaine", "/trending/movie/week", { pages: 3 }, "movie"),
+      catalogRow("new-movies", "movie", "Sorties cinema France", "/movie/now_playing", { pages: 3 }, "movie"),
+      catalogRow("upcoming-movies", "movie", "Bientot au cinema", "/movie/upcoming", { pages: 3 }, "movie"),
+      catalogRow("popular-movies", "movie", "Films populaires", "/movie/popular", { pages: 4 }, "movie"),
+      catalogRow("top-movies", "movie", "Films les mieux notes", "/movie/top_rated", { pages: 4 }, "movie"),
+      catalogRow("action", "movie", "Action", "/discover/movie", { sort_by: "popularity.desc", with_genres: "28", pages: 4 }, "movie"),
+      catalogRow("thriller", "movie", "Thriller", "/discover/movie", { sort_by: "popularity.desc", with_genres: "53", pages: 4 }, "movie"),
+      catalogRow("horror", "movie", "Horreur", "/discover/movie", { sort_by: "popularity.desc", with_genres: "27", pages: 4 }, "movie"),
+      catalogRow("comedy", "movie", "Comedies", "/discover/movie", { sort_by: "popularity.desc", with_genres: "35", pages: 4 }, "movie"),
+      catalogRow("romance", "movie", "Romance", "/discover/movie", { sort_by: "popularity.desc", with_genres: "10749", pages: 4 }, "movie"),
+      catalogRow("sci-fi", "movie", "Science-fiction", "/discover/movie", { sort_by: "popularity.desc", with_genres: "878", pages: 4 }, "movie"),
+      catalogRow("family", "movie", "Famille", "/discover/movie", { sort_by: "popularity.desc", with_genres: "10751", pages: 4 }, "movie"),
+      catalogRow("french-movies", "movie", "Films francais", "/discover/movie", { sort_by: "popularity.desc", with_original_language: "fr", pages: 4 }, "movie"),
+      catalogRow("popular-series", "series", "Series populaires", "/tv/popular", { pages: 4 }, "tv"),
+      catalogRow("airing-series", "series", "Episodes en diffusion", "/tv/on_the_air", { pages: 3 }, "tv"),
+      catalogRow("top-series", "series", "Series les mieux notees", "/tv/top_rated", { pages: 4 }, "tv"),
+      catalogRow("drama-series", "series", "Series drama", "/discover/tv", { sort_by: "popularity.desc", with_genres: "18", pages: 4 }, "tv"),
+      catalogRow("crime-series", "series", "Crime et enquete", "/discover/tv", { sort_by: "popularity.desc", with_genres: "80", pages: 4 }, "tv"),
+      catalogRow("comedy-series", "series", "Series comedie", "/discover/tv", { sort_by: "popularity.desc", with_genres: "35", pages: 4 }, "tv"),
+      catalogRow("french-series", "series", "Series francaises", "/discover/tv", { sort_by: "popularity.desc", with_original_language: "fr", pages: 4 }, "tv"),
+      catalogRow("anime", "anime", "Animation et anime", "/discover/tv", { sort_by: "popularity.desc", with_genres: "16", pages: 4 }, "tv"),
+      catalogRow("anime-jp", "anime", "Animes japonais", "/discover/tv", { sort_by: "popularity.desc", with_original_language: "ja", pages: 4 }, "tv"),
+      catalogRow("animated-movies", "anime", "Films animation", "/discover/movie", { sort_by: "popularity.desc", with_genres: "16", pages: 4 }, "movie")
     ]);
     const generatedAt = new Date();
     return {
