@@ -272,7 +272,8 @@ function sendSiteFile(res, relativePath, status) {
   return true;
 }
 
-function routeSitePage(res, pathname) {
+function routeSitePage(req, res, url) {
+  const pathname = url.pathname;
   const pageMap = {
     "/": "index.html",
     "/catalog": "catalog.html",
@@ -280,11 +281,14 @@ function routeSitePage(res, pathname) {
     "/player": "player.html",
     "/test-player": "player.html",
     "/providers": "providers.html",
-    "/admin": "admin.html",
     "/legal": "legal.html",
     "/dmca": "dmca.html",
     "/security": "security.html"
   };
+  if (pathname === "/admin") {
+    if (!isAdminAuthorized(req, url)) return sendSiteFile(res, "404.html", 404);
+    return sendSiteFile(res, "admin.html", 200);
+  }
   if (!pageMap[pathname]) return false;
   return sendSiteFile(res, pageMap[pathname], 200);
 }
@@ -1877,7 +1881,7 @@ const server = http.createServer(async (req, res) => {
       return;
     }
 
-    if (routeSitePage(res, url.pathname)) {
+    if (routeSitePage(req, res, url)) {
       return;
     }
 

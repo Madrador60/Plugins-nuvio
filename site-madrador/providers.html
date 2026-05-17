@@ -4,20 +4,38 @@
   <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Providers - Madrador Film</title>
   <link rel="icon" href="/site-madrador/assets/img/favicon.svg">
-  <link rel="stylesheet" href="/site-madrador/assets/css/style.css?v=3.6.0">
-  <link rel="stylesheet" href="/site-madrador/assets/css/responsive.css?v=3.6.0">
+  <link rel="stylesheet" href="/site-madrador/assets/css/style.css?v=3.7.0">
+  <link rel="stylesheet" href="/site-madrador/assets/css/responsive.css?v=3.7.0">
 </head>
 <body>
   <div class="app-shell">
     <header class="site-header" data-nav></header>
     <main class="main"><div class="container">
-      <div class="section-head"><div><h1 class="page-title">Providers</h1><p>Etat, score, langues, formats, domaine actif et diagnostics.</p></div><div class="toolbar"><button class="btn" id="testAllProviders">Tester tous</button><button class="btn secondary" id="testDomains">Tester domaines</button></div></div>
-      <div class="toolbar"><input class="input" id="providerFilter" placeholder="Filtrer un provider..." style="max-width:360px"><span class="badge info" id="providerCount">Chargement</span></div>
-      <section class="section grid" id="providersGrid"><div class="skeleton"></div></section>
+      <section class="providers-hero">
+        <div>
+          <span class="eyebrow">Providers Madrador</span>
+          <h1>Sources FR, domaines et diagnostics.</h1>
+          <p>Vue claire des fournisseurs actifs, lents, instables ou a porter. Les tests ne contournent aucune protection et servent seulement a diagnostiquer la disponibilite.</p>
+        </div>
+        <div class="providers-stats" id="providersStats">
+          <div><strong>...</strong><span>Total</span></div>
+          <div><strong>...</strong><span>Actifs</span></div>
+          <div><strong>...</strong><span>OK</span></div>
+          <div><strong>...</strong><span>Instables</span></div>
+        </div>
+      </section>
+      <section class="providers-toolbar">
+        <input class="input" id="providerFilter" placeholder="Filtrer par nom, domaine, format, langue...">
+        <select class="select" id="providerStateFilter"><option value="all">Tous les etats</option><option value="active">Actifs</option><option value="ok">OK</option><option value="slow">Lents / zero</option><option value="error">Erreurs</option><option value="disabled">A porter</option></select>
+        <button class="btn" id="testAllProviders">Tester tous</button>
+        <span class="badge info" id="providerCount">Chargement</span>
+      </section>
+      <div class="notice">Les providers affiches ici peuvent changer de domaine ou devenir indisponibles. Le score aide a prioriser les sources les plus fiables.</div>
+      <section class="section providers-grid" id="providersGrid"><div class="skeleton"></div></section>
     </div></main>
     <footer class="footer" data-footer></footer>
   </div>
-  <script src="/site-madrador/assets/js/app.js?v=3.6.0"></script>
-  <script src="/site-madrador/assets/js/providers.js?v=3.6.0"></script>
+  <script src="/site-madrador/assets/js/app.js?v=3.7.0"></script>
+  <script src="/site-madrador/assets/js/providers.js?v=3.7.0"></script>
 </body>
 </html>

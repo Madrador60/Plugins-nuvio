@@ -4,7 +4,6 @@
     ["/", "Accueil"],
     ["/catalog", "Catalogue"],
     ["/providers", "Providers"],
-    ["/admin", "Admin"],
     ["/legal", "Legal"]
   ];
 

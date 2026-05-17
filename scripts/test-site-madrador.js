@@ -15,7 +15,6 @@ const checks = [
   { name: "details page", url: "/details?type=movie&id=157336", expects: ["detailsRoot", "/site-madrador/assets/js/details.js"] },
   { name: "player page", url: "/player?type=movie&id=157336&title=Interstellar", expects: ["sourceList", "nextSource", "/site-madrador/assets/js/player.js"] },
   { name: "providers page", url: "/providers", expects: ["providersGrid", "/site-madrador/assets/js/providers.js", "Tester tous"] },
-  { name: "admin page", url: "/admin", expects: ["ADMIN_TOKEN", "/site-madrador/assets/js/admin.js"] },
   { name: "legal page", url: "/legal", expects: ["ne stocke aucune video"] },
   { name: "dmca page", url: "/dmca", expects: ["Retrait de contenu"] },
   { name: "security page", url: "/security", expects: ["Securite"] },
