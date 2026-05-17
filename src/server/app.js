@@ -128,6 +128,9 @@ function fallbackEpisodes(tvId, seasonNumber) {
 }
 
 const fallbackItems = [
+  fallbackItem({ id: "19995", imdbId: "tt0499549", type: "movie", title: "Avatar", year: "2009", rating: 7.6 }),
+  fallbackItem({ id: "76600", imdbId: "tt1630029", type: "movie", title: "Avatar : La voie de l'eau", year: "2022", rating: 7.6 }),
+  fallbackItem({ id: "83533", imdbId: "tt1757678", type: "movie", title: "Avatar 3", year: "2025", rating: 0 }),
   fallbackItem({ id: "157336", imdbId: "tt0816692", type: "movie", title: "Interstellar", year: "2014", rating: 8.4 }),
   fallbackItem({ id: "155", imdbId: "tt0468569", type: "movie", title: "The Dark Knight", year: "2008", rating: 8.5 }),
   fallbackItem({ id: "603", imdbId: "tt0133093", type: "movie", title: "Matrix", year: "1999", rating: 8.2 }),
@@ -759,21 +762,26 @@ async function searchTmdb(query, mediaType) {
     }).slice(0, 20);
   }
   const type = mediaType === "series" || mediaType === "tv" ? "tv" : "movie";
-  const normalizedQuery = query.trim().toLowerCase();
+  const normalizedQuery = normalizeText(query).trim();
   const looseQuery = normalizedQuery
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
     .replace(/\b(film|serie|series|anime|vf|vostfr|multi|episode|saison|horreur|action|comedie|comedy)\b/g, "")
     .replace(/\s+/g, " ")
     .trim();
   if (!TMDB_API_KEY) {
     const wantedType = type === "tv" ? "series" : "movie";
     const haystack = (item) => normalizeText(item.title);
+    const terms = looseQuery.split(/\s+/).filter((term) => term.length > 1);
     const matches = fallbackItems
       .filter((item) => item.type === wantedType)
-      .filter((item) => haystack(item).includes(normalizedQuery) || haystack(item).includes(looseQuery) || looseQuery.includes(haystack(item)))
+      .filter((item) => {
+        const text = haystack(item);
+        return text.includes(normalizedQuery) ||
+          (looseQuery && text.includes(looseQuery)) ||
+          terms.some((term) => text.includes(term));
+      })
       .slice(0, 10);
-    return matches.length ? matches : fallbackItems
+    if (matches.length || normalizedQuery || looseQuery) return matches;
+    return fallbackItems
       .filter((item) => item.type === wantedType)
       .slice(0, 10);
   }
