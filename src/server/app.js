@@ -131,6 +131,14 @@ const fallbackItems = [
   fallbackItem({ id: "19995", imdbId: "tt0499549", type: "movie", title: "Avatar", year: "2009", rating: 7.6 }),
   fallbackItem({ id: "76600", imdbId: "tt1630029", type: "movie", title: "Avatar : La voie de l'eau", year: "2022", rating: 7.6 }),
   fallbackItem({ id: "83533", imdbId: "tt1757678", type: "movie", title: "Avatar 3", year: "2025", rating: 0 }),
+  fallbackItem({ id: "533535", imdbId: "tt6263850", type: "movie", title: "Deadpool & Wolverine", year: "2024", rating: 7.6, genres: ["Action", "Comedie"] }),
+  fallbackItem({ id: "748783", imdbId: "tt5040012", type: "movie", title: "The Garfield Movie", year: "2024", rating: 7.1, genres: ["Animation", "Comedie", "Famille"] }),
+  fallbackItem({ id: "945961", imdbId: "tt22022452", type: "movie", title: "Alien: Romulus", year: "2024", rating: 7.2, genres: ["Horreur", "Science-fiction"] }),
+  fallbackItem({ id: "933260", imdbId: "tt5040012", type: "movie", title: "The Substance", year: "2024", rating: 7.3, genres: ["Horreur", "Thriller"] }),
+  fallbackItem({ id: "1029235", imdbId: "tt27489557", type: "movie", title: "Azrael", year: "2024", rating: 6.1, genres: ["Horreur", "Action"] }),
+  fallbackItem({ id: "1034541", imdbId: "tt27534307", type: "movie", title: "Terrifier 3", year: "2024", rating: 6.8, genres: ["Horreur"] }),
+  fallbackItem({ id: "1100782", imdbId: "tt28015403", type: "movie", title: "Smile 2", year: "2024", rating: 6.6, genres: ["Horreur", "Thriller"] }),
+  fallbackItem({ id: "1114513", imdbId: "tt27534307", type: "movie", title: "Abigail", year: "2024", rating: 6.8, genres: ["Horreur", "Thriller"] }),
   fallbackItem({ id: "157336", imdbId: "tt0816692", type: "movie", title: "Interstellar", year: "2014", rating: 8.4 }),
   fallbackItem({ id: "155", imdbId: "tt0468569", type: "movie", title: "The Dark Knight", year: "2008", rating: 8.5 }),
   fallbackItem({ id: "603", imdbId: "tt0133093", type: "movie", title: "Matrix", year: "1999", rating: 8.2 }),
@@ -763,8 +771,26 @@ async function searchTmdb(query, mediaType) {
   }
   const type = mediaType === "series" || mediaType === "tv" ? "tv" : "movie";
   const normalizedQuery = normalizeText(query).trim();
+  const yearFilter = (normalizedQuery.match(/\b(19|20)\d{2}\b/) || [])[0] || "";
+  const genreAliases = {
+    horreur: ["horreur", "horror", "thriller"],
+    horror: ["horreur", "horror", "thriller"],
+    action: ["action"],
+    comedie: ["comedie", "comedy"],
+    comedy: ["comedie", "comedy"],
+    romance: ["romance"],
+    famille: ["famille", "family"],
+    animation: ["animation", "anime"],
+    anime: ["anime", "animation"],
+    thriller: ["thriller"],
+    science: ["science-fiction", "science fiction", "sci fi"],
+    sf: ["science-fiction", "science fiction", "sci fi"]
+  };
+  const detectedGenre = Object.keys(genreAliases).find((genre) => normalizedQuery.includes(genre));
   const looseQuery = normalizedQuery
-    .replace(/\b(film|serie|series|anime|vf|vostfr|multi|episode|saison|horreur|action|comedie|comedy)\b/g, "")
+    .replace(/\b(film|films|movie|movies|serie|series|vf|vostfr|multi|episode|saison)\b/g, "")
+    .replace(/\b(19|20)\d{2}\b/g, "")
+    .replace(detectedGenre ? new RegExp("\\b" + detectedGenre + "\\b", "g") : /$a/, "")
     .replace(/\s+/g, " ")
     .trim();
   if (!TMDB_API_KEY) {
@@ -773,8 +799,15 @@ async function searchTmdb(query, mediaType) {
     const terms = looseQuery.split(/\s+/).filter((term) => term.length > 1);
     const matches = fallbackItems
       .filter((item) => item.type === wantedType)
+      .filter((item) => !yearFilter || String(item.year || "") === yearFilter)
+      .filter((item) => {
+        if (!detectedGenre) return true;
+        const genres = (item.genres || []).map(normalizeText).join(" ");
+        return genreAliases[detectedGenre].some((genre) => genres.includes(normalizeText(genre)));
+      })
       .filter((item) => {
         const text = haystack(item);
+        if (detectedGenre || yearFilter) return !terms.length || terms.some((term) => text.includes(term));
         return text.includes(normalizedQuery) ||
           (looseQuery && text.includes(looseQuery)) ||
           terms.some((term) => text.includes(term));
