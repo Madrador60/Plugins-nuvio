@@ -897,13 +897,14 @@ async function searchTmdb(query, mediaType) {
         year: yearFilter,
         pages: looseQuery ? 2 : 5
       }).catch(() => []);
+      const yearChecked = yearFilter ? discovered.filter((item) => String(item.year || "") === yearFilter) : discovered;
       const terms = looseQuery.split(/\s+/).filter((term) => term.length > 1);
       const filtered = terms.length
-        ? discovered.filter((item) => {
+        ? yearChecked.filter((item) => {
           const text = normalizeText(item.title);
           return terms.some((term) => text.includes(term));
         })
-        : discovered;
+        : yearChecked;
       if (filtered.length) return uniqueMediaItems(filtered, 80);
     }
     const endpoint = "https://api.themoviedb.org/3/search/" + type +
