@@ -5,41 +5,46 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Madrador Film</title>
   <link rel="icon" href="/site-madrador/assets/img/favicon.svg">
-  <link rel="stylesheet" href="/site-madrador/assets/css/style.css?v=3.3.1">
-  <link rel="stylesheet" href="/site-madrador/assets/css/responsive.css?v=3.3.1">
+  <link rel="stylesheet" href="/site-madrador/assets/css/style.css?v=3.4.0">
+  <link rel="stylesheet" href="/site-madrador/assets/css/responsive.css?v=3.4.0">
 </head>
 <body>
   <div class="app-shell">
     <header class="site-header" data-nav></header>
-    <section class="hero">
+    <section class="home-hero">
       <div class="container">
-        <span class="eyebrow">Catalogue responsable pour providers FR</span>
-        <h1>Madrador Film</h1>
-        <p>Explore films, series et animes avec une interface propre. Le site ne stocke aucune video et utilise seulement les routes de ton serveur.</p>
-        <form class="search-panel" action="/catalog" method="get">
-          <input class="input" id="homeSearch" name="q" placeholder="Rechercher un film, une serie, un anime..." autocomplete="off">
-          <select class="select" id="homeType" name="type"><option value="all">Tout</option><option value="movie">Films</option><option value="series">Series</option></select>
-          <button class="btn" id="homeGo" type="submit">Rechercher</button>
-        </form>
-        <div class="actions" style="margin-top:18px">
-          <a class="btn" href="/catalog">Ouvrir le catalogue</a>
-          <a class="btn secondary" href="/manifest.json">Installer dans Nuvio</a>
+        <div class="hero-search-card">
+          <span class="eyebrow">Streaming UI responsable</span>
+          <h1>Madrador Film</h1>
+          <p>Films, series, animes, acteurs et providers FR dans une interface plus fluide. Le site ne stocke aucune video.</p>
+          <form class="search-panel hero-search" action="/catalog" method="get">
+            <input class="input" id="homeSearch" name="q" placeholder="Rechercher films, series, acteurs..." autocomplete="off">
+            <select class="select" id="homeType" name="type"><option value="all">Tout</option><option value="movie">Films</option><option value="series">Series</option><option value="person">Acteurs</option></select>
+            <button class="btn" id="homeGo" type="submit">Rechercher</button>
+          </form>
+          <div class="quick-searches" id="searchQuick" aria-label="Recherches rapides"></div>
+          <div class="actions" style="margin-top:18px">
+            <a class="btn" href="/catalog">Ouvrir le catalogue</a>
+            <a class="btn secondary" href="/providers">Voir les providers</a>
+            <a class="btn ghost" href="/manifest.json">Installer dans Nuvio</a>
+          </div>
         </div>
       </div>
     </section>
     <main class="main">
       <div class="container">
+        <section class="spotlight" id="featuredHero"><div class="skeleton"></div></section>
         <div class="notice">Madrador Film ne stocke aucun contenu video. Les sources dependent des providers configures et peuvent etre indisponibles, lentes ou desactivees.</div>
-        <section class="section"><div class="section-head"><h2>Tendances</h2><a class="btn ghost" href="/catalog">Tout voir</a></div><div class="rail" data-row="trending-day"><div class="skeleton"></div></div></section>
-        <section class="section"><div class="section-head"><h2>Films populaires</h2></div><div class="rail" data-row="popular-movies"><div class="skeleton"></div></div></section>
-        <section class="section"><div class="section-head"><h2>Series</h2></div><div class="rail" data-row="popular-series"><div class="skeleton"></div></div></section>
-        <section class="section"><div class="section-head"><h2>Animes</h2></div><div class="rail" data-row="anime"><div class="skeleton"></div></div></section>
+        <section class="section home-row"><div class="section-head"><h2>Films tendance</h2><a class="btn ghost" href="/catalog">Voir tout</a></div><div class="rail cinematic-rail" data-row="trending-day"><div class="skeleton"></div></div></section>
+        <section class="section home-row"><div class="section-head"><h2>Films populaires</h2><a class="btn ghost" href="/catalog?type=movie">Voir tout</a></div><div class="rail cinematic-rail" data-row="popular-movies"><div class="skeleton"></div></div></section>
+        <section class="section home-row"><div class="section-head"><h2>Series tendance</h2><a class="btn ghost" href="/catalog?type=series">Voir tout</a></div><div class="rail cinematic-rail" data-row="popular-series"><div class="skeleton"></div></div></section>
+        <section class="section home-row"><div class="section-head"><h2>Animes populaires</h2><a class="btn ghost" href="/catalog?q=anime&type=all">Voir tout</a></div><div class="rail cinematic-rail" data-row="anime"><div class="skeleton"></div></div></section>
       </div>
     </main>
     <footer class="footer" data-footer></footer>
   </div>
-  <script src="/site-madrador/assets/js/app.js?v=3.3.1"></script>
-  <script src="/site-madrador/assets/js/catalog.js?v=3.3.1"></script>
-  <script src="/site-madrador/assets/js/search-ui.js?v=3.3.1"></script>
+  <script src="/site-madrador/assets/js/app.js?v=3.4.0"></script>
+  <script src="/site-madrador/assets/js/catalog.js?v=3.4.0"></script>
+  <script src="/site-madrador/assets/js/search-ui.js?v=3.4.0"></script>
 </body>
 </html>

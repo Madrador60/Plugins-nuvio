@@ -11,6 +11,7 @@
   const yearFilter = document.getElementById("yearFilter");
   const genreFilter = document.getElementById("genreFilter");
   const sortFilter = document.getElementById("sortFilter");
+  const featuredHero = document.getElementById("featuredHero");
   let catalogRows = [];
   let activeFilter = "all";
   let suggestionTimer = 0;
@@ -68,6 +69,21 @@
     applyFilter();
   }
 
+  function renderFeatured(item) {
+    if (!featuredHero || !item) return;
+    const title = item.title || "Madrador Film";
+    const backdrop = item.backdrop || item.poster || "/site-madrador/assets/img/banner.svg";
+    const rating = Number(item.rating || 0);
+    const meta = [item.year, Madrador.typeForUrl(item.type) === "series" ? "Serie" : "Film", rating ? `★ ${rating.toFixed(1)}` : ""].filter(Boolean).join(" · ");
+    featuredHero.style.backgroundImage = `linear-gradient(90deg, rgba(5,7,20,.98), rgba(5,7,20,.48), rgba(5,7,20,.94)), url("${Madrador.esc(backdrop)}")`;
+    featuredHero.innerHTML = `<div class="spotlight-copy">
+      <span class="eyebrow">Selection du moment</span>
+      <h1>${Madrador.esc(title)}</h1>
+      <p>${Madrador.esc(meta || "Catalogue Madrador Film")}</p>
+      <div class="actions"><a class="btn" href="${Madrador.detailsUrl(item)}">Voir la fiche</a><a class="btn secondary" href="/catalog">Explorer le catalogue</a></div>
+    </div>`;
+  }
+
   async function loadCatalog(force) {
     const data = await Madrador.getJson(`/catalog.json${force ? "?refresh=1" : ""}`, { rows: [] });
     catalogRows = data.rows || [];
@@ -79,6 +95,8 @@
         const row = catalogRows.find((item) => item.id === target.dataset.row) || catalogRows.find((item) => (item.title || "").toLowerCase().includes(target.dataset.row.replace("-", " ")));
         target.innerHTML = row ? (row.items || []).slice(0, 12).map(Madrador.card).join("") : `<div class="empty">Section indisponible.</div>`;
       });
+      const firstRow = catalogRows.find((row) => row.items && row.items.length);
+      if (firstRow) renderFeatured(firstRow.items[0]);
     }
   }
 
