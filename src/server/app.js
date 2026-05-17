@@ -75,6 +75,22 @@ function normalizeText(value) {
     .replace(/[\u0300-\u036f]/g, "");
 }
 
+function mapCinemetaMeta(meta, fallbackType) {
+  const type = (meta.type || fallbackType) === "series" ? "series" : "movie";
+  const year = String(meta.releaseInfo || meta.year || meta.released || "").match(/\b(19|20)\d{2}\b/);
+  return {
+    id: String(meta.id || meta.imdb_id || ""),
+    imdbId: meta.imdb_id || meta.id || null,
+    type,
+    title: meta.name || meta.title || "Sans titre",
+    year: year ? year[0] : "",
+    poster: meta.poster || null,
+    backdrop: meta.background || null,
+    rating: Number(meta.imdbRating || meta.rating || 0) || 0,
+    genres: meta.genres || meta.genre || []
+  };
+}
+
 const fallbackCast = {
   "157336": [
     { id: "10297", name: "Matthew McConaughey", character: "Cooper" },
@@ -797,7 +813,7 @@ async function searchTmdb(query, mediaType) {
     const wantedType = type === "tv" ? "series" : "movie";
     const haystack = (item) => normalizeText(item.title);
     const terms = looseQuery.split(/\s+/).filter((term) => term.length > 1);
-    const matches = fallbackItems
+    const localMatches = fallbackItems
       .filter((item) => item.type === wantedType)
       .filter((item) => !yearFilter || String(item.year || "") === yearFilter)
       .filter((item) => {
@@ -813,7 +829,18 @@ async function searchTmdb(query, mediaType) {
           terms.some((term) => text.includes(term));
       })
       .slice(0, 10);
-    if (matches.length || normalizedQuery || looseQuery) return matches;
+    if (!detectedGenre && !yearFilter && (looseQuery || normalizedQuery).length >= 2) {
+      const externalMatches = await searchCinemeta(looseQuery || normalizedQuery, wantedType).catch(() => []);
+      const seen = new Set();
+      const merged = localMatches.concat(externalMatches).filter((item) => {
+        const key = (item.imdbId || item.id || item.title) + ":" + item.type;
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      }).slice(0, 20);
+      if (merged.length) return merged;
+    }
+    if (localMatches.length || normalizedQuery || looseQuery) return localMatches;
     return fallbackItems
       .filter((item) => item.type === wantedType)
       .slice(0, 10);
@@ -833,6 +860,44 @@ async function searchTmdb(query, mediaType) {
       poster: item.poster_path ? "https://image.tmdb.org/t/p/w185" + item.poster_path : null
     }));
   }, SEARCH_CACHE_TTL_MS);
+}
+
+async function searchCinemeta(query, mediaType) {
+  const type = mediaType === "series" || mediaType === "tv" ? "series" : "movie";
+  const cleanQuery = String(query || "").trim();
+  if (cleanQuery.length < 2) return [];
+  return cachedJson("cinemeta-search:" + type + ":" + normalizeText(cleanQuery), async () => {
+    const endpoint = "https://v3-cinemeta.strem.io/catalog/" + type + "/top/search=" + encodeURIComponent(cleanQuery) + ".json";
+    const response = await fetch(endpoint);
+    if (!response.ok) throw new Error("Cinemeta search failed: HTTP " + response.status);
+    const data = await response.json();
+    return (data.metas || [])
+      .map((meta) => mapCinemetaMeta(meta, type))
+      .filter((item) => item.id && item.title)
+      .slice(0, 18);
+  }, SEARCH_CACHE_TTL_MS);
+}
+
+async function getCinemetaDetails(imdbId, mediaType) {
+  const type = mediaType === "series" || mediaType === "tv" ? "series" : "movie";
+  if (!String(imdbId || "").startsWith("tt")) return null;
+  return cachedJson("cinemeta-meta:" + type + ":" + imdbId, async () => {
+    const endpoint = "https://v3-cinemeta.strem.io/meta/" + type + "/" + encodeURIComponent(imdbId) + ".json";
+    const response = await fetch(endpoint);
+    if (!response.ok) throw new Error("Cinemeta meta failed: HTTP " + response.status);
+    const data = await response.json();
+    if (!data.meta) return null;
+    const item = mapCinemetaMeta(data.meta, type);
+    return Object.assign({}, item, {
+      overview: data.meta.description || "",
+      cast: Array.isArray(data.meta.cast) ? data.meta.cast.slice(0, 14).map((name, index) => ({
+        id: String(index + 1),
+        name,
+        character: ""
+      })) : [],
+      seasons: []
+    });
+  }, 24 * 60 * 60 * 1000);
 }
 
 async function searchPeople(query) {
@@ -877,6 +942,10 @@ async function searchPeople(query) {
 async function getTmdbDetails(tmdbId, mediaType) {
   const type = mediaType === "series" || mediaType === "tv" ? "tv" : "movie";
   if (!TMDB_API_KEY) {
+    if (String(tmdbId).startsWith("tt")) {
+      const cinemeta = await getCinemetaDetails(tmdbId, type === "tv" ? "series" : "movie").catch(() => null);
+      if (cinemeta) return cinemeta;
+    }
     const fallback = fallbackItems.find((item) => item.id === String(tmdbId));
     if (fallback) {
       return Object.assign({}, fallback, {
@@ -1501,7 +1570,7 @@ async function resolveTmdb(imdbId, mediaType) {
     return { tmdbId: imdbId, mediaType };
   }
   if (!TMDB_API_KEY) {
-    throw new Error("TMDB_API_KEY is required to resolve IMDb ids");
+    return { tmdbId: imdbId, mediaType };
   }
 
   return cachedJson("find:" + mediaType + ":" + imdbId, async () => {
