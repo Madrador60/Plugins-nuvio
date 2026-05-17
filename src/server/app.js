@@ -828,6 +828,20 @@ async function searchTmdb(query, mediaType) {
     science: "Sci-Fi",
     sf: "Sci-Fi"
   };
+  const tmdbGenreIds = {
+    horreur: "27",
+    horror: "27",
+    action: "28",
+    comedie: "35",
+    comedy: "35",
+    romance: "10749",
+    famille: "10751",
+    animation: "16",
+    anime: "16",
+    thriller: "53",
+    science: "878",
+    sf: "878"
+  };
   const detectedGenre = Object.keys(genreAliases).find((genre) => normalizedQuery.includes(genre));
   const looseQuery = normalizedQuery
     .replace(/\b(film|films|movie|movies|serie|series|vf|vostfr|multi|episode|saison)\b/g, "")
@@ -877,18 +891,35 @@ async function searchTmdb(query, mediaType) {
       .slice(0, 10);
   }
   return cachedJson("search:" + type + ":" + normalizedQuery, async () => {
+    if (detectedGenre || yearFilter) {
+      const discovered = await tmdbDiscoverSearch(type, {
+        genreId: detectedGenre ? tmdbGenreIds[detectedGenre] : "",
+        year: yearFilter,
+        pages: looseQuery ? 2 : 5
+      }).catch(() => []);
+      const terms = looseQuery.split(/\s+/).filter((term) => term.length > 1);
+      const filtered = terms.length
+        ? discovered.filter((item) => {
+          const text = normalizeText(item.title);
+          return terms.some((term) => text.includes(term));
+        })
+        : discovered;
+      if (filtered.length) return uniqueMediaItems(filtered, 80);
+    }
     const endpoint = "https://api.themoviedb.org/3/search/" + type +
       "?api_key=" + encodeURIComponent(TMDB_API_KEY) +
       "&language=fr-FR&query=" + encodeURIComponent(query);
     const response = await fetch(endpoint);
     if (!response.ok) throw new Error("TMDB search failed: HTTP " + response.status);
     const data = await response.json();
-    return (data.results || []).slice(0, 10).map((item) => ({
+    return (data.results || []).slice(0, 30).map((item) => ({
       id: String(item.id),
       type: type === "tv" ? "series" : "movie",
       title: item.title || item.name || "Sans titre",
       year: String(item.release_date || item.first_air_date || "").slice(0, 4),
-      poster: item.poster_path ? "https://image.tmdb.org/t/p/w185" + item.poster_path : null
+      poster: item.poster_path ? "https://image.tmdb.org/t/p/w185" + item.poster_path : null,
+      backdrop: item.backdrop_path ? "https://image.tmdb.org/t/p/w780" + item.backdrop_path : null,
+      rating: item.vote_average || 0
     }));
   }, SEARCH_CACHE_TTL_MS);
 }
@@ -1195,6 +1226,23 @@ async function tmdbList(pathname, params, type) {
     .filter((item) => item.poster_path)
     .slice(0, 20)
     .map((item) => normalizeTmdbItem(item, type));
+}
+
+async function tmdbDiscoverSearch(type, options) {
+  const mediaPath = type === "tv" ? "/discover/tv" : "/discover/movie";
+  const yearKey = type === "tv" ? "first_air_date_year" : "primary_release_year";
+  const pages = Math.max(1, Math.min(Number(options && options.pages || 3), 8));
+  const params = {
+    sort_by: "popularity.desc",
+    include_adult: "false"
+  };
+  if (options && options.genreId) params.with_genres = options.genreId;
+  if (options && options.year) params[yearKey] = String(options.year);
+  const lists = [];
+  for (let page = 1; page <= pages; page += 1) {
+    lists.push(tmdbList(mediaPath, Object.assign({}, params, { page: String(page) }), type));
+  }
+  return uniqueMediaItems((await Promise.all(lists)).flat(), 120);
 }
 
 async function catalogRow(id, group, title, pathname, params, type) {

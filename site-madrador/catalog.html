@@ -4,17 +4,40 @@
   <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Catalogue - Madrador Film</title>
   <link rel="icon" href="/site-madrador/assets/img/favicon.svg">
-  <link rel="stylesheet" href="/site-madrador/assets/css/style.css?v=3.4.1">
-  <link rel="stylesheet" href="/site-madrador/assets/css/responsive.css?v=3.4.1">
+  <link rel="stylesheet" href="/site-madrador/assets/css/style.css?v=3.6.0">
+  <link rel="stylesheet" href="/site-madrador/assets/css/responsive.css?v=3.6.0">
 </head>
 <body>
   <div class="app-shell">
     <header class="site-header" data-nav></header>
     <main class="main">
       <div class="container">
-        <section class="section">
-          <div class="section-head"><div><h1 class="page-title">Catalogue</h1><p>Recherche, filtres et catalogue auto depuis le backend.</p></div><button class="btn ghost" id="refreshCatalog">Rafraichir</button></div>
-          <div class="panel">
+        <section class="catalog-hero">
+          <div class="catalog-hero-copy">
+            <span class="eyebrow">Catalogue Cinema</span>
+            <h1><span>Films</span>le grand <strong>Catalogue</strong></h1>
+            <p>Explore des milliers de films et series tries par popularite, annee et genre. Les nouveautes se mettent a jour automatiquement depuis le backend.</p>
+          </div>
+          <div class="catalog-hero-stats">
+            <div><strong id="heroMovieCount">...</strong><span>Titres</span></div>
+            <div><strong id="heroProviderCount">...</strong><span>Providers</span></div>
+            <div><strong id="heroGenreCount">19</strong><span>Genres</span></div>
+          </div>
+        </section>
+
+        <section class="catalog-controls">
+          <div class="section-head">
+            <div>
+              <h2>Explorer</h2>
+              <p>Recherche par titre, acteur, genre ou annee, par exemple : film horreur 2024.</p>
+            </div>
+            <button class="btn ghost" id="refreshCatalog">Rafraichir</button>
+          </div>
+          <div class="catalog-status" id="catalogStatus">
+            <span class="badge info">Verification TMDB...</span>
+            <span class="muted">Le catalogue se met a jour automatiquement avec le cache serveur.</span>
+          </div>
+          <div class="panel catalog-search-panel">
             <form class="search-panel" action="/catalog" method="get">
               <input class="input" id="catalogSearch" name="q" placeholder="Interstellar, Naruto, film horreur 2024..." autocomplete="off">
               <select class="select" id="catalogType" name="type"><option value="all">Tout</option><option value="movie">Films</option><option value="series">Series</option><option value="person">Acteurs</option></select>
@@ -22,15 +45,35 @@
             </form>
             <div class="quick-searches" id="searchQuick" aria-label="Recherches rapides"></div>
             <div id="suggestions" class="panel hidden" style="margin-top:10px;padding:10px"></div>
-            <div class="filters" style="margin-top:14px">
+            <div class="filters catalog-type-filters">
               <button class="btn secondary" data-filter="all">Tout</button>
               <button class="btn ghost" data-filter="movie">Films</button>
               <button class="btn ghost" data-filter="series">Series</button>
               <button class="btn ghost" data-filter="anime">Animes</button>
               <select class="select" id="yearFilter" style="max-width:160px"><option value="">Annee</option></select>
-              <select class="select" id="genreFilter" style="max-width:180px"><option value="">Genre</option><option>Action</option><option>Horreur</option><option>Comedie</option><option>Anime</option></select>
+              <select class="select" id="genreFilter" style="max-width:180px"><option value="">Genre</option><option>Action</option><option>Aventure</option><option>Animation</option><option>Comedie</option><option>Crime</option><option>Documentaire</option><option>Drame</option><option>Famille</option><option>Fantastique</option><option>Histoire</option><option>Horreur</option><option>Musique</option><option>Mystere</option><option>Romance</option><option>Science-fiction</option><option>Thriller</option><option>Guerre</option></select>
               <select class="select" id="sortFilter" style="max-width:190px"><option value="popular">Populaire</option><option value="recent">Recent</option><option value="rating">Mieux note</option><option value="az">A-Z</option></select>
             </div>
+          </div>
+          <div class="genre-strip" id="genreStrip">
+            <button class="active" data-genre-chip="">Tous</button>
+            <button data-genre-chip="Action">Action</button>
+            <button data-genre-chip="Aventure">Aventure</button>
+            <button data-genre-chip="Animation">Animation</button>
+            <button data-genre-chip="Comedie">Comedie</button>
+            <button data-genre-chip="Crime">Crime</button>
+            <button data-genre-chip="Documentaire">Documentaire</button>
+            <button data-genre-chip="Drame">Drame</button>
+            <button data-genre-chip="Famille">Famille</button>
+            <button data-genre-chip="Fantastique">Fantastique</button>
+            <button data-genre-chip="Histoire">Histoire</button>
+            <button data-genre-chip="Horreur">Horreur</button>
+            <button data-genre-chip="Musique">Musique</button>
+            <button data-genre-chip="Mystere">Mystere</button>
+            <button data-genre-chip="Romance">Romance</button>
+            <button data-genre-chip="Science-fiction">Science-fiction</button>
+            <button data-genre-chip="Thriller">Thriller</button>
+            <button data-genre-chip="Guerre">Guerre</button>
           </div>
         </section>
         <section id="searchResults" class="section hidden"></section>
@@ -40,9 +83,9 @@
     </main>
     <footer class="footer" data-footer></footer>
   </div>
-  <script src="/site-madrador/assets/js/app.js?v=3.4.1"></script>
-  <script src="/site-madrador/assets/js/search.js?v=3.4.1"></script>
-  <script src="/site-madrador/assets/js/catalog.js?v=3.4.1"></script>
-  <script src="/site-madrador/assets/js/search-ui.js?v=3.4.1"></script>
+  <script src="/site-madrador/assets/js/app.js?v=3.6.0"></script>
+  <script src="/site-madrador/assets/js/search.js?v=3.6.0"></script>
+  <script src="/site-madrador/assets/js/catalog.js?v=3.6.0"></script>
+  <script src="/site-madrador/assets/js/search-ui.js?v=3.6.0"></script>
 </body>
 </html>

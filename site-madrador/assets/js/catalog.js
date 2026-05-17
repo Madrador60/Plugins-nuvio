@@ -12,9 +12,16 @@
   const genreFilter = document.getElementById("genreFilter");
   const sortFilter = document.getElementById("sortFilter");
   const featuredHero = document.getElementById("featuredHero");
+  const catalogStatus = document.getElementById("catalogStatus");
+  const heroMovieCount = document.getElementById("heroMovieCount");
+  const heroProviderCount = document.getElementById("heroProviderCount");
+  const heroGenreCount = document.getElementById("heroGenreCount");
+  const genreStrip = document.getElementById("genreStrip");
   let catalogRows = [];
   let activeFilter = "all";
   let suggestionTimer = 0;
+  const visibleCounts = {};
+  const PAGE_SIZE = 36;
 
   async function runSearch(query, type) {
     if (window.MadradorSearch && typeof window.MadradorSearch.runSearch === "function") {
@@ -26,8 +33,12 @@
 
   function renderRow(row, mode) {
     const items = sortItems(filterItems(row.items || [], row));
-    const body = items.length ? `<div class="${mode === "grid" ? "grid" : "rail"}">${items.map(Madrador.card).join("")}</div>` : `<div class="empty">Aucun titre dans cette section.</div>`;
-    return `<section class="section" data-group="${Madrador.esc(row.group || "movie")}" data-title="${Madrador.esc(row.title || "")}"><div class="section-head"><h2>${Madrador.esc(row.title)}</h2><span class="badge info">${items.length} titres</span></div>${body}</section>`;
+    const rowId = row.id || row.title || "row";
+    const visible = Math.min(visibleCounts[rowId] || PAGE_SIZE, items.length);
+    const shown = items.slice(0, visible);
+    const body = items.length ? `<div class="${mode === "grid" ? "grid" : "rail"}">${shown.map(Madrador.card).join("")}</div>` : `<div class="empty">Aucun titre dans cette section.</div>`;
+    const more = items.length > visible ? `<button class="btn ghost load-more-row" data-row-id="${Madrador.esc(rowId)}">Charger plus (${items.length - visible})</button>` : "";
+    return `<section class="section" data-group="${Madrador.esc(row.group || "movie")}" data-title="${Madrador.esc(row.title || "")}"><div class="section-head"><h2>${Madrador.esc(row.title)}</h2><span class="badge info">${visible}/${items.length} titres</span></div>${body}${more}</section>`;
   }
 
   function applyFilter() {
@@ -87,6 +98,15 @@
   async function loadCatalog(force) {
     const data = await Madrador.getJson(`/catalog.json${force ? "?refresh=1" : ""}`, { rows: [] });
     catalogRows = data.rows || [];
+    const total = catalogRows.reduce((sum, row) => sum + ((row.items || []).length), 0);
+    const groups = catalogRows.reduce((set, row) => set.add(row.group || "movie"), new Set());
+    if (heroMovieCount) heroMovieCount.textContent = total ? total.toLocaleString("fr-FR") : "...";
+    if (heroProviderCount) heroProviderCount.textContent = groups.size ? String(Math.max(groups.size, 3)) : "...";
+    if (heroGenreCount) heroGenreCount.textContent = genreStrip ? String(Math.max(genreStrip.querySelectorAll("[data-genre-chip]").length - 1, 19)) : "19";
+    if (catalogStatus) {
+      const tmdbActive = data.fallback !== true;
+      catalogStatus.innerHTML = `<span class="badge ${tmdbActive ? "ok" : "warn"}">${tmdbActive ? "TMDB actif" : "TMDB absent"}</span><span class="muted">${total} titres charges · ${Madrador.esc(data.autoUpdate || data.warning || "Cache catalogue actif")}</span>`;
+    }
     if (rowsHost) {
       rerenderCatalog();
     }
@@ -174,6 +194,20 @@
   if (searchInput) searchInput.addEventListener("input", updateSuggestions);
   if (searchType) searchType.addEventListener("change", updateSuggestions);
   if (refreshButton) refreshButton.addEventListener("click", () => loadCatalog(true));
+  if (genreStrip) genreStrip.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-genre-chip]");
+    if (!button) return;
+    genreStrip.querySelectorAll("[data-genre-chip]").forEach((item) => item.classList.toggle("active", item === button));
+    if (genreFilter) genreFilter.value = button.dataset.genreChip || "";
+    rerenderCatalog();
+  });
+  if (rowsHost) rowsHost.addEventListener("click", (event) => {
+    const button = event.target.closest(".load-more-row");
+    if (!button) return;
+    const rowId = button.dataset.rowId;
+    visibleCounts[rowId] = (visibleCounts[rowId] || PAGE_SIZE) + PAGE_SIZE;
+    rerenderCatalog();
+  });
   if (yearFilter) yearFilter.addEventListener("change", rerenderCatalog);
   if (genreFilter) genreFilter.addEventListener("change", rerenderCatalog);
   if (sortFilter) sortFilter.addEventListener("change", rerenderCatalog);
