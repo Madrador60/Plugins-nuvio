@@ -163,7 +163,7 @@ button, input, select {
 
 .platform-hero-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(310px, .42fr);
+  grid-template-columns: minmax(0, 900px);
   gap: clamp(22px, 5vw, 56px);
   align-items: center;
 }
