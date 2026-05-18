@@ -1,5 +1,15 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <defs><linearGradient id="g" x1="0" x2="1"><stop stop-color="#38bdf8"/><stop offset="1" stop-color="#8b5cf6"/></linearGradient></defs>
-  <rect width="64" height="64" rx="16" fill="#080b1c"/>
-  <path d="M17 45V18h8l7 13 7-13h8v27h-8V31l-5 10h-4l-5-10v14z" fill="url(#g)"/>
+  <defs>
+    <linearGradient id="g" x1="0" x2="1" y1="0" y2="1">
+      <stop stop-color="#fff7b0"/>
+      <stop offset=".5" stop-color="#f8c248"/>
+      <stop offset="1" stop-color="#7c3aed"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="16" fill="#050714"/>
+  <path d="M12 38C16 18 31 10 51 19" fill="none" stroke="url(#g)" stroke-width="5" stroke-linecap="round"/>
+  <path d="M19 42h30l-3 10H22z" fill="#080b1c" stroke="#f8c248" stroke-width="2"/>
+  <path d="M27 40l9-14 10 14z" fill="#f8c248" opacity=".35"/>
+  <path d="M44 18a8 8 0 1 0 6 13 10 10 0 1 1-6-13z" fill="#f8c248"/>
+  <text x="32" y="50" text-anchor="middle" font-family="Georgia,serif" font-size="20" font-weight="900" fill="url(#g)">M</text>
 </svg>

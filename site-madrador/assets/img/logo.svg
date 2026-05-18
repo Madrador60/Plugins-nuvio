@@ -1,12 +1,50 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 64" role="img" aria-label="Madrador Film">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 120" role="img" aria-label="Madrador Streaming Film">
   <defs>
-    <linearGradient id="g" x1="0" x2="1">
-      <stop offset="0" stop-color="#38bdf8"/>
-      <stop offset="1" stop-color="#8b5cf6"/>
+    <linearGradient id="gold" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#fff7b0"/>
+      <stop offset=".32" stop-color="#f8c248"/>
+      <stop offset=".62" stop-color="#a96a12"/>
+      <stop offset="1" stop-color="#ffe28a"/>
     </linearGradient>
+    <linearGradient id="blue" x1="0" x2="1">
+      <stop offset="0" stop-color="#0ea5e9"/>
+      <stop offset="1" stop-color="#7c3aed"/>
+    </linearGradient>
+    <radialGradient id="sky" cx="52%" cy="42%" r="62%">
+      <stop offset="0" stop-color="#17345d"/>
+      <stop offset=".52" stop-color="#071329"/>
+      <stop offset="1" stop-color="#02040c"/>
+    </radialGradient>
+    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="0" stdDeviation="2.4" flood-color="#f8c248" flood-opacity=".6"/>
+      <feDropShadow dx="0" dy="5" stdDeviation="5" flood-color="#000" flood-opacity=".65"/>
+    </filter>
   </defs>
-  <rect width="64" height="64" rx="16" fill="#0b1028"/>
-  <path d="M17 45V18h8l7 13 7-13h8v27h-8V31l-5 10h-4l-5-10v14z" fill="url(#g)"/>
-  <text x="76" y="30" fill="#fff" font-family="Inter,Segoe UI,sans-serif" font-size="22" font-weight="800">Madrador</text>
-  <text x="76" y="51" fill="#93c5fd" font-family="Inter,Segoe UI,sans-serif" font-size="18" font-weight="700">Film</text>
+
+  <rect width="360" height="120" fill="none"/>
+  <g filter="url(#glow)">
+    <path d="M72 63C87 25 121 9 181 10c58 1 94 20 110 59" fill="url(#sky)" stroke="url(#gold)" stroke-width="4"/>
+    <path d="M84 54c39-20 87-27 153-12 25 6 45 16 58 28" fill="none" stroke="#f8c248" stroke-width="3" opacity=".78"/>
+    <path d="M108 61h171" stroke="#f8c248" stroke-width="2" opacity=".8"/>
+
+    <path d="M213 23a21 21 0 1 0 20 31 25 25 0 1 1-20-31z" fill="url(#gold)"/>
+    <path d="M116 63l36-35 35 35z" fill="#06101f"/>
+    <path d="M143 63l44-44 50 44z" fill="#0a1426"/>
+    <path d="M152 61l23-26 15 26z" fill="#f8c248" opacity=".28"/>
+    <path d="M102 67c25-8 132-8 170 0" stroke="#fff7b0" stroke-width="2" opacity=".75"/>
+
+    <path d="M76 61c-11-12-22-16-33-12 15-11 28-11 39-1-2-13 5-25 20-32-10 13-12 25-7 36 8-11 20-15 34-12-16 5-25 14-26 27z" fill="#020816" opacity=".92"/>
+
+    <path d="M65 21c71-27 172-26 238 11" fill="none" stroke="url(#gold)" stroke-width="8" stroke-linecap="round"/>
+    <g stroke="#2b1605" stroke-width="2">
+      <path d="M83 17l4 11M103 12l3 11M124 8l2 12M146 6l1 12M169 5v12M192 6l-1 12M214 8l-2 12M236 12l-4 12M257 18l-5 11M277 25l-7 10"/>
+    </g>
+  </g>
+
+  <g filter="url(#glow)">
+    <path d="M42 70c26-7 256-7 284 0l-14 33H58z" fill="#030611" stroke="url(#gold)" stroke-width="3"/>
+    <path d="M60 99c58 11 181 12 251-2" fill="none" stroke="url(#blue)" stroke-width="5" opacity=".9"/>
+    <text x="180" y="96" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="48" font-weight="900" letter-spacing="2" fill="url(#gold)" stroke="#271000" stroke-width="1.2">MADRADOR</text>
+  </g>
+  <text x="180" y="116" text-anchor="middle" font-family="Inter, Segoe UI, sans-serif" font-size="10" font-weight="800" letter-spacing="7" fill="#c6a15a">STREAMING FILM</text>
 </svg>

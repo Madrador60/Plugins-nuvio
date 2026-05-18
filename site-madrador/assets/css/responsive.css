@@ -3,6 +3,7 @@
     grid-template-columns: 1fr;
     min-height: auto;
   }
+  .home-compact-search,
   .platform-hero-grid,
   .providers-hero {
     grid-template-columns: 1fr;
@@ -17,7 +18,7 @@
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
   .nav { min-height: 66px; grid-template-columns: auto 1fr auto; }
-  .brand img { width: 136px; }
+  .brand img { width: 150px; }
   .nav-search { order: 3; grid-column: 1 / -1; max-width: none; }
   .mobile-toggle { display: inline-flex; }
   .nav-links {
@@ -83,6 +84,9 @@
   .catalog-hero {
     margin-top: 10px;
     padding: 22px 16px;
+  }
+  .home-compact-search {
+    grid-template-columns: 1fr;
   }
   .platform-home {
     min-height: auto;

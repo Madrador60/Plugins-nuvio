@@ -5,31 +5,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Madrador Film</title>
   <link rel="icon" href="/site-madrador/assets/img/favicon.svg">
-  <link rel="stylesheet" href="/site-madrador/assets/css/style.css?v=3.7.2">
-  <link rel="stylesheet" href="/site-madrador/assets/css/responsive.css?v=3.7.2">
+  <link rel="stylesheet" href="/site-madrador/assets/css/style.css?v=3.8.0">
+  <link rel="stylesheet" href="/site-madrador/assets/css/responsive.css?v=3.8.0">
 </head>
 <body>
   <div class="app-shell">
     <header class="site-header" data-nav></header>
-    <section class="home-hero platform-home">
+    <section class="home-compact">
       <div class="container">
-        <div class="platform-hero-grid">
-          <div class="platform-copy">
-            <span class="eyebrow">Madrador Film</span>
-            <h1>Films, series et animes dans une interface rapide.</h1>
-            <p>Un catalogue propre, des fiches riches, une recherche TMDB et des providers FR suivis avec diagnostics. Le site ne stocke aucune video.</p>
-            <form class="search-panel hero-search" action="/catalog" method="get">
-              <input class="input" id="homeSearch" name="q" placeholder="Rechercher films, series, acteurs..." autocomplete="off">
-              <select class="select" id="homeType" name="type"><option value="all">Tout</option><option value="movie">Films</option><option value="series">Series</option><option value="person">Acteurs</option></select>
-              <button class="btn" id="homeGo" type="submit">Rechercher</button>
-            </form>
-            <div class="quick-searches" id="searchQuick" aria-label="Recherches rapides"></div>
-            <div class="actions" style="margin-top:18px">
-              <a class="btn" href="/catalog">Explorer le catalogue</a>
-              <a class="btn secondary" href="/providers">Etat des providers</a>
-            </div>
-          </div>
-        </div>
+        <form class="home-compact-search" action="/catalog" method="get">
+          <input class="input" id="homeSearch" name="q" placeholder="Rechercher films, series, acteurs..." autocomplete="off">
+          <select class="select" id="homeType" name="type"><option value="all">Tout</option><option value="movie">Films</option><option value="series">Series</option><option value="person">Acteurs</option></select>
+          <button class="btn" id="homeGo" type="submit">Rechercher</button>
+        </form>
+        <div class="quick-searches compact-quick" id="searchQuick" aria-label="Recherches rapides"></div>
       </div>
     </section>
     <main class="main">
@@ -50,8 +39,8 @@
     </main>
     <footer class="footer" data-footer></footer>
   </div>
-  <script src="/site-madrador/assets/js/app.js?v=3.7.2"></script>
-  <script src="/site-madrador/assets/js/catalog.js?v=3.7.2"></script>
-  <script src="/site-madrador/assets/js/search-ui.js?v=3.7.2"></script>
+  <script src="/site-madrador/assets/js/app.js?v=3.8.0"></script>
+  <script src="/site-madrador/assets/js/catalog.js?v=3.8.0"></script>
+  <script src="/site-madrador/assets/js/search-ui.js?v=3.8.0"></script>
 </body>
 </html>

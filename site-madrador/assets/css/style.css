@@ -69,7 +69,7 @@ button, input, select {
   letter-spacing: 0;
 }
 
-.brand img { width: 158px; height: auto; display: block; }
+.brand img { width: 178px; height: auto; display: block; }
 .nav-links { display: flex; align-items: center; gap: 8px; }
 .nav-links a {
   color: var(--muted);
@@ -149,6 +149,26 @@ button, input, select {
     radial-gradient(circle at 15% 0%, rgba(56, 189, 248, .24), transparent 32%),
     radial-gradient(circle at 80% 20%, rgba(139, 92, 246, .32), transparent 36%),
     url("/site-madrador/assets/img/banner.svg") center/cover;
+}
+
+.home-compact {
+  border-bottom: 1px solid rgba(56, 189, 248, .14);
+  background:
+    linear-gradient(90deg, rgba(5, 7, 20, .94), rgba(9, 14, 36, .84)),
+    radial-gradient(circle at 15% 0%, rgba(56,189,248,.14), transparent 28%),
+    radial-gradient(circle at 85% 0%, rgba(139,92,246,.16), transparent 32%);
+  padding: 18px 0 14px;
+}
+
+.home-compact-search {
+  display: grid;
+  grid-template-columns: minmax(0, 560px) 120px auto;
+  gap: 10px;
+  align-items: center;
+}
+
+.compact-quick {
+  margin-top: 10px;
 }
 
 .platform-home {
