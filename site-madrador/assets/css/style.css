@@ -151,26 +151,6 @@ button, input, select {
     url("/site-madrador/assets/img/banner.svg") center/cover;
 }
 
-.home-compact {
-  border-bottom: 1px solid rgba(56, 189, 248, .14);
-  background:
-    linear-gradient(90deg, rgba(5, 7, 20, .94), rgba(9, 14, 36, .84)),
-    radial-gradient(circle at 15% 0%, rgba(56,189,248,.14), transparent 28%),
-    radial-gradient(circle at 85% 0%, rgba(139,92,246,.16), transparent 32%);
-  padding: 18px 0 14px;
-}
-
-.home-compact-search {
-  display: grid;
-  grid-template-columns: minmax(0, 560px) 120px auto;
-  gap: 10px;
-  align-items: center;
-}
-
-.compact-quick {
-  margin-top: 10px;
-}
-
 .platform-home {
   min-height: 620px;
   align-items: center;
@@ -238,28 +218,6 @@ button, input, select {
   font-size: 24px;
 }
 
-.home-strip {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 10px;
-  margin: -4px 0 24px;
-}
-
-.home-strip a {
-  min-height: 54px;
-  display: grid;
-  place-items: center;
-  border: 1px solid rgba(56, 189, 248, .18);
-  border-radius: 16px;
-  background: rgba(8, 13, 32, .78);
-  color: #dbeafe;
-  font-weight: 900;
-}
-
-.home-strip a:hover {
-  border-color: rgba(56, 189, 248, .58);
-  background: rgba(56, 189, 248, .1);
-}
 .home-hero::before {
   content: "";
   position: absolute;

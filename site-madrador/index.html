@@ -5,30 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Madrador Film</title>
   <link rel="icon" href="/site-madrador/assets/img/favicon.svg">
-  <link rel="stylesheet" href="/site-madrador/assets/css/style.css?v=3.8.0">
-  <link rel="stylesheet" href="/site-madrador/assets/css/responsive.css?v=3.8.0">
+  <link rel="stylesheet" href="/site-madrador/assets/css/style.css?v=3.8.1">
+  <link rel="stylesheet" href="/site-madrador/assets/css/responsive.css?v=3.8.1">
 </head>
 <body>
   <div class="app-shell">
     <header class="site-header" data-nav></header>
-    <section class="home-compact">
-      <div class="container">
-        <form class="home-compact-search" action="/catalog" method="get">
-          <input class="input" id="homeSearch" name="q" placeholder="Rechercher films, series, acteurs..." autocomplete="off">
-          <select class="select" id="homeType" name="type"><option value="all">Tout</option><option value="movie">Films</option><option value="series">Series</option><option value="person">Acteurs</option></select>
-          <button class="btn" id="homeGo" type="submit">Rechercher</button>
-        </form>
-        <div class="quick-searches compact-quick" id="searchQuick" aria-label="Recherches rapides"></div>
-      </div>
-    </section>
     <main class="main">
       <div class="container">
-        <section class="home-strip">
-          <a href="/catalog?q=film%20horreur%202024&type=movie">Horreur 2024</a>
-          <a href="/catalog?q=black%20panther&type=movie">Black Panther</a>
-          <a href="/catalog?q=anime&type=all">Animes VF/VOSTFR</a>
-          <a href="/catalog?q=keanu%20reeves&type=person">Acteurs</a>
-        </section>
         <section class="spotlight" id="featuredHero"><div class="skeleton"></div></section>
         <div class="notice">Madrador Film ne stocke aucun contenu video. Les sources dependent des providers configures et peuvent etre indisponibles, lentes ou desactivees.</div>
         <section class="section home-row"><div class="section-head"><h2>Films tendance</h2><a class="btn ghost" href="/catalog">Voir tout</a></div><div class="rail cinematic-rail" data-row="trending-day"><div class="skeleton"></div></div></section>
@@ -39,8 +23,7 @@
     </main>
     <footer class="footer" data-footer></footer>
   </div>
-  <script src="/site-madrador/assets/js/app.js?v=3.8.0"></script>
-  <script src="/site-madrador/assets/js/catalog.js?v=3.8.0"></script>
-  <script src="/site-madrador/assets/js/search-ui.js?v=3.8.0"></script>
+  <script src="/site-madrador/assets/js/app.js?v=3.8.1"></script>
+  <script src="/site-madrador/assets/js/catalog.js?v=3.8.1"></script>
 </body>
 </html>

@@ -3,13 +3,9 @@
     grid-template-columns: 1fr;
     min-height: auto;
   }
-  .home-compact-search,
   .platform-hero-grid,
   .providers-hero {
     grid-template-columns: 1fr;
-  }
-  .home-strip {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
   .providers-toolbar {
     grid-template-columns: 1fr 1fr;
@@ -85,9 +81,6 @@
     margin-top: 10px;
     padding: 22px 16px;
   }
-  .home-compact-search {
-    grid-template-columns: 1fr;
-  }
   .platform-home {
     min-height: auto;
   }
@@ -97,7 +90,6 @@
   .platform-panel {
     padding: 12px;
   }
-  .home-strip,
   .providers-stats,
   .providers-toolbar {
     grid-template-columns: 1fr;
