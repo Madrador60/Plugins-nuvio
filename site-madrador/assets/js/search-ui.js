@@ -4,6 +4,8 @@
     { label: "Naruto VF", q: "naruto vf", type: "all" },
     { label: "One Piece", q: "one piece", type: "all" },
     { label: "Horreur 2024", q: "film horreur 2024", type: "movie" },
+    { label: "Action 2024", q: "action 2024", type: "movie" },
+    { label: "Black Panther", q: "black panther", type: "movie" },
     { label: "Keanu Reeves", q: "keanu reeves", type: "person" }
   ];
   let lastQuery = "";

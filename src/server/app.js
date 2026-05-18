@@ -799,7 +799,7 @@ async function searchTmdb(query, mediaType) {
       if (seen.has(key)) return false;
       seen.add(key);
       return true;
-    }).slice(0, 20);
+    }).slice(0, 80);
   }
   const type = mediaType === "series" || mediaType === "tv" ? "tv" : "movie";
   const normalizedQuery = normalizeText(query).trim();
@@ -808,6 +808,8 @@ async function searchTmdb(query, mediaType) {
     horreur: ["horreur", "horror", "thriller"],
     horror: ["horreur", "horror", "thriller"],
     action: ["action"],
+    aventure: ["aventure", "adventure"],
+    adventure: ["aventure", "adventure"],
     comedie: ["comedie", "comedy"],
     comedy: ["comedie", "comedy"],
     romance: ["romance"],
@@ -815,6 +817,15 @@ async function searchTmdb(query, mediaType) {
     animation: ["animation", "anime"],
     anime: ["anime", "animation"],
     thriller: ["thriller"],
+    crime: ["crime"],
+    drame: ["drame", "drama"],
+    drama: ["drame", "drama"],
+    fantastique: ["fantastique", "fantasy"],
+    fantasy: ["fantastique", "fantasy"],
+    guerre: ["guerre", "war"],
+    war: ["guerre", "war"],
+    documentaire: ["documentaire", "documentary"],
+    documentary: ["documentaire", "documentary"],
     science: ["science-fiction", "science fiction", "sci fi"],
     sf: ["science-fiction", "science fiction", "sci fi"]
   };
@@ -822,6 +833,8 @@ async function searchTmdb(query, mediaType) {
     horreur: "Horror",
     horror: "Horror",
     action: "Action",
+    aventure: "Adventure",
+    adventure: "Adventure",
     comedie: "Comedy",
     comedy: "Comedy",
     romance: "Romance",
@@ -829,6 +842,15 @@ async function searchTmdb(query, mediaType) {
     animation: "Animation",
     anime: "Animation",
     thriller: "Thriller",
+    crime: "Crime",
+    drame: "Drama",
+    drama: "Drama",
+    fantastique: "Fantasy",
+    fantasy: "Fantasy",
+    guerre: "War",
+    war: "War",
+    documentaire: "Documentary",
+    documentary: "Documentary",
     science: "Sci-Fi",
     sf: "Sci-Fi"
   };
@@ -836,6 +858,8 @@ async function searchTmdb(query, mediaType) {
     horreur: "27",
     horror: "27",
     action: "28",
+    aventure: "12",
+    adventure: "12",
     comedie: "35",
     comedy: "35",
     romance: "10749",
@@ -843,12 +867,22 @@ async function searchTmdb(query, mediaType) {
     animation: "16",
     anime: "16",
     thriller: "53",
+    crime: "80",
+    drame: "18",
+    drama: "18",
+    fantastique: "14",
+    fantasy: "14",
+    guerre: "10752",
+    war: "10752",
+    documentaire: "99",
+    documentary: "99",
     science: "878",
     sf: "878"
   };
   const detectedGenre = Object.keys(genreAliases).find((genre) => normalizedQuery.includes(genre));
+  const detectedFrench = /\b(francais|francaise|francaises|français|française|françaises|french)\b/.test(normalizedQuery);
   const looseQuery = normalizedQuery
-    .replace(/\b(film|films|movie|movies|serie|series|vf|vostfr|multi|episode|saison)\b/g, "")
+    .replace(/\b(film|films|movie|movies|serie|series|vf|vostfr|multi|episode|saison|francais|francaise|francaises|français|française|françaises|french)\b/g, "")
     .replace(/\b(19|20)\d{2}\b/g, "")
     .replace(detectedGenre ? new RegExp("\\b" + detectedGenre + "\\b", "g") : /$a/, "")
     .replace(/\s+/g, " ")
@@ -895,11 +929,12 @@ async function searchTmdb(query, mediaType) {
       .slice(0, 10);
   }
   return cachedJson("search:" + type + ":" + normalizedQuery, async () => {
-    if (detectedGenre || yearFilter) {
+    if (detectedGenre || yearFilter || detectedFrench) {
       const discovered = await tmdbDiscoverSearch(type, {
         genreId: detectedGenre ? tmdbGenreIds[detectedGenre] : "",
         year: yearFilter,
-        pages: looseQuery ? 2 : 5
+        originalLanguage: detectedFrench ? "fr" : "",
+        pages: looseQuery ? 4 : 8
       }).catch(() => []);
       const yearChecked = yearFilter ? discovered.filter((item) => String(item.year || "") === yearFilter) : discovered;
       const terms = looseQuery.split(/\s+/).filter((term) => term.length > 1);
@@ -909,24 +944,40 @@ async function searchTmdb(query, mediaType) {
           return terms.some((term) => text.includes(term));
         })
         : yearChecked;
-      if (filtered.length) return uniqueMediaItems(filtered, 80);
+      if (filtered.length) return uniqueMediaItems(filtered, 160);
+      if (looseQuery.length >= 2) {
+        const direct = await tmdbTextSearch(type, looseQuery).catch(() => []);
+        const directFiltered = direct
+          .filter((item) => !yearFilter || String(item.year || "") === yearFilter)
+          .filter((item) => {
+            if (!detectedGenre) return true;
+            const genres = (item.genres || []).map(normalizeText).join(" ");
+            return !genres || genreAliases[detectedGenre].some((genre) => genres.includes(normalizeText(genre)));
+          });
+        if (directFiltered.length) return uniqueMediaItems(directFiltered, 80);
+      }
     }
-    const endpoint = "https://api.themoviedb.org/3/search/" + type +
-      "?api_key=" + encodeURIComponent(TMDB_API_KEY) +
-      "&language=fr-FR&query=" + encodeURIComponent(query);
-    const response = await fetch(endpoint);
-    if (!response.ok) throw new Error("TMDB search failed: HTTP " + response.status);
-    const data = await response.json();
-    return (data.results || []).slice(0, 30).map((item) => ({
-      id: String(item.id),
-      type: type === "tv" ? "series" : "movie",
-      title: item.title || item.name || "Sans titre",
-      year: String(item.release_date || item.first_air_date || "").slice(0, 4),
-      poster: item.poster_path ? "https://image.tmdb.org/t/p/w185" + item.poster_path : null,
-      backdrop: item.backdrop_path ? "https://image.tmdb.org/t/p/w780" + item.backdrop_path : null,
-      rating: item.vote_average || 0
-    }));
+    return tmdbTextSearch(type, query);
   }, SEARCH_CACHE_TTL_MS);
+}
+
+async function tmdbTextSearch(type, query) {
+  const endpoint = "https://api.themoviedb.org/3/search/" + type +
+    "?api_key=" + encodeURIComponent(TMDB_API_KEY) +
+    "&language=fr-FR&include_adult=false&query=" + encodeURIComponent(query);
+  const response = await fetch(endpoint);
+  if (!response.ok) throw new Error("TMDB search failed: HTTP " + response.status);
+  const data = await response.json();
+  return (data.results || []).slice(0, 60).map((item) => ({
+    id: String(item.id),
+    type: type === "tv" ? "series" : "movie",
+    title: item.title || item.name || "Sans titre",
+    year: String(item.release_date || item.first_air_date || "").slice(0, 4),
+    poster: item.poster_path ? "https://image.tmdb.org/t/p/w185" + item.poster_path : null,
+    backdrop: item.backdrop_path ? "https://image.tmdb.org/t/p/w780" + item.backdrop_path : null,
+    rating: item.vote_average || 0,
+    genreIds: item.genre_ids || []
+  }));
 }
 
 async function searchCinemeta(query, mediaType) {
@@ -1243,6 +1294,7 @@ async function tmdbDiscoverSearch(type, options) {
   };
   if (options && options.genreId) params.with_genres = options.genreId;
   if (options && options.year) params[yearKey] = String(options.year);
+  if (options && options.originalLanguage) params.with_original_language = String(options.originalLanguage);
   const lists = [];
   for (let page = 1; page <= pages; page += 1) {
     lists.push(tmdbList(mediaPath, Object.assign({}, params, { page: String(page) }), type));
@@ -1267,17 +1319,17 @@ async function catalogRow(id, group, title, pathname, params, type) {
       seen.add(key);
       return true;
     })
-    .slice(0, 72);
+    .slice(0, 120);
   return { id, group, title, items };
 }
 
 async function cinemetaCatalogRow(id, group, title, mediaType, options) {
-  const items = await searchCinemetaCatalog(mediaType, Object.assign({ pages: 6, limit: 72 }, options || {})).catch(() => []);
+  const items = await searchCinemetaCatalog(mediaType, Object.assign({ pages: 8, limit: 120 }, options || {})).catch(() => []);
   return { id, group, title, items };
 }
 
 async function getCatalogRows(forceRefresh) {
-  const cacheKey = "catalog:v5-big";
+  const cacheKey = "catalog:v6-boosted";
   if (forceRefresh) memoryCache.delete(cacheKey);
   return cachedJson(cacheKey, async () => {
     if (!TMDB_API_KEY) {

@@ -1223,6 +1223,33 @@ button, input, select {
   padding: 12px 14px;
 }
 
+.catalog-boost-links {
+  display: flex;
+  gap: 10px;
+  margin: 12px 0 14px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.catalog-boost-links a {
+  flex: 0 0 auto;
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 15px;
+  border: 1px solid rgba(56, 189, 248, .22);
+  border-radius: 999px;
+  background: linear-gradient(135deg, rgba(14, 165, 233, .12), rgba(124, 58, 237, .12));
+  color: #dbeafe;
+  font-weight: 900;
+}
+
+.catalog-boost-links a:hover {
+  border-color: rgba(56, 189, 248, .6);
+  background: linear-gradient(135deg, rgba(14, 165, 233, .24), rgba(124, 58, 237, .22));
+}
+
 .providers-hero {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(330px, .5fr);
