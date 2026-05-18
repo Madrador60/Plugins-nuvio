@@ -4,8 +4,8 @@
   <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Providers - Madrador Film</title>
   <link rel="icon" href="/site-madrador/assets/img/favicon.svg">
-  <link rel="stylesheet" href="/site-madrador/assets/css/style.css?v=3.9.0">
-  <link rel="stylesheet" href="/site-madrador/assets/css/responsive.css?v=3.9.0">
+  <link rel="stylesheet" href="/site-madrador/assets/css/style.css?v=3.10.0">
+  <link rel="stylesheet" href="/site-madrador/assets/css/responsive.css?v=3.10.0">
 </head>
 <body>
   <div class="app-shell">
@@ -28,14 +28,15 @@
         <input class="input" id="providerFilter" placeholder="Filtrer par nom, domaine, format, langue...">
         <select class="select" id="providerStateFilter"><option value="all">Tous les etats</option><option value="active">Actifs</option><option value="ok">OK</option><option value="slow">Lents / zero</option><option value="error">Erreurs</option><option value="disabled">A porter</option></select>
         <button class="btn" id="testAllProviders">Tester tous</button>
+        <button class="btn secondary" id="testDomains">Tester domaines</button>
         <span class="badge info" id="providerCount">Chargement</span>
       </section>
-      <div class="notice">Les providers affiches ici peuvent changer de domaine ou devenir indisponibles. Le score aide a prioriser les sources les plus fiables.</div>
+      <div class="notice" id="domainsNotice">Les providers affiches ici peuvent changer de domaine. Le bouton domaines verifie DNS Cloudflare + reponse HTTP, puis met le meilleur domaine connu en premier.</div>
       <section class="section providers-grid" id="providersGrid"><div class="skeleton"></div></section>
     </div></main>
     <footer class="footer" data-footer></footer>
   </div>
-  <script src="/site-madrador/assets/js/app.js?v=3.9.0"></script>
-  <script src="/site-madrador/assets/js/providers.js?v=3.9.0"></script>
+  <script src="/site-madrador/assets/js/app.js?v=3.10.0"></script>
+  <script src="/site-madrador/assets/js/providers.js?v=3.10.0"></script>
 </body>
 </html>

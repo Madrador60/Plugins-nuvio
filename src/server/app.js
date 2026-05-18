@@ -11,7 +11,7 @@ const ROOT = path.resolve(__dirname, "..", "..");
 const SITE_MADRADOR_DIR = path.join(ROOT, "site-madrador");
 const REPORTS_DIR = path.join(ROOT, "data", "reports");
 const nuvioManifest = require(path.join(ROOT, "manifest.json"));
-const domains = require(path.join(ROOT, "domains.json"));
+const DOMAINS_FILE = path.join(ROOT, "domains.json");
 
 const SITE_NAME = "Madrador Film";
 const SITE_VERSION = "2.0.0";
@@ -355,10 +355,22 @@ function safeFilename(value, extension) {
 }
 
 function getProviderDomains(providerId) {
+  let domains = {};
+  try {
+    domains = JSON.parse(fs.readFileSync(DOMAINS_FILE, "utf8"));
+  } catch {
+    domains = {};
+  }
   const entry = domains[providerId];
   if (!entry) return [];
   if (Array.isArray(entry)) return entry;
   return Array.isArray(entry.domains) ? entry.domains : [];
+}
+
+function getProviderActiveDomain(providerId) {
+  const status = domainService.getDomainStatus()[providerId];
+  if (status && status.activeDomain) return status.activeDomain;
+  return getProviderDomains(providerId)[0] || "";
 }
 
 function getProviderSummary(mediaType) {
@@ -2029,6 +2041,27 @@ const server = http.createServer(async (req, res) => {
       return;
     }
 
+    if (url.pathname === "/domains/status.json") {
+      sendJson(res, 200, {
+        success: true,
+        statuses: domainService.getDomainStatus()
+      });
+      return;
+    }
+
+    if (req.method === "POST" && url.pathname === "/domains/check.json") {
+      const cacheKey = "public-domain-check";
+      const cached = memoryCache.get(cacheKey);
+      if (cached && cached.expiresAt > Date.now()) {
+        sendJson(res, 200, { success: true, cached: true, results: cached.value });
+        return;
+      }
+      const results = await domainService.checkDomains({ timeoutMs: 8000, writeDomains: true });
+      memoryCache.set(cacheKey, { value: results, expiresAt: Date.now() + 5 * 60 * 1000 });
+      sendJson(res, 200, { success: true, cached: false, results });
+      return;
+    }
+
     if (url.pathname === "/providers.json") {
       const statuses = providerStatusService.getProviderStatuses();
       sendJson(res, 200, {
@@ -2043,7 +2076,8 @@ const server = http.createServer(async (req, res) => {
           languages: provider.contentLanguage || [],
           formats: provider.formats || [],
           domains: getProviderDomains(provider.id),
-          activeDomain: getProviderDomains(provider.id)[0] || "",
+          activeDomain: getProviderActiveDomain(provider.id),
+          domainStatus: domainService.getDomainStatus()[provider.id] || null,
           status: statuses[provider.id] || null,
           type: animeProviders.has(provider.id) ? "anime" : "movie"
         }))

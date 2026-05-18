@@ -1,88 +1,112 @@
 {
   "frenchstream": {
     "domains": [
-      "https://fstream.info",
-      "https://fs03.lol",
-      "https://french-stream.one"
+      "https://fstream.info/",
+      "https://fs03.lol/",
+      "https://french-stream.one/"
     ],
-    "lastChecked": null,
-    "status": "unknown"
+    "candidates": [],
+    "lastChecked": "2026-05-18T06:45:03.497Z",
+    "status": "working",
+    "activeDomain": "https://fstream.info/"
   },
   "movix": {
     "domains": [
-      "https://movix.cash"
+      "https://movix.cash/"
     ],
-    "lastChecked": null,
-    "status": "unknown"
+    "candidates": [],
+    "lastChecked": "2026-05-18T06:45:03.559Z",
+    "status": "down",
+    "activeDomain": "https://movix.cash/"
   },
   "purstream": {
     "domains": [
-      "https://purstream.art"
+      "https://purstream.art/"
     ],
-    "lastChecked": null,
-    "status": "unknown"
+    "candidates": [],
+    "lastChecked": "2026-05-18T06:45:03.666Z",
+    "status": "down",
+    "activeDomain": "https://purstream.art/"
   },
   "toflix": {
     "domains": [
-      "https://toflix.sbs"
+      "https://toflix.sbs/"
     ],
-    "lastChecked": null,
-    "status": "unknown"
+    "candidates": [],
+    "lastChecked": "2026-05-18T06:45:03.772Z",
+    "status": "down",
+    "activeDomain": "https://toflix.sbs/"
   },
   "cinemacity": {
     "domains": [
-      "https://cinemacity.cc"
+      "https://cinemacity.cc/"
     ],
-    "lastChecked": null,
-    "status": "unknown"
+    "candidates": [],
+    "lastChecked": "2026-05-18T06:45:03.977Z",
+    "status": "working",
+    "activeDomain": "https://cinemacity.cc/"
   },
   "afterdark": {
     "domains": [
-      "https://afterdark.best"
+      "https://afterdark.best/"
     ],
-    "lastChecked": null,
-    "status": "unknown"
+    "candidates": [],
+    "lastChecked": "2026-05-18T06:45:04.096Z",
+    "status": "down",
+    "activeDomain": "https://afterdark.best/"
   },
   "frenchmanga": {
     "domains": [
-      "https://w16.french-manga.net"
+      "https://w16.french-manga.net/"
     ],
-    "lastChecked": null,
-    "status": "unknown"
+    "candidates": [],
+    "lastChecked": "2026-05-18T06:45:04.306Z",
+    "status": "working",
+    "activeDomain": "https://w16.french-manga.net/"
   },
   "frembed": {
     "domains": [
-      "https://frembed.one"
+      "https://frembed.one/"
     ],
-    "lastChecked": null,
-    "status": "unknown"
+    "candidates": [],
+    "lastChecked": "2026-05-18T06:45:04.464Z",
+    "status": "working",
+    "activeDomain": "https://frembed.one/"
   },
   "kidraz": {
     "domains": [
       "https://www.kidraz.com/saby1jy/home/kidraz"
     ],
-    "lastChecked": null,
-    "status": "unknown"
+    "candidates": [],
+    "lastChecked": "2026-05-18T06:45:04.596Z",
+    "status": "working",
+    "activeDomain": "https://www.kidraz.com/saby1jy/home/kidraz"
   },
   "otakufr": {
     "domains": [
-      "https://otakufr.cc"
+      "https://otakufr.cc/"
     ],
-    "lastChecked": null,
-    "status": "unknown"
+    "candidates": [],
+    "lastChecked": "2026-05-18T06:45:12.688Z",
+    "status": "down",
+    "activeDomain": "https://otakufr.cc/"
   },
   "unjourunfilm": {
     "domains": [
-      "https://1jour1film0126b.site"
+      "https://1jour1film0126b.site/"
     ],
-    "lastChecked": null,
-    "status": "unknown"
+    "candidates": [],
+    "lastChecked": "2026-05-18T06:45:12.972Z",
+    "status": "working",
+    "activeDomain": "https://1jour1film0126b.site/"
   },
   "wiflix": {
     "domains": [
-      "http://flemmix.best"
+      "http://flemmix.best/"
     ],
-    "lastChecked": null,
-    "status": "unknown"
+    "candidates": [],
+    "lastChecked": "2026-05-18T06:45:13.077Z",
+    "status": "down",
+    "activeDomain": null
   }
 }

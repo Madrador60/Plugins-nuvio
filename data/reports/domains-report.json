@@ -1,70 +1,252 @@
 {
   "frenchstream": {
     "status": "working",
-    "activeDomain": "https://fs03.lol/",
-    "lastChecked": "2026-05-16T09:28:53.972Z",
+    "activeDomain": "https://fstream.info/",
+    "dnsWorking": 3,
+    "httpWorking": 2,
+    "lastChecked": "2026-05-18T06:45:03.497Z",
     "domains": [
       {
         "url": "https://fstream.info/",
         "ok": true,
         "statusCode": 200,
-        "responseTime": 147,
+        "responseTime": 270,
+        "hostname": "fstream.info",
+        "dns": {
+          "ok": true,
+          "provider": "cloudflare-dns",
+          "hostname": "fstream.info",
+          "records": [
+            {
+              "type": "A",
+              "value": "188.114.96.2",
+              "ttl": 129
+            },
+            {
+              "type": "A",
+              "value": "188.114.97.2",
+              "ttl": 129
+            },
+            {
+              "type": "AAAA",
+              "value": "2a06:98c1:3120::2",
+              "ttl": 300
+            },
+            {
+              "type": "AAAA",
+              "value": "2a06:98c1:3121::2",
+              "ttl": 300
+            }
+          ],
+          "error": null
+        },
         "error": null
       },
       {
         "url": "https://fs03.lol/",
         "ok": true,
         "statusCode": 200,
-        "responseTime": 130,
+        "responseTime": 303,
+        "hostname": "fs03.lol",
+        "dns": {
+          "ok": true,
+          "provider": "cloudflare-dns",
+          "hostname": "fs03.lol",
+          "records": [
+            {
+              "type": "A",
+              "value": "172.67.176.167",
+              "ttl": 245
+            },
+            {
+              "type": "A",
+              "value": "104.21.64.58",
+              "ttl": 245
+            },
+            {
+              "type": "AAAA",
+              "value": "2606:4700:3037::ac43:b0a7",
+              "ttl": 111
+            },
+            {
+              "type": "AAAA",
+              "value": "2606:4700:3031::6815:403a",
+              "ttl": 111
+            }
+          ],
+          "error": null
+        },
         "error": null
       },
       {
         "url": "https://french-stream.one/",
         "ok": false,
         "statusCode": 0,
-        "responseTime": 13,
+        "responseTime": 62,
+        "hostname": "french-stream.one",
+        "dns": {
+          "ok": true,
+          "provider": "cloudflare-dns",
+          "hostname": "french-stream.one",
+          "records": [
+            {
+              "type": "A",
+              "value": "104.21.26.145",
+              "ttl": 194
+            },
+            {
+              "type": "A",
+              "value": "172.67.136.130",
+              "ttl": 194
+            },
+            {
+              "type": "AAAA",
+              "value": "2606:4700:3030::6815:1a91",
+              "ttl": 207
+            },
+            {
+              "type": "AAAA",
+              "value": "2606:4700:3033::ac43:8882",
+              "ttl": 207
+            }
+          ],
+          "error": null
+        },
         "error": "fetch failed"
       }
     ]
   },
   "movix": {
     "status": "down",
-    "activeDomain": null,
-    "lastChecked": "2026-05-16T09:28:53.985Z",
+    "activeDomain": "https://movix.cash/",
+    "dnsWorking": 1,
+    "httpWorking": 0,
+    "lastChecked": "2026-05-18T06:45:03.559Z",
     "domains": [
       {
         "url": "https://movix.cash/",
         "ok": false,
         "statusCode": 0,
-        "responseTime": 12,
+        "responseTime": 62,
+        "hostname": "movix.cash",
+        "dns": {
+          "ok": true,
+          "provider": "cloudflare-dns",
+          "hostname": "movix.cash",
+          "records": [
+            {
+              "type": "A",
+              "value": "188.114.97.2",
+              "ttl": 284
+            },
+            {
+              "type": "A",
+              "value": "188.114.96.2",
+              "ttl": 284
+            },
+            {
+              "type": "AAAA",
+              "value": "2a06:98c1:3120::2",
+              "ttl": 83
+            },
+            {
+              "type": "AAAA",
+              "value": "2a06:98c1:3121::2",
+              "ttl": 83
+            }
+          ],
+          "error": null
+        },
         "error": "fetch failed"
       }
     ]
   },
   "purstream": {
     "status": "down",
-    "activeDomain": null,
-    "lastChecked": "2026-05-16T09:28:53.996Z",
+    "activeDomain": "https://purstream.art/",
+    "dnsWorking": 1,
+    "httpWorking": 0,
+    "lastChecked": "2026-05-18T06:45:03.666Z",
     "domains": [
       {
         "url": "https://purstream.art/",
         "ok": false,
         "statusCode": 0,
-        "responseTime": 11,
+        "responseTime": 107,
+        "hostname": "purstream.art",
+        "dns": {
+          "ok": true,
+          "provider": "cloudflare-dns",
+          "hostname": "purstream.art",
+          "records": [
+            {
+              "type": "A",
+              "value": "104.21.16.188",
+              "ttl": 300
+            },
+            {
+              "type": "A",
+              "value": "172.67.215.140",
+              "ttl": 300
+            },
+            {
+              "type": "AAAA",
+              "value": "2606:4700:3031::ac43:d78c",
+              "ttl": 300
+            },
+            {
+              "type": "AAAA",
+              "value": "2606:4700:3036::6815:10bc",
+              "ttl": 300
+            }
+          ],
+          "error": null
+        },
         "error": "fetch failed"
       }
     ]
   },
   "toflix": {
     "status": "down",
-    "activeDomain": null,
-    "lastChecked": "2026-05-16T09:28:54.007Z",
+    "activeDomain": "https://toflix.sbs/",
+    "dnsWorking": 1,
+    "httpWorking": 0,
+    "lastChecked": "2026-05-18T06:45:03.772Z",
     "domains": [
       {
         "url": "https://toflix.sbs/",
         "ok": false,
         "statusCode": 0,
-        "responseTime": 11,
+        "responseTime": 106,
+        "hostname": "toflix.sbs",
+        "dns": {
+          "ok": true,
+          "provider": "cloudflare-dns",
+          "hostname": "toflix.sbs",
+          "records": [
+            {
+              "type": "A",
+              "value": "104.21.48.113",
+              "ttl": 281
+            },
+            {
+              "type": "A",
+              "value": "172.67.150.181",
+              "ttl": 281
+            },
+            {
+              "type": "AAAA",
+              "value": "2606:4700:3030::6815:3071",
+              "ttl": 300
+            },
+            {
+              "type": "AAAA",
+              "value": "2606:4700:3035::ac43:96b5",
+              "ttl": 300
+            }
+          ],
+          "error": null
+        },
         "error": "fetch failed"
       }
     ]
@@ -72,27 +254,89 @@
   "cinemacity": {
     "status": "working",
     "activeDomain": "https://cinemacity.cc/",
-    "lastChecked": "2026-05-16T09:28:54.147Z",
+    "dnsWorking": 1,
+    "httpWorking": 1,
+    "lastChecked": "2026-05-18T06:45:03.977Z",
     "domains": [
       {
         "url": "https://cinemacity.cc/",
         "ok": true,
         "statusCode": 200,
-        "responseTime": 140,
+        "responseTime": 205,
+        "hostname": "cinemacity.cc",
+        "dns": {
+          "ok": true,
+          "provider": "cloudflare-dns",
+          "hostname": "cinemacity.cc",
+          "records": [
+            {
+              "type": "A",
+              "value": "172.67.144.119",
+              "ttl": 58
+            },
+            {
+              "type": "A",
+              "value": "104.21.47.48",
+              "ttl": 58
+            },
+            {
+              "type": "AAAA",
+              "value": "2606:4700:3031::6815:2f30",
+              "ttl": 300
+            },
+            {
+              "type": "AAAA",
+              "value": "2606:4700:3033::ac43:9077",
+              "ttl": 300
+            }
+          ],
+          "error": null
+        },
         "error": null
       }
     ]
   },
   "afterdark": {
     "status": "down",
-    "activeDomain": null,
-    "lastChecked": "2026-05-16T09:28:54.159Z",
+    "activeDomain": "https://afterdark.best/",
+    "dnsWorking": 1,
+    "httpWorking": 0,
+    "lastChecked": "2026-05-18T06:45:04.096Z",
     "domains": [
       {
         "url": "https://afterdark.best/",
         "ok": false,
         "statusCode": 0,
-        "responseTime": 12,
+        "responseTime": 119,
+        "hostname": "afterdark.best",
+        "dns": {
+          "ok": true,
+          "provider": "cloudflare-dns",
+          "hostname": "afterdark.best",
+          "records": [
+            {
+              "type": "A",
+              "value": "172.67.146.64",
+              "ttl": 300
+            },
+            {
+              "type": "A",
+              "value": "104.21.81.199",
+              "ttl": 300
+            },
+            {
+              "type": "AAAA",
+              "value": "2606:4700:3035::6815:51c7",
+              "ttl": 300
+            },
+            {
+              "type": "AAAA",
+              "value": "2606:4700:3034::ac43:9240",
+              "ttl": 300
+            }
+          ],
+          "error": null
+        },
         "error": "fetch failed"
       }
     ]
@@ -100,13 +344,44 @@
   "frenchmanga": {
     "status": "working",
     "activeDomain": "https://w16.french-manga.net/",
-    "lastChecked": "2026-05-16T09:28:54.309Z",
+    "dnsWorking": 1,
+    "httpWorking": 1,
+    "lastChecked": "2026-05-18T06:45:04.306Z",
     "domains": [
       {
         "url": "https://w16.french-manga.net/",
         "ok": true,
         "statusCode": 200,
-        "responseTime": 150,
+        "responseTime": 210,
+        "hostname": "w16.french-manga.net",
+        "dns": {
+          "ok": true,
+          "provider": "cloudflare-dns",
+          "hostname": "w16.french-manga.net",
+          "records": [
+            {
+              "type": "A",
+              "value": "188.114.97.2",
+              "ttl": 119
+            },
+            {
+              "type": "A",
+              "value": "188.114.96.2",
+              "ttl": 119
+            },
+            {
+              "type": "AAAA",
+              "value": "2a06:98c1:3120::2",
+              "ttl": 279
+            },
+            {
+              "type": "AAAA",
+              "value": "2a06:98c1:3121::2",
+              "ttl": 279
+            }
+          ],
+          "error": null
+        },
         "error": null
       }
     ]
@@ -114,41 +389,134 @@
   "frembed": {
     "status": "working",
     "activeDomain": "https://frembed.one/",
-    "lastChecked": "2026-05-16T09:28:54.399Z",
+    "dnsWorking": 1,
+    "httpWorking": 1,
+    "lastChecked": "2026-05-18T06:45:04.464Z",
     "domains": [
       {
         "url": "https://frembed.one/",
         "ok": true,
         "statusCode": 200,
-        "responseTime": 90,
+        "responseTime": 158,
+        "hostname": "frembed.one",
+        "dns": {
+          "ok": true,
+          "provider": "cloudflare-dns",
+          "hostname": "frembed.one",
+          "records": [
+            {
+              "type": "A",
+              "value": "172.67.196.28",
+              "ttl": 240
+            },
+            {
+              "type": "A",
+              "value": "104.21.76.143",
+              "ttl": 240
+            },
+            {
+              "type": "AAAA",
+              "value": "2606:4700:3037::6815:4c8f",
+              "ttl": 300
+            },
+            {
+              "type": "AAAA",
+              "value": "2606:4700:3036::ac43:c41c",
+              "ttl": 300
+            }
+          ],
+          "error": null
+        },
         "error": null
       }
     ]
   },
   "kidraz": {
-    "status": "down",
-    "activeDomain": null,
-    "lastChecked": "2026-05-16T09:29:02.402Z",
+    "status": "working",
+    "activeDomain": "https://www.kidraz.com/saby1jy/home/kidraz",
+    "dnsWorking": 1,
+    "httpWorking": 1,
+    "lastChecked": "2026-05-18T06:45:04.596Z",
     "domains": [
       {
         "url": "https://www.kidraz.com/saby1jy/home/kidraz",
-        "ok": false,
-        "statusCode": 0,
-        "responseTime": 8003,
-        "error": "This operation was aborted"
+        "ok": true,
+        "statusCode": 200,
+        "responseTime": 132,
+        "hostname": "www.kidraz.com",
+        "dns": {
+          "ok": true,
+          "provider": "cloudflare-dns",
+          "hostname": "kidraz.com",
+          "records": [
+            {
+              "type": "A",
+              "value": "188.114.96.2",
+              "ttl": 300
+            },
+            {
+              "type": "A",
+              "value": "188.114.97.2",
+              "ttl": 300
+            },
+            {
+              "type": "AAAA",
+              "value": "2a06:98c1:3121::2",
+              "ttl": 300
+            },
+            {
+              "type": "AAAA",
+              "value": "2a06:98c1:3120::2",
+              "ttl": 300
+            }
+          ],
+          "error": null
+        },
+        "error": null
       }
     ]
   },
   "otakufr": {
     "status": "down",
-    "activeDomain": null,
-    "lastChecked": "2026-05-16T09:29:10.410Z",
+    "activeDomain": "https://otakufr.cc/",
+    "dnsWorking": 1,
+    "httpWorking": 0,
+    "lastChecked": "2026-05-18T06:45:12.688Z",
     "domains": [
       {
         "url": "https://otakufr.cc/",
         "ok": false,
         "statusCode": 0,
-        "responseTime": 8008,
+        "responseTime": 8091,
+        "hostname": "otakufr.cc",
+        "dns": {
+          "ok": true,
+          "provider": "cloudflare-dns",
+          "hostname": "otakufr.cc",
+          "records": [
+            {
+              "type": "A",
+              "value": "188.114.97.2",
+              "ttl": 300
+            },
+            {
+              "type": "A",
+              "value": "188.114.96.2",
+              "ttl": 300
+            },
+            {
+              "type": "AAAA",
+              "value": "2a06:98c1:3120::2",
+              "ttl": 300
+            },
+            {
+              "type": "AAAA",
+              "value": "2a06:98c1:3121::2",
+              "ttl": 300
+            }
+          ],
+          "error": null
+        },
         "error": "This operation was aborted"
       }
     ]
@@ -156,13 +524,44 @@
   "unjourunfilm": {
     "status": "working",
     "activeDomain": "https://1jour1film0126b.site/",
-    "lastChecked": "2026-05-16T09:29:10.528Z",
+    "dnsWorking": 1,
+    "httpWorking": 1,
+    "lastChecked": "2026-05-18T06:45:12.972Z",
     "domains": [
       {
         "url": "https://1jour1film0126b.site/",
         "ok": true,
         "statusCode": 403,
-        "responseTime": 117,
+        "responseTime": 284,
+        "hostname": "1jour1film0126b.site",
+        "dns": {
+          "ok": true,
+          "provider": "cloudflare-dns",
+          "hostname": "1jour1film0126b.site",
+          "records": [
+            {
+              "type": "A",
+              "value": "188.114.96.2",
+              "ttl": 300
+            },
+            {
+              "type": "A",
+              "value": "188.114.97.2",
+              "ttl": 300
+            },
+            {
+              "type": "AAAA",
+              "value": "2a06:98c1:3120::2",
+              "ttl": 300
+            },
+            {
+              "type": "AAAA",
+              "value": "2a06:98c1:3121::2",
+              "ttl": 300
+            }
+          ],
+          "error": null
+        },
         "error": null
       }
     ]
@@ -170,13 +569,23 @@
   "wiflix": {
     "status": "down",
     "activeDomain": null,
-    "lastChecked": "2026-05-16T09:29:10.539Z",
+    "dnsWorking": 0,
+    "httpWorking": 0,
+    "lastChecked": "2026-05-18T06:45:13.077Z",
     "domains": [
       {
         "url": "http://flemmix.best/",
         "ok": false,
         "statusCode": 0,
-        "responseTime": 11,
+        "responseTime": 105,
+        "hostname": "flemmix.best",
+        "dns": {
+          "ok": false,
+          "provider": "cloudflare-dns",
+          "hostname": "flemmix.best",
+          "records": [],
+          "error": "No DNS record"
+        },
         "error": "fetch failed"
       }
     ]

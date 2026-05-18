@@ -1393,6 +1393,16 @@ button, input, select {
   gap: 6px;
 }
 
+.provider-active-domain {
+  border: 1px solid rgba(56, 189, 248, .22);
+  border-radius: 12px;
+  background: rgba(56, 189, 248, .08);
+  color: #dbeafe;
+  padding: 10px 12px;
+  font-weight: 850;
+  overflow-wrap: anywhere;
+}
+
 .provider-domains span {
   border: 1px solid rgba(56, 189, 248, .16);
   border-radius: 10px;

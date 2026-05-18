@@ -73,9 +73,9 @@
     return `<a class="poster-card" href="${detailsUrl(item)}"><span class="poster-media"><img src="${esc(poster)}" alt="">${rating ? `<span class="poster-rating">★ ${rating.toFixed(1)}</span>` : ""}<span class="poster-type">${esc(typeLabel)}</span></span><span class="body"><strong>${esc(title)}</strong><small>${esc(meta || "Madrador Film")}</small><span class="poster-action">Voir la fiche</span></span></a>`;
   }
 
-  async function getJson(url, fallback) {
+  async function getJson(url, fallback, options) {
     try {
-      const response = await fetch(url);
+      const response = await fetch(url, options || {});
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       return await response.json();
     } catch (error) {
